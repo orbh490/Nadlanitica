@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>מצפן פיננסי לרוכש דירה</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f7f7f9; color: #222; }
+  h1 { font-size: 22px; }
+  section { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+  label { display: block; margin-top: 10px; font-size: 14px; }
+  input[type=number], input.money-input { width: 100%; padding: 6px; box-sizing: border-box; }
+  .checkbox-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .checkbox-row input { width: auto; }
+  button { margin-top: 16px; padding: 8px 20px; background: #2a6df4; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  button:hover { background: #1d55c4; }
+  .result { margin-top: 14px; padding: 12px; border-radius: 6px; font-size: 15px; }
+  .result.ok { background: #e6f7ea; border: 1px solid #8fd6a8; }
+  .result.bad { background: #fdeaea; border: 1px solid #f0a5a5; }
+  select { width: 100%; padding: 6px; }
+</style>
+</head>
+<body>
+  <h1>מצפן פיננסי לרוכש הישראלי - כלי בדיקה טכני</h1>
+  <p><a href="/home.html">← לעמוד הבית</a> · <a href="/dashboard.html">למשכנתאות</a> · <a href="/leads.html">לידים (ניהול)</a></p>
+
+  <section>
+    <h2>מחשבון הון עצמי נדרש</h2>
+    <label>הון עצמי זמין (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="availableEquity" value="150000"></label>
+    <label>הכנסה חודשית נטו (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="monthlyIncome" value="15000"></label>
+    <label>סוג הרכישה
+      <select id="category">
+        <option value="SINGLE">דירה יחידה (אין לי דירה אחרת) — הון עצמי מינ' 25%</option>
+        <option value="REPLACEMENT">דירה חליפית (משפר דיור, מוכר את הקיימת) — הון עצמי מינ' 30%</option>
+        <option value="INVESTMENT">דירה להשקעה (משאיר את הקיימת) — הון עצמי מינ' 50%</option>
+      </select>
+    </label>
+    <label>שווי שוק של הדירה (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="marketValue" value="1500000"></label>
+    <label>מחיר רכישה בפועל (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="purchasePrice" value="1400000"></label>
+    <div class="checkbox-row"><input type="checkbox" id="subsidized" checked><label for="subsidized">דירה בהנחה (מחיר למשתכן)</label></div>
+    <div class="checkbox-row"><input type="checkbox" id="usedBroker"><label for="usedBroker">רכישה דרך מתווך (2%+מע"מ)</label></div>
+    <button onclick="calculateEquity()">חשב הון עצמי נדרש</button>
+    <div id="equityResult"></div>
+  </section>
+
+  <section>
+    <h2>סיכויי זכייה בהגרלה</h2>
+    <label>פרויקט <select id="projectSelect"></select></label>
+    <div class="checkbox-row"><input type="checkbox" id="oddsLocalResident"><label for="oddsLocalResident">בן מקום</label></div>
+    <button onclick="calculateOdds()">בדוק סיכוי זכייה</button>
+    <div id="oddsResult"></div>
+  </section>
+
+  <section>
+    <h2>עלות ההמתנה לקבלן (הצמדה למדד תשומות הבנייה)</h2>
+    <p style="font-size:13px;color:#666;margin-top:0">רלוונטי בעיקר לדירה בהנחה שממתינים לבנייתה. השיעור השנתי הוא הנחת עבודה שאפשר לשנות - הטווח ההיסטורי האופייני של המדד הוא 2%-5% לשנה (הלמ"ס), עם חריגות כלפי מעלה בתקופות משבר.</p>
+    <label>מחיר הרכישה (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="waitPurchasePrice" value="1400000"></label>
+    <label>שיעור עלייה שנתי משוער של המדד (%) <input type="number" id="waitRate" value="3.5" step="0.1"></label>
+    <label>תקופת המתנה (שנים) <input type="number" id="waitYears" value="4"></label>
+    <button onclick="calculateWaitingCost()">חשב עלות המתנה</button>
+    <div id="waitResult"></div>
+  </section>
+
+  <section>
+    <h2>תשלום חודשי משוער למשכנתא</h2>
+    <label>סכום ההלוואה (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="loanAmount" value="1050000"></label>
+    <label>תקופת ההלוואה (שנים) <input type="number" id="termYears" value="20"></label>
+    <button onclick="calculatePayment()">חשב תשלום חודשי</button>
+    <div id="paymentResult"></div>
+  </section>
+
+<script src="/app.js"></script>
+<script>
+async function calculateEquity() {
+  const body = {
+    availableEquity: numericValue(document.getElementById('availableEquity')),
+    monthlyIncome: numericValue(document.getElementById('monthlyIncome')),
+    category: document.getElementById('category').value,
+    marketValue: numericValue(document.getElementById('marketValue')),
+    purchasePrice: numericValue(document.getElementById('purchasePrice')),
+    subsidized: document.getElementById('subsidized').checked,
+    usedBroker: document.getElementById('usedBroker').checked
+  };
+  const res = await fetch('/api/equity/calculate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  const el = document.getElementById('equityResult');
+  el.className = 'result ' + (data.canAfford ? 'ok' : 'bad');
+  const fmt = n => n.toLocaleString(undefined, {maximumFractionDigits: 0});
+  el.innerHTML = `הון עצמי נדרש: ${fmt(data.requiredEquity)} ש"ח<br>` +
+    `מס רכישה: ${fmt(data.purchaseTax)} ש"ח<br>` +
+    `<small>עלויות סגירה (אומדן): עו"ד ${fmt(data.closingCosts.lawyerFee)} ש"ח + שמאי ${fmt(data.closingCosts.appraiserFee)} ש"ח` +
+    (data.closingCosts.brokerCommission > 0 ? ` + תיווך ${fmt(data.closingCosts.brokerCommission)} ש"ח` : '') +
+    ` = ${fmt(data.closingCosts.total)} ש"ח</small><br>` +
+    `<b>סה"כ מזומן נדרש: ${fmt(data.totalCashNeeded)} ש"ח</b> — ${data.canAfford ? 'יש לך מספיק הון עצמי' : 'חסר לך הון עצמי'}`;
+}
+
+let projects = [];
+
+async function loadProjects() {
+  projects = await (await fetch('/api/lottery/projects')).json();
+  const select = document.getElementById('projectSelect');
+  select.innerHTML = projects.map((p, i) => `<option value="${i}">${p.city} - ${p.projectName}</option>`).join('');
+}
+
+async function calculateOdds() {
+  const p = projects[document.getElementById('projectSelect').value];
+  const localResident = document.getElementById('oddsLocalResident').checked;
+  const url = `/api/lottery/odds?city=${encodeURIComponent(p.city)}&project=${encodeURIComponent(p.projectName)}&localResident=${localResident}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  const el = document.getElementById('oddsResult');
+  el.className = 'result ok';
+  const historicalLine = data.actualHistoricalWinRatePercent != null
+    ? `<br>שיעור זכייה בפועל בהגרלה זו (נתון היסטורי): ${data.actualHistoricalWinRatePercent.toFixed(2)}%`
+    : '<br><small>אין נתון זכייה בפועל זמין להגרלה זו</small>';
+  el.innerHTML = `סיכוי זכייה חזוי ב${data.city} - ${data.projectName}: ${data.winProbabilityPercent.toFixed(2)}%${historicalLine}`;
+}
+
+async function calculatePayment() {
+  const body = {
+    loanAmount: numericValue(document.getElementById('loanAmount')),
+    termYears: Number(document.getElementById('termYears').value),
+    monthlyIncome: numericValue(document.getElementById('monthlyIncome'))
+  };
+  const res = await fetch('/api/mortgage/monthly-payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  const el = document.getElementById('paymentResult');
+  el.className = 'result ' + (data.withinLegalDtiLimit ? 'ok' : 'bad');
+  const dtiLine = data.dtiPercent > 0
+    ? `<br>שיעור החזר מהכנסה: ${data.dtiPercent.toFixed(1)}% — ${data.withinLegalDtiLimit ? 'בתוך המגבלה הבנקאית (מקס\' 50%)' : 'חורג מהמגבלה הבנקאית של 50% - הבנק לא יאשר הלוואה כזו'}`
+    : '';
+  el.innerHTML = `ריבית שנתית ממוצעת: ${data.annualRatePercent.toFixed(2)}% — תשלום חודשי: ${data.monthlyPayment.toLocaleString(undefined, {maximumFractionDigits: 0})} ש"ח — סה"כ לאורך התקופה: ${data.totalPayment.toLocaleString(undefined, {maximumFractionDigits: 0})} ש"ח${dtiLine}`;
+}
+
+async function calculateWaitingCost() {
+  const body = {
+    purchasePrice: numericValue(document.getElementById('waitPurchasePrice')),
+    assumedAnnualIndexRatePercent: Number(document.getElementById('waitRate').value),
+    waitYears: Number(document.getElementById('waitYears').value)
+  };
+  const res = await fetch('/api/costs/waiting-period-projection', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  const el = document.getElementById('waitResult');
+  el.className = 'result ok';
+  const fmt = n => n.toLocaleString(undefined, {maximumFractionDigits: 0});
+  el.innerHTML = `עלות נוספת משוערת מהצמדה: ${fmt(data.extraCost)} ש"ח<br>עלות כוללת משוערת בתום ההמתנה: ${fmt(data.totalProjectedCost)} ש"ח`;
+}
+
+loadProjects();
+</script>
+</body>
+</html>

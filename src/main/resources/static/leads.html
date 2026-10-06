@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>לידים - ניהול (פנימי)</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f7f7f9; color: #222; }
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; background: #fff; }
+  th, td { border: 1px solid #ddd; padding: 8px; font-size: 13px; text-align: right; vertical-align: top; }
+  th { background: #eee; }
+  button, input[type=password] { padding: 8px 14px; font-size: 14px; }
+  input[type=password] { width: 260px; }
+  #status { margin-top: 10px; font-size: 13px; color: #b02a2a; }
+</style>
+</head>
+<body>
+  <h1>לידים שהגיעו מדף הייעוץ</h1>
+  <p><a href="/tools.html">← לכלי בדיקה טכני</a></p>
+  <div>
+    <label>מפתח ניהול (ADMIN_KEY) <input type="password" id="adminKey"></label>
+    <button onclick="loadLeads()">הצג</button>
+    <button onclick="exportCsv()">ייצוא ל-CSV</button>
+  </div>
+  <div id="status"></div>
+  <table id="leadsTable" style="display:none">
+    <thead><tr><th>תאריך</th><th>שם מלא</th><th>טלפון</th><th>אימייל</th><th>הודעה</th></tr></thead>
+    <tbody id="leadsBody"></tbody>
+  </table>
+
+<script>
+const KEY_STORAGE = 'financialCompassAdminKey';
+document.getElementById('adminKey').value = sessionStorage.getItem(KEY_STORAGE) || '';
+
+function currentKey() {
+  const key = document.getElementById('adminKey').value.trim();
+  sessionStorage.setItem(KEY_STORAGE, key);
+  return key;
+}
+
+async function loadLeads() {
+  const statusEl = document.getElementById('status');
+  statusEl.textContent = '';
+  const res = await fetch('/api/admin/leads?key=' + encodeURIComponent(currentKey()));
+  if (!res.ok) {
+    statusEl.textContent = res.status === 403 ? 'מפתח שגוי' : 'שגיאה בטעינה';
+    document.getElementById('leadsTable').style.display = 'none';
+    return;
+  }
+  const leads = await res.json();
+  const body = document.getElementById('leadsBody');
+  body.innerHTML = leads.map(l => `
+    <tr>
+      <td>${new Date(l.createdAt).toLocaleString('he-IL')}</td>
+      <td>${l.fullName || ''}</td>
+      <td>${l.phone || ''}</td>
+      <td>${l.email || ''}</td>
+      <td>${l.message || ''}</td>
+    </tr>`).join('');
+  document.getElementById('leadsTable').style.display = leads.length ? 'table' : 'none';
+  if (!leads.length) statusEl.textContent = 'אין עדיין לידים';
+}
+
+function exportCsv() {
+  window.location.href = '/api/admin/leads/export.csv?key=' + encodeURIComponent(currentKey());
+}
+</script>
+</body>
+</html>

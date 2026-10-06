@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: analytics
+    runtime: docker
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: PG_HOST
+        fromDatabase:
+          name: analytics-db
+          property: host
+      - key: PG_PORT
+        fromDatabase:
+          name: analytics-db
+          property: port
+      - key: PG_DATABASE
+        fromDatabase:
+          name: analytics-db
+          property: database
+      - key: PG_USER
+        fromDatabase:
+          name: analytics-db
+          property: user
+      - key: PG_PASSWORD
+        fromDatabase:
+          name: analytics-db
+          property: password
+      # אלה חייבים להיות מוגדרים ידנית ב-Dashboard של Render (Environment) אחרי הפריסה - לא סודות שאמורים לשבת בקובץ הזה.
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: ADMIN_KEY
+        sync: false
+      - key: BASE_URL
+        sync: false
+
+databases:
+  - name: analytics-db
+    plan: free

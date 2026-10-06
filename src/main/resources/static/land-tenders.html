@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מכרזי קרקעות ובנייה עצמית</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+<style>
+  details.table-toggle summary { cursor: pointer; font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>מכרזי קרקעות ובנייה עצמית</h1>
+    <p class="subtitle">רשימה חיה של מכרזי קרקע פעילים למגרשי בנייה נמוכה/צמודת קרקע, ישירות מ-API של רשות מקרקעי ישראל - לא תמונת מצב קפואה.
+      <span class="info-tip" tabindex="0" data-tip="בשונה מ'מחיר למשתכן' (תוכנית קבועה עם נתונים היסטוריים), מכרזי קרקע נפתחים ונסגרים כל הזמן, כל אחד בתנאים משלו. הרשימה כאן נטענת בזמן אמת משרת רשות מקרקעי ישראל בכל טעינת הדף.">?</span>
+    </p>
+
+    <div class="card">
+      <h2>שלב 1: בחרו מכרז</h2>
+      <label>חפשו עיר או מספר מכרז
+        <input type="text" id="tenderSearch" list="tenderOptions" placeholder="למשל: גבע בנימין, או 143/2023..."
+          onfocus="this.dataset.prev = this.value; this.value = '';"
+          onblur="if (!this.value) this.value = this.dataset.prev || '';">
+        <datalist id="tenderOptions"></datalist>
+      </label>
+      <div id="tenderListStatus" style="font-size:13px;color:#8b93a6;margin-top:6px">טוען מכרזים פעילים...</div>
+      <button onclick="loadTenderDetail()">הצג פרטי מכרז</button>
+    </div>
+
+    <div class="card" id="tenderDetailCard" style="display:none">
+      <h2>פרטי המכרז</h2>
+      <div id="tenderDetailSummary"></div>
+      <div id="populationsNote" style="margin-top:10px"></div>
+
+      <div id="discountsSection" style="margin-top:16px; display:none">
+        <h3>הנחות לאוכלוסיות עדיפות במכרז זה
+          <span class="info-tip" tabindex="0" data-tip="חיפשנו אוטומטית בחוברת המכרז המקורית קטעים שמזכירים הנחה ליד מילת מפתח (מילואים/חסרי דיור/נכות וכו'). זה חיפוש טקסט, לא חישוב - יכול להיות לא מדויק או לא שלם, ולפעמים כמה הנחות חלות יחד. תמיד אמתו מול החוברת המלאה (קישור למטה) לפני שמסתמכים על המספר.">?</span>
+        </h3>
+        <div id="discountsStatus" style="font-size:13px;color:#8b93a6">מחפש הנחות בחוברת המכרז...</div>
+        <a id="discountsPageLink" class="secondary" style="display:none;margin-top:8px;text-decoration:none">📄 צפייה בכל הקטעים שנמצאו</a>
+      </div>
+      <div id="bookletLinkWrap" style="margin-top:10px"></div>
+
+      <h3 style="margin-top:16px">מגרשים במכרז
+        <span class="info-tip" tabindex="0" data-tip="מחיר סף/שמאי הוא מחיר הבסיס למגרש - במכרז תחרותי המחיר הסופי נקבע לפי ההצעה הזוכה ויכול להיות גבוה יותר. עלות הפיתוח היא תשלום נוסף חובה (תשתיות) שנגבה בנפרד ממחיר הקרקע.">?</span>
+      </h3>
+      <div id="plotsTable"></div>
+    </div>
+
+    <div class="card">
+      <h2>שלב 2: מחשבון בנייה עצמית
+        <span class="info-tip" tabindex="0" data-tip="בבנייה עצמית קונים קרקע ואז בונים בעצמכם (או עם קבלן) - בשונה מדירה מוכנה. מס הרכישה חל רק על שווי הקרקע, אבל הבנק בדרך כלל בוחן את דרישת ההון העצמי מול שווי הפרויקט הכולל (קרקע + בנייה). זו הערכה - מדיניות מדויקת משתנה בין בנקים.">?</span>
+      </h2>
+      <div class="grid2">
+        <label>מחיר הקרקע (ש"ח)
+          <span class="info-tip" tabindex="0" data-tip="אם בחרתם מגרש למעלה, זה מתמלא אוטומטית ממחיר הסף/השמאי הרשמי. אחרת הזינו את המחיר הצפוי בעצמכם.">?</span>
+          <input type="text" inputmode="numeric" class="money-input" id="landPrice" value="0">
+        </label>
+        <label>עלות פיתוח (ש"ח)
+          <span class="info-tip" tabindex="0" data-tip="תשלום נוסף חובה לתשתיות (כבישים, ביוב, חשמל) - מופיע בחוברת המכרז, נגבה בנפרד ממחיר הקרקע.">?</span>
+          <input type="text" inputmode="numeric" class="money-input" id="developmentCost" value="0">
+        </label>
+      </div>
+      <div class="grid2">
+        <label>ערבות המכרז (ש"ח)
+          <span class="info-tip" tabindex="0" data-tip="פיקדון שחייבים להפקיד כדי להשתתף במכרז - מוחזר אם לא זכיתם, אבל צריך שיהיה זמין מראש כמזומן נזיל.">?</span>
+          <input type="text" inputmode="numeric" class="money-input" id="guaranteeDeposit" value="0">
+        </label>
+        <label>תקציב בנייה משוער (ש"ח)
+          <span class="info-tip" tabindex="0" data-tip="עלות הבנייה עצמה (חומרים+קבלן) - משתנה מאוד לפי גודל הבית וסטנדרט הגמר. אין כאן הערכה אוטומטית - זה תלוי בתוכנית הבנייה הספציפית שלכם, כדאי לקבל הצעת מחיר ממהנדס/קבלן.">?</span>
+          <input type="text" inputmode="numeric" class="money-input" id="constructionBudget" value="1000000">
+        </label>
+      </div>
+      <div class="grid2">
+        <label>הון עצמי זמין (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="availableEquity" value="400000"></label>
+        <label>הכנסה חודשית נטו (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="monthlyIncome" value="18000"></label>
+      </div>
+      <div class="grid2">
+        <label>סוג הרכישה
+          <select id="category">
+            <option value="SINGLE">דירה יחידה (אין לי דירה אחרת)</option>
+            <option value="REPLACEMENT">דירה חליפית (משפר דיור)</option>
+            <option value="INVESTMENT">דירה להשקעה</option>
+          </select>
+        </label>
+        <label>תקופת משכנתא (שנים) <input type="number" id="termYears" value="20"></label>
+      </div>
+
+      <label class="advanced-toggle">
+        <input type="checkbox" id="enableDiscount" onchange="toggleDiscount()">
+        מגיעה לכם הנחה מיוחדת על המכרז הזה? (מילואים / חסרי דיור / נכות וכו')
+      </label>
+      <div id="discountDetails" style="display:none">
+        <div id="discountCategoryWrap" style="display:none; margin-bottom:10px">
+          <label>איזו קטגוריה חלה עליכם, לפי הרשימה הרשמית של המכרז?
+            <span class="info-tip" tabindex="0" data-tip="חיפשנו עבורכם בחוברת המכרז ליד הקטגוריה שתבחרו, ונמלא הצעה לאחוז הנחה. זו הצעה אוטומטית שמבוססת על חיפוש טקסט - לא ערך רשמי - ולכן מוצג גם הציטוט המקורי שממנו היא הגיעה, כדי שתוכלו לבדוק בעצמכם.">?</span>
+            <select id="discountCategory" onchange="loadDiscountSuggestion()">
+              <option value="">בחרו קטגוריה...</option>
+            </select>
+          </label>
+          <div id="discountSuggestionNote" style="font-size:12px;margin-top:6px"></div>
+        </div>
+        <p class="subtitle" style="margin-bottom:8px">אחוז ההנחה כאן הוא לצורך החישוב בלבד - תמיד ניתן וכדאי לערוך אותו ידנית אחרי שבדקתם מול חוברת המכרז המלאה.</p>
+        <label>אחוז הנחה על מחיר הקרקע (%) <input type="number" id="discountPercent" value="0" min="0" max="100"></label>
+      </div>
+
+      <button onclick="calculateSelfBuild()">חשב</button>
+      <div id="selfBuildResult" style="margin-top:16px"></div>
+    </div>
+
+    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+  </div>
+
+  <nav class="floating-nav">
+    <a href="/lottery.html"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
+    <a href="/land-tenders.html" class="active"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
+    <a href="/results-board.html"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
+    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
+    <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
+    <a href="/account.html"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
+  </nav>
+
+<script src="/app.js"></script>
+<script>
+function toggleDiscount() {
+  document.getElementById('discountDetails').style.display = document.getElementById('enableDiscount').checked ? 'block' : 'none';
+}
+
+let tendersByLabel = {};
+let selectedTenderId = null;
+
+function labelFor(t) { return `${t.tenderNumber} - ${t.city}${t.neighborhood ? ' (' + t.neighborhood + ')' : ''}`; }
+
+async function loadTenders() {
+  const statusEl = document.getElementById('tenderListStatus');
+  try {
+    const tenders = await (await fetch('/api/land-tenders/self-build')).json();
+    const datalist = document.getElementById('tenderOptions');
+    datalist.innerHTML = '';
+    tendersByLabel = {};
+    tenders.forEach(t => {
+      const label = labelFor(t);
+      tendersByLabel[label] = t;
+      const option = document.createElement('option');
+      option.value = label;
+      datalist.appendChild(option);
+    });
+    statusEl.textContent = `${tenders.length} מכרזי בנייה עצמית פעילים כרגע (נטען עכשיו מרשות מקרקעי ישראל)`;
+  } catch (e) {
+    statusEl.textContent = 'לא הצלחנו לטעון את רשימת המכרזים כרגע. נסו לרענן את הדף בעוד רגע.';
+  }
+}
+
+async function loadTenderDetail() {
+  const label = document.getElementById('tenderSearch').value;
+  const t = tendersByLabel[label];
+  if (!t) {
+    alert('בחרו מכרז מהרשימה (הקלידו כדי לסנן)');
+    return;
+  }
+  const detail = await (await fetch(`/api/land-tenders/${t.id}`)).json();
+  selectedTenderId = t.id;
+  const card = document.getElementById('tenderDetailCard');
+  card.style.display = 'block';
+  const fmt = n => n == null ? '—' : Math.round(n).toLocaleString();
+
+  document.getElementById('tenderDetailSummary').innerHTML = `
+    <div class="badge ok">${detail.tenderNumber} - ${detail.city}${detail.neighborhood ? ' (' + detail.neighborhood + ')' : ''}</div>
+    <table>
+      <tr><td>מועד פתיחת המכרז</td><td>${detail.openingDate ?? 'לא פורסם'}</td></tr>
+      <tr><td>מועד סגירת הגשות</td><td>${detail.closingDate ?? 'לא פורסם'}</td></tr>
+    </table>
+    <p style="margin-top:8px">
+      <a href="https://apps.land.gov.il/MichrazimSite/#/michraz/${t.id}" target="_blank" class="secondary" style="display:inline-block;text-decoration:none">🔗 המכרז באתר רמ"י</a>
+    </p>`;
+
+  document.getElementById('populationsNote').innerHTML = detail.priorityPopulations.length > 0
+    ? `<p style="font-size:13px;color:#1a7a34">🎯 במכרז זה יש עדיפות/מכסה נפרדת לאוכלוסיות: ${detail.priorityPopulations.map(p => p.label).join(', ')}. אפשר לבחור את הקטגוריה שלכם במחשבון למטה ולקבל הצעה לאחוז ההנחה.</p>`
+    : `<p style="font-size:13px;color:#8b93a6">לא צוינה במכרז זה עדיפות לאוכלוסייה מסוימת.</p>`;
+
+  const categoryWrap = document.getElementById('discountCategoryWrap');
+  const categorySelect = document.getElementById('discountCategory');
+  if (detail.priorityPopulations.length > 0) {
+    categorySelect.innerHTML = '<option value="">בחרו קטגוריה...</option>' +
+      detail.priorityPopulations.map(p => `<option value="${p.code}">${p.label}</option>`).join('') +
+      '<option value="none">אף אחת מהאוכלוסיות הרשומות לא חלה עליי</option>';
+    categoryWrap.style.display = 'block';
+  } else {
+    categoryWrap.style.display = 'none';
+  }
+  document.getElementById('discountSuggestionNote').innerHTML = '';
+
+  const bookletWrap = document.getElementById('bookletLinkWrap');
+  const discountsSection = document.getElementById('discountsSection');
+  if (detail.bookletAvailable) {
+    bookletWrap.innerHTML = `<a href="/api/land-tenders/${t.id}/booklet" target="_blank" class="secondary" style="display:inline-block;text-decoration:none">📄 צפייה בחוברת המכרז המלאה (PDF מקורי מרשות מקרקעי ישראל)</a>`;
+    discountsSection.style.display = 'block';
+    document.getElementById('discountsStatus').textContent = 'מחפש הנחות בחוברת המכרז...';
+    document.getElementById('discountsPageLink').style.display = 'none';
+    fetch(`/api/land-tenders/${t.id}/discounts`).then(r => r.json()).then(info => {
+      const statusEl = document.getElementById('discountsStatus');
+      const linkEl = document.getElementById('discountsPageLink');
+      if (info.discountSnippets.length === 0) {
+        statusEl.textContent = 'לא נמצאו אוטומטית קטעים על הנחות בחוברת - ייתכן שהמידע קיים בניסוח שונה. מומלץ לעיין בחוברת המלאה למעלה.';
+        return;
+      }
+      statusEl.textContent = `נמצאו ${info.discountSnippets.length} קטעים בחוברת שמזכירים הנחה ליד אוכלוסיית עדיפות.`;
+      linkEl.href = `/land-tender-discounts.html?id=${t.id}`;
+      linkEl.style.display = 'inline-block';
+    }).catch(() => {
+      document.getElementById('discountsStatus').textContent = 'לא הצלחנו לחפש הנחות בחוברת כרגע.';
+    });
+  } else {
+    bookletWrap.innerHTML = '<p style="font-size:13px;color:#8b93a6">חוברת המכרז טרם פורסמה במערכת רמ"י.</p>';
+    discountsSection.style.display = 'none';
+  }
+
+  const plotsEl = document.getElementById('plotsTable');
+  const fmtMoney = n => n == null ? '<span style="color:#b02a2a">טרם פורסם ע"י רמ"י</span>' : fmt(n) + ' ש"ח';
+  if (detail.plots.length === 0) {
+    plotsEl.innerHTML = '<p style="color:#8b93a6;font-size:13px">אין עדיין נתוני מגרשים מפורטים למכרז זה</p>';
+  } else {
+    const anyMissingPrice = detail.plots.some(p => p.appraisedPrice == null);
+    const rowHtml = (p, i) => `
+        <tr>
+          <td>${p.areaName ?? p.plotId}</td>
+          <td>${p.areaSqm ?? '—'}</td>
+          <td>${fmtMoney(p.appraisedPrice)}</td>
+          <td>${fmtMoney(p.developmentCost)}</td>
+          <td>${fmtMoney(p.guaranteeDeposit)}</td>
+          <td><button class="secondary" onclick="usePlotInCalculator(${i})">השתמש במחשבון</button></td>
+        </tr>`;
+    const PLOTS_SHOWN_INITIALLY = 3;
+    const firstRows = detail.plots.slice(0, PLOTS_SHOWN_INITIALLY).map(rowHtml).join('');
+    const restRows = detail.plots.slice(PLOTS_SHOWN_INITIALLY).map(rowHtml).join('');
+    plotsEl.innerHTML = `
+      ${anyMissingPrice ? '<p style="font-size:12px;color:#8b93a6;margin-bottom:8px">חלק מהמגרשים עדיין ללא מחיר שמאי מפורסם במערכת רמ"י (לא קשור לתקלה אצלנו - חסר גם באתר הרשמי) - אפשר להזין הערכה ידנית במחשבון למטה.</p>' : ''}
+      <div style="overflow-x:auto">
+      <table>
+      <tr><th>מגרש</th><th>שטח (מ"ר)</th><th>מחיר סף/שמאי</th><th>עלות פיתוח</th><th>ערבות</th><th></th></tr>
+      ${firstRows}
+      </table>
+      </div>
+    ${detail.plots.length > PLOTS_SHOWN_INITIALLY ? `
+    <details class="table-toggle">
+      <summary>הצג את כל ${detail.plots.length} המגרשים</summary>
+      <div style="overflow-x:auto"><table>${restRows}</table></div>
+    </details>` : ''}`;
+  }
+  window.lastPlots = detail.plots;
+}
+
+async function loadDiscountSuggestion() {
+  const code = document.getElementById('discountCategory').value;
+  const noteEl = document.getElementById('discountSuggestionNote');
+  if (!code || code === 'none' || !selectedTenderId) {
+    noteEl.innerHTML = '';
+    return;
+  }
+  noteEl.style.color = '#8b93a6';
+  noteEl.textContent = 'מחפש הצעה בחוברת המכרז...';
+  try {
+    const suggestion = await (await fetch(`/api/land-tenders/${selectedTenderId}/discount-suggestion?populationCode=${code}`)).json();
+    if (suggestion.suggestedPercent == null) {
+      noteEl.style.color = '#8b93a6';
+      noteEl.innerHTML = 'לא נמצאה אוטומטית הצעה לקטגוריה זו - בדקו את חוברת המכרז והזינו את האחוז ידנית למטה.';
+      return;
+    }
+    document.getElementById('discountPercent').value = suggestion.suggestedPercent;
+    noteEl.style.color = '#1a7a34';
+    noteEl.innerHTML = `הצעה למילוי אוטומטי: <b>${suggestion.suggestedPercent}%</b> (ניתן לערוך למטה). מבוסס על הקטע הבא בחוברת - יש לאשר:<br>
+      <span style="display:block;background:#f7f8fb;border-radius:8px;padding:8px 10px;margin-top:4px;color:#333">${suggestion.sourceSnippet}</span>`;
+  } catch (e) {
+    noteEl.style.color = '#8b93a6';
+    noteEl.textContent = 'לא הצלחנו לחפש הצעה כרגע - הזינו את האחוז ידנית לפי החוברת.';
+  }
+}
+
+function usePlotInCalculator(index) {
+  const p = window.lastPlots[index];
+  if (p.appraisedPrice) document.getElementById('landPrice').value = Math.round(p.appraisedPrice).toLocaleString('en-US');
+  if (p.developmentCost) document.getElementById('developmentCost').value = Math.round(p.developmentCost).toLocaleString('en-US');
+  if (p.guaranteeDeposit) document.getElementById('guaranteeDeposit').value = Math.round(p.guaranteeDeposit).toLocaleString('en-US');
+  document.getElementById('selfBuildResult').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function calculateSelfBuild() {
+  const body = {
+    landPrice: numericValue(document.getElementById('landPrice')),
+    developmentCost: numericValue(document.getElementById('developmentCost')),
+    discountPercent: document.getElementById('enableDiscount').checked ? Number(document.getElementById('discountPercent').value) : 0,
+    guaranteeDeposit: numericValue(document.getElementById('guaranteeDeposit')),
+    constructionBudget: numericValue(document.getElementById('constructionBudget')),
+    availableEquity: numericValue(document.getElementById('availableEquity')),
+    monthlyIncome: numericValue(document.getElementById('monthlyIncome')),
+    category: document.getElementById('category').value,
+    termYears: Number(document.getElementById('termYears').value)
+  };
+  const data = await (await fetch('/api/self-build/calculate', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  })).json();
+  const fmt = n => n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const el = document.getElementById('selfBuildResult');
+  el.innerHTML = `
+    <span class="badge ${data.canAffordEquity ? 'ok' : 'bad'}">${data.canAffordEquity ? 'יש לך מספיק הון עצמי' : 'חסר לך הון עצמי'}</span>
+    <table>
+      <tr><td>שווי פרויקט כולל (קרקע+פיתוח+בנייה)</td><td>${fmt(data.totalPropertyValue)} ש"ח</td></tr>
+      <tr><td>הון עצמי נדרש (לפי שווי הפרויקט)</td><td>${fmt(data.totalCashNeeded - data.purchaseTax - data.closingCosts - data.guaranteeDeposit)} ש"ח</td></tr>
+      <tr><td>מס רכישה (על הקרקע בלבד)</td><td>${fmt(data.purchaseTax)} ש"ח</td></tr>
+      <tr><td>עלויות סגירה (אומדן)</td><td>${fmt(data.closingCosts)} ש"ח</td></tr>
+      <tr><td>ערבות מכרז</td><td>${fmt(data.guaranteeDeposit)} ש"ח</td></tr>
+      <tr><td><b>סה"כ מזומן נדרש</b></td><td><b>${fmt(data.totalCashNeeded)} ש"ח</b></td></tr>
+    </table>
+    <table style="margin-top:10px">
+      <tr><td>סכום הלוואה משוער</td><td>${fmt(data.loanAmount)} ש"ח</td></tr>
+      <tr><td>תשלום חודשי משוער</td><td>${fmt(data.monthlyPayment)} ש"ח</td></tr>
+      <tr><td>שיעור החזר מהכנסה</td><td>${data.dtiPercent.toFixed(1)}% ${data.withinLegalDtiLimit ? '(בתוך המגבלה)' : '(חורג מהמגבלה הבנקאית של 50%!)'}</td></tr>
+    </table>
+    <p style="font-size:11px;color:#8b93a6;margin-top:6px">הערכה בלבד: תקציב הבנייה הוא הזנה ידנית שלכם, ומדיניות הבנק המדויקת למשכנתא לבנייה עצמית (למשל פריסת ההלוואה לשלבים) משתנה בין בנקים.</p>`;
+}
+
+loadTenders();
+</script>
+</body>
+</html>

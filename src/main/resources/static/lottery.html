@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מחיר למשתכן - סיכויי זכייה</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="page">
+    <h1>מחיר למשתכן</h1>
+    <p class="subtitle">חפשו פרויקט ובדקו את הסיכוי הריאלי שלכם לזכות - כולל ניקוד הזכאות האישי שלכם, לא רק ממוצע כללי.</p>
+
+    <div class="card">
+      <h2>שלב 1: הניקוד שלי
+        <span class="info-tip" tabindex="0" data-tip="ב'מחיר למשתכן' לא כולם מתחרים על אותן דירות בדיוק - כל נרשם מקבל ניקוד, ולפי הניקוד משבצים אותו לקבוצה. זה קובע איזה חלק מהדירות פתוח בשבילו. אם זה נשמע מסובך - אפשר לדלג ולראות רק ממוצע כללי.">?</span>
+      </h2>
+      <label class="advanced-toggle">
+        <input type="checkbox" id="enableScoreCalc" onchange="toggleScoreCalc()">
+        רוצה לחשב את הניקוד האישי שלך? (מומלץ, אבל אפשר לדלג)
+      </label>
+      <div id="scoreDetails" style="display:none">
+        <p class="subtitle" style="margin-bottom:10px">לפי תקנון הגרלת "מחיר למשתכן" (מסלול כללי) - הדירות מחולקות ל-3 קבוצות ניקוד קבועות, וההגרלה האקראית מתקיימת בתוך כל קבוצה בנפרד.</p>
+        <div class="grid2">
+          <label>מספר ילדים <input type="number" id="numberOfChildren" value="0" min="0"></label>
+          <label>הרשמות קודמות שנכשלו
+            <span class="info-tip" tabindex="0" data-tip="כל פעם שנרשמת בעבר להגרלה ולא זכית, זה מוסיף לך נקודות - ותק בהמתנה נחשב לזכותך.">?</span>
+            <input type="number" id="failedPriorApplications" value="0" min="0">
+          </label>
+        </div>
+        <div class="checkbox-row"><input type="checkbox" id="completedMilitaryOrNationalService"><label for="completedMilitaryOrNationalService" style="margin:0">שירות צבאי/לאומי/אזרחי מלא</label></div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="newImmigrant">
+          <label for="newImmigrant" style="margin:0">עולה חדש</label>
+          <span class="info-tip" tabindex="0" data-tip="מי שעלה לישראל וטרם עברו התקופה הקבועה בחוק מקבל ניקוד נוסף בהרשמה.">?</span>
+        </div>
+        <div class="checkbox-row"><input type="checkbox" id="disabledCoupleExemptFromService"><label for="disabledCoupleExemptFromService" style="margin:0">בני זוג פטורים משירות עקב נכות</label></div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="medicalDisability65Plus">
+          <label for="medicalDisability65Plus" style="margin:0">נכות רפואית 65% ומעלה</label>
+          <span class="info-tip" tabindex="0" data-tip="לפי אישור נכות רפואית מהמוסד לביטוח לאומי.">?</span>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="earningIncapacity75Plus">
+          <label for="earningIncapacity75Plus" style="margin:0">אי-כושר השתכרות 75% ומעלה</label>
+          <span class="info-tip" tabindex="0" data-tip="קביעה נפרדת מנכות רפואית - מתייחסת ליכולת שלך להשתכר, לא רק למצב הרפואי.">?</span>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="lowIncomeHousehold">
+          <label for="lowIncomeHousehold" style="margin:0">הכנסה מתחת לחמישון 5</label>
+          <span class="info-tip" tabindex="0" data-tip="חמישון 5 = החמישון החמישי (מתוך 5) בהתפלגות ההכנסות בישראל. אם ההכנסה המשותפת שלכם נמוכה יחסית, זה מוסיף נקודות.">?</span>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="reservistEligible">
+          <label for="reservistEligible" style="margin:0">מילואימניק/ית פעיל/ה (60+ ימי שירות מ-7/10/23)</label>
+          <span class="info-tip" tabindex="0" data-tip="לא חלק מהניקוד עצמו, אלא מכסה נפרדת: עד 50% מהדירות בהגרלות הנוכחיות (2026) מוקצות בעדיפות למשרתי מילואים.">?</span>
+        </div>
+        <button onclick="calculateScore()">חשב ניקוד</button>
+        <div id="scoreResult" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>שלב 2: חיפוש פרויקט
+        <span class="info-tip" tabindex="0" data-tip="הרשימה מבוססת על 2,320 הגרלות היסטוריות ממשרד השיכון. לצד חישוב הסיכוי, נבדוק גם אם יש כרגע הרשמה פעילה או עתידית לפרויקט הזה בלוח החי של משרד הבינוי והשיכון.">?</span>
+      </h2>
+      <label>הקלידו עיר או שם פרויקט
+        <input type="text" id="projectSearch" list="projectOptions" placeholder="למשל: תל אביב, או ראשון לציון...">
+        <datalist id="projectOptions"></datalist>
+      </label>
+      <label>הצג
+        <select id="liveFilter" onchange="renderProjectOptions()">
+          <option value="all">כל הפרויקטים</option>
+          <option value="open">רק פרויקטים עם הרשמה פתוחה כרגע</option>
+          <option value="open_or_upcoming">פרויקטים פתוחים או שעומדים להיפתח בקרוב</option>
+        </select>
+      </label>
+      <div id="openCountStatus" style="font-size:12px;color:#8b93a6;margin-top:4px"></div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="localResident">
+        <label for="localResident" style="margin:0">בן מקום</label>
+        <span class="info-tip" tabindex="0" data-tip="תושב רשום של העיר בה נמצא הפרויקט. יש מכסת דירות שמורה במיוחד לבני מקום, עם סיכוי זכייה אחר לגמרי.">?</span>
+      </div>
+      <button onclick="calculateOdds()">בדוק סיכוי זכייה</button>
+      <div id="oddsResult" style="margin-top:16px"></div>
+    </div>
+
+    <div class="card">
+      <h2>דברים חשובים לדעת לפני שנרשמים</h2>
+      <table>
+        <tr><td>תוקף אישור זכאות</td><td>שנה אחת בלבד - חייב להיות בתוקף ביום בחירת הדירה, אחרת הזכייה לא תמומש</td></tr>
+        <tr><td>דמי הרשמה</td><td>לא מוחזרים אם מבטלים את הזכייה או בוחרים דירה, גם לפני חתימת חוזה</td></tr>
+        <tr><td>זמן בחירת דירה</td><td>עד 45 דקות בלבד לזוכים - כדאי להכיר מראש את התוכניות באתר ההגרלה</td></tr>
+        <tr><td>מגבלת מכירה</td><td>אסור למכור 5 שנים מטופס 4, או 7 שנים מיום הזכייה - לפי המוקדם</td></tr>
+        <tr><td>אישור משכנתא</td><td>לא מובטח - הבנק מחליט לפי שיקול דעתו, ולעיתים לפי הערכת שמאי ולא מחיר הרכישה</td></tr>
+      </table>
+    </div>
+
+    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+  </div>
+
+  <nav class="floating-nav">
+    <a href="/lottery.html" class="active"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
+    <a href="/land-tenders.html"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
+    <a href="/results-board.html"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
+    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
+    <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
+    <a href="/account.html"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
+  </nav>
+
+<script src="/app.js"></script>
+<script>
+function toggleScoreCalc() {
+  document.getElementById('scoreDetails').style.display = document.getElementById('enableScoreCalc').checked ? 'block' : 'none';
+}
+
+let projectsByLabel = {};
+let lastScoreInfo = null;
+let allProjects = [];
+
+function labelFor(p) { return `${p.city} - ${p.projectName}`; }
+
+async function loadProjects() {
+  allProjects = await (await fetch('/api/lottery/projects')).json();
+  allProjects.sort((a, b) => labelFor(a).localeCompare(labelFor(b), 'he'));
+  renderProjectOptions();
+}
+
+function renderProjectOptions() {
+  const filter = document.getElementById('liveFilter').value;
+  const projects = filter === 'open' ? allProjects.filter(p => p.liveStatus === 'OPEN')
+    : filter === 'open_or_upcoming' ? allProjects.filter(p => p.liveStatus === 'OPEN' || p.liveStatus === 'NOT_YET_OPEN')
+    : allProjects;
+  const datalist = document.getElementById('projectOptions');
+  datalist.innerHTML = '';
+  projectsByLabel = {};
+  projects.forEach(p => {
+    const label = labelFor(p);
+    projectsByLabel[label] = p;
+    const option = document.createElement('option');
+    option.value = label;
+    datalist.appendChild(option);
+  });
+  document.getElementById('projectSearch').value = '';
+  const openCount = allProjects.filter(p => p.liveStatus === 'OPEN').length;
+  const upcomingCount = allProjects.filter(p => p.liveStatus === 'NOT_YET_OPEN').length;
+  document.getElementById('openCountStatus').textContent =
+    `${openCount} פרויקטים עם הרשמה פתוחה כרגע, ${upcomingCount} עומדים להיפתח בקרוב (מתוך ${allProjects.length} ברשימה)`;
+}
+
+async function calculateScore() {
+  const body = {
+    numberOfChildren: Number(document.getElementById('numberOfChildren').value),
+    completedMilitaryOrNationalService: document.getElementById('completedMilitaryOrNationalService').checked,
+    newImmigrant: document.getElementById('newImmigrant').checked,
+    disabledCoupleExemptFromService: document.getElementById('disabledCoupleExemptFromService').checked,
+    medicalDisability65Plus: document.getElementById('medicalDisability65Plus').checked,
+    earningIncapacity75Plus: document.getElementById('earningIncapacity75Plus').checked,
+    lowIncomeHousehold: document.getElementById('lowIncomeHousehold').checked,
+    failedPriorApplications: Number(document.getElementById('failedPriorApplications').value),
+    reservistEligible: document.getElementById('reservistEligible').checked
+  };
+  const data = await (await fetch('/api/lottery/eligibility-score', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  })).json();
+  lastScoreInfo = data;
+  const resultEl = document.getElementById('scoreResult');
+  const reservistLine = data.reservistEligible
+    ? '<br><small>כמילואימניק/ית את/ה בקבוצת עדיפות נפרדת - עד 50% מהדירות בהגרלות הנוכחיות (2026) מוקצות לזכאי מילואים, מעבר לחלוקת קבוצות הניקוד הרגילה.</small>' : '';
+  if (!data.meetsMinimumThreshold) {
+    resultEl.innerHTML = `<div class="badge bad">ניקוד: ${data.score}</div><p style="font-size:13px;margin-top:8px">ניקוד זה נמוך מסף הרישום המינימלי (11 נקודות) במסלול הכללי.${reservistLine}</p>`;
+    return;
+  }
+  resultEl.innerHTML = `
+    <div class="badge ok">ניקוד: ${data.score}</div>
+    <p style="font-size:13px;margin-top:8px">את/ה בקבוצת <b>${data.bracketLabel}</b>, שמקבלת <b>${data.unitSharePercent}%</b> מהדירות בכל הגרלה. ההגרלה בתוך הקבוצה אקראית לחלוטין.${reservistLine}</p>`;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('he-IL');
+}
+
+function liveStatusHtml(live) {
+  if (!live || !live.hasLiveData) {
+    return '<p style="font-size:13px;color:#8b93a6;margin-top:8px">אין כרגע הרשמה פתוחה או עתידית לפרויקט זה בלוח החי של משרד הבינוי והשיכון.</p>';
+  }
+  const p = live.liveProject;
+  if (p.status === 'NOT_YET_OPEN') {
+    return `<p style="font-size:13px;color:#a6650a;margin-top:8px">🕓 טרם נפתח להרשמה - צפוי להיפתח ב-${fmtDate(p.applicationStartDate)}.</p>`;
+  }
+  return `
+    <div class="badge ok" style="margin-top:8px">✅ פתוח להרשמה כרגע</div>
+    <table style="margin-top:8px">
+      <tr><td>סגירת הרשמה</td><td>${fmtDate(p.applicationEndDate)}</td></tr>
+      <tr><td>מסלול</td><td>${p.processName ?? '—'}</td></tr>
+      <tr><td>זכאות</td><td>${p.entitlement ?? '—'}</td></tr>
+      <tr><td>יח"ד</td><td>${p.housingUnits ?? '—'}</td></tr>
+      <tr><td>מחיר בסיס למ"ר</td><td>${p.pricePerSqm ? Math.round(p.pricePerSqm).toLocaleString() + ' ש"ח (לפני הנחה)' : '—'}</td></tr>
+      <tr><td>יזם</td><td>${p.contractorName ?? '—'}</td></tr>
+      <tr><td>נרשמים עד כה</td><td>${p.totalSubscribers ?? '—'}${p.totalLocalSubscribers ? ' (מתוכם ' + p.totalLocalSubscribers + ' בני מקום)' : ''}</td></tr>
+    </table>
+    <p style="font-size:11px;color:#8b93a6;margin-top:6px">מחיר הבסיס למ"ר הוא לפני הנחה - שיעור ההנחה בפועל ותנאיו משתנים בין מכרזים, יש לבדוק את תנאי המכרז הספציפי.</p>`;
+}
+
+async function calculateOdds() {
+  const label = document.getElementById('projectSearch').value;
+  const p = projectsByLabel[label];
+  const resultEl = document.getElementById('oddsResult');
+  if (!p) {
+    resultEl.innerHTML = '<p style="color:#b02a2a;font-size:13px">בחרו פרויקט מהרשימה (הקלידו כדי לסנן)</p>';
+    return;
+  }
+  const localResident = document.getElementById('localResident').checked;
+  const url = `/api/lottery/odds?city=${encodeURIComponent(p.city)}&project=${encodeURIComponent(p.projectName)}&localResident=${localResident}`;
+  const oddsPromise = fetch(url).then(r => r.json());
+  const livePromise = p.projectId
+    ? fetch(`/api/lottery/live-status?projectId=${encodeURIComponent(p.projectId)}`).then(r => r.json())
+    : Promise.resolve({ hasLiveData: false });
+  const [data, live] = await Promise.all([oddsPromise, livePromise]);
+  const historicalLine = data.actualHistoricalWinRatePercent != null
+    ? `שיעור זכייה בפועל בהגרלה זו (נתון היסטורי): <b>${data.actualHistoricalWinRatePercent.toFixed(2)}%</b>`
+    : '<small style="color:#8b93a6">אין נתון זכייה בפועל זמין להגרלה זו</small>';
+  const scoreNote = lastScoreInfo && lastScoreInfo.meetsMinimumThreshold
+    ? `<p style="font-size:12px;color:#8b93a6;margin-top:10px">שימו לב: המספר הזה הוא ממוצע כלל-הנרשמים. הניקוד שלך (${lastScoreInfo.score}, קבוצת ${lastScoreInfo.bracketLabel}) קובע איזה חלק מהדירות פתוח בשבילך בפועל.</p>`
+    : '<p style="font-size:12px;color:#8b93a6;margin-top:10px">חשבו קודם את הניקוד שלכם למעלה כדי לקבל תמונה מדויקת יותר.</p>';
+  const peripheryNote = data.peripheryGrantEligibleCity
+    ? '<p style="font-size:12px;color:#1a7a34;margin-top:6px">🎁 עיר זו מוכרת כישוב עדיפות לאומית - ייתכן שתהיו זכאים למענק מותנה של כ-40,000-60,000 ש"ח, שבנק ישראל מכיר בו כחלק מההון העצמי (בכפוף למגורים בדירה 5-7 שנים). בדקו זכאות מדויקת מול משרד השיכון.</p>'
+    : '';
+  resultEl.innerHTML = `
+    <div class="badge ok">${data.city} - ${data.projectName}</div>
+    <table>
+      <tr><td>סיכוי זכייה חזוי (ממוצע)</td><td><b>${data.winProbabilityPercent.toFixed(2)}%</b></td></tr>
+      <tr><td>נתון היסטורי</td><td>${historicalLine}</td></tr>
+    </table>
+    ${liveStatusHtml(live)}
+    ${scoreNote}
+    ${peripheryNote}`;
+}
+
+loadProjects();
+</script>
+</body>
+</html>

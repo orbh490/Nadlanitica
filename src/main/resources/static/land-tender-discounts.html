@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הנחות לאוכלוסיות עדיפות - חוברת המכרז</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="page">
+    <p><a href="/land-tenders.html">← חזרה למכרזי קרקעות</a></p>
+    <h1>הנחות לאוכלוסיות עדיפות</h1>
+    <p class="subtitle" id="tenderHeader">טוען...</p>
+
+    <div class="card">
+      <p style="font-size:13px;color:#8b93a6">חיפשנו אוטומטית בחוברת המכרז המקורית קטעים שמזכירים הנחה ליד מילת מפתח (מילואים/חסרי דיור/נכות וכו'). זה חיפוש טקסט, לא חישוב מדויק - ולפעמים כמה הנחות חלות יחד, ולפעמים דווקא רק הנחה אחת. תמיד יש לאמת מול חוברת המכרז המלאה לפני שמסתמכים על מספר.</p>
+      <div id="bookletLinkWrap"></div>
+      <div id="status" style="font-size:13px;color:#8b93a6;margin-top:10px">טוען קטעים...</div>
+      <div id="snippets"></div>
+    </div>
+  </div>
+
+<script>
+function paramId() {
+  return new URLSearchParams(window.location.search).get('id');
+}
+
+async function load() {
+  const id = paramId();
+  if (!id) {
+    document.getElementById('status').textContent = 'לא צוין מכרז.';
+    return;
+  }
+  try {
+    const detail = await (await fetch(`/api/land-tenders/${id}`)).json();
+    document.getElementById('tenderHeader').textContent = `${detail.tenderNumber} - ${detail.city}${detail.neighborhood ? ' (' + detail.neighborhood + ')' : ''}`;
+    document.getElementById('bookletLinkWrap').innerHTML = detail.bookletAvailable
+      ? `<a href="/api/land-tenders/${id}/booklet" target="_blank" class="secondary" style="display:inline-block;text-decoration:none">📄 צפייה בחוברת המכרז המלאה (PDF מקורי מרשות מקרקעי ישראל)</a>`
+      : '';
+  } catch (e) {
+    document.getElementById('tenderHeader').textContent = '';
+  }
+
+  const statusEl = document.getElementById('status');
+  const snippetsEl = document.getElementById('snippets');
+  try {
+    const info = await (await fetch(`/api/land-tenders/${id}/discounts`)).json();
+    if (!info.bookletAvailable) {
+      statusEl.textContent = 'חוברת המכרז טרם פורסמה במערכת רמ"י.';
+      return;
+    }
+    if (info.discountSnippets.length === 0) {
+      statusEl.textContent = 'לא נמצאו אוטומטית קטעים על הנחות בחוברת - ייתכן שהמידע קיים בניסוח שונה. מומלץ לעיין בחוברת המלאה למעלה.';
+      return;
+    }
+    statusEl.textContent = `נמצאו ${info.discountSnippets.length} קטעים בחוברת שמזכירים הנחה ליד אוכלוסיית עדיפות:`;
+    snippetsEl.innerHTML = info.discountSnippets.map(s => `<p style="font-size:13px;background:#f7f8fb;border-radius:8px;padding:10px 12px;margin-top:8px">${s}</p>`).join('');
+  } catch (e) {
+    statusEl.textContent = 'לא הצלחנו לחפש הנחות בחוברת כרגע.';
+  }
+}
+
+load();
+</script>
+</body>
+</html>

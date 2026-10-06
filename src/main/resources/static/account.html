@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>האזור האישי שלי</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+<style>
+  #historyList { margin-top: 10px; }
+  .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>האזור האישי שלי</h1>
+    <p class="subtitle">היסטוריית החישובים שלך והשוואת מסלולים - זמין רק כשמחוברים, כדי שהמידע שלך יישמר.</p>
+
+    <div class="card" id="loggedOutView" style="display:none">
+      <h2>התחברות / הרשמה</h2>
+      <label>אימייל <input type="email" id="authEmail"></label>
+      <label>סיסמה (לפחות 6 תווים) <input type="password" id="authPassword"></label>
+      <div class="checkbox-row">
+        <input type="checkbox" id="consentCheckbox">
+        <label for="consentCheckbox" style="margin:0;font-weight:400">קראתי ואני מסכים/ה ל<a href="/privacy.html" target="_blank">מדיניות הפרטיות</a> (נדרש להרשמה בלבד)</label>
+      </div>
+      <button onclick="handleLogin()">התחברות</button>
+      <button class="secondary" onclick="handleRegister()">הרשמה</button>
+      <p style="margin-top:10px"><a href="#" onclick="toggleForgotPassword();return false" style="font-size:12px">שכחתי סיסמה</a></p>
+      <div id="forgotPasswordBox" style="display:none">
+        <label>אימייל לאיפוס סיסמה <input type="email" id="forgotEmail"></label>
+        <button class="secondary" onclick="submitForgotPassword()">שלחו קישור לאיפוס</button>
+      </div>
+      <div id="authMessage" style="margin-top:8px;font-size:13px"></div>
+      <a href="#" id="resendVerificationLink" style="display:none;font-size:12px" onclick="resendVerification();return false">שלחו שוב מייל אימות</a>
+    </div>
+
+    <div id="loggedInView" style="display:none">
+      <div class="card">
+        <span class="badge ok">מחובר/ת כ-<span id="authEmailDisplay"></span></span>
+        <button class="secondary" onclick="handleLogout()">התנתקות</button>
+      </div>
+
+      <div class="card">
+        <h2>השוואת מסלולים: מחיר למשתכן / שוק חופשי / בנייה עצמית
+          <span class="info-tip" tabindex="0" data-tip="השוואה כללית ומפושטת על סמך הנתונים שתמלאו כאן - לפרטים מדויקים על מכרז קרקע ספציפי יש להשתמש במחשבון הבנייה העצמית הייעודי בעמוד 'מכרזי קרקעות'.">?</span>
+        </h2>
+        <div class="grid2">
+          <label>הון עצמי זמין (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="cmpEquity" value="150000"></label>
+          <label>הכנסה חודשית נטו (ש"ח) <input type="text" inputmode="numeric" class="money-input" id="cmpIncome" value="15000"></label>
+        </div>
+        <label>סוג הרכישה
+          <select id="cmpCategory">
+            <option value="SINGLE">דירה יחידה</option>
+            <option value="REPLACEMENT">דירה חליפית (משפר דיור)</option>
+            <option value="INVESTMENT">דירה להשקעה</option>
+          </select>
+        </label>
+        <div class="grid2">
+          <label>שווי שוק (שוק חופשי, ש"ח) <input type="text" inputmode="numeric" class="money-input" id="cmpMarketValue" value="1500000"></label>
+          <label>מחיר רכישה (מחיר למשתכן, ש"ח) <input type="text" inputmode="numeric" class="money-input" id="cmpPurchasePrice" value="1400000"></label>
+        </div>
+        <div class="grid2">
+          <label>תקופת משכנתא (שנים) <input type="number" id="cmpTermYears" value="20"></label>
+          <label>תקציב כולל משוער לבנייה עצמית (ש"ח)
+            <span class="info-tip" tabindex="0" data-tip="הערכה גסה אחת לכל עלויות מסלול הבנייה העצמית (קרקע+פיתוח+בנייה), לצורך השוואה בלבד.">?</span>
+            <input type="text" inputmode="numeric" class="money-input" id="cmpSelfBuildBudget" value="2000000">
+          </label>
+        </div>
+        <button onclick="comparePaths()">השווה מסלולים</button>
+        <div id="pathComparisonResult" style="margin-top:14px"></div>
+      </div>
+
+      <div class="card">
+        <h2>ההיסטוריה שלי</h2>
+        <div id="historyList"></div>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+  </div>
+
+  <nav class="floating-nav">
+    <a href="/lottery.html"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
+    <a href="/land-tenders.html"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
+    <a href="/results-board.html"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
+    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
+    <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
+    <a href="/account.html" class="active"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
+  </nav>
+
+<script src="/app.js"></script>
+<script>
+async function handleLogin() {
+  const result = await submit('/api/auth/login', false);
+  if (result) {
+    setAuthToken(result.data.token);
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPassword').value = '';
+    await refreshAccountUI();
+  }
+}
+
+async function handleRegister() {
+  if (!document.getElementById('consentCheckbox').checked) {
+    const msgEl = document.getElementById('authMessage');
+    msgEl.style.color = '#b02a2a';
+    msgEl.textContent = 'יש לאשר את מדיניות הפרטיות כדי להירשם';
+    return;
+  }
+  const result = await submit('/api/auth/register', true);
+  if (result) {
+    const msgEl = document.getElementById('authMessage');
+    msgEl.style.color = '#1a7a34';
+    msgEl.textContent = result.data.message;
+  }
+}
+
+async function submit(url, consent) {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const msgEl = document.getElementById('authMessage');
+  const resendLink = document.getElementById('resendVerificationLink');
+  msgEl.style.color = '#8b93a6';
+  msgEl.textContent = 'רגע...';
+  resendLink.style.display = 'none';
+  const result = await authRequest(url, email, password, consent);
+  if (!result.ok) {
+    msgEl.style.color = '#b02a2a';
+    msgEl.textContent = result.error;
+    resendLink.style.display = result.status === 403 ? 'inline' : 'none';
+    return null;
+  }
+  return result;
+}
+
+function toggleForgotPassword() {
+  const box = document.getElementById('forgotPasswordBox');
+  const showing = box.style.display !== 'none';
+  box.style.display = showing ? 'none' : 'block';
+  if (!showing) document.getElementById('forgotEmail').value = document.getElementById('authEmail').value;
+}
+
+async function submitForgotPassword() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  const msgEl = document.getElementById('authMessage');
+  msgEl.style.color = '#8b93a6';
+  msgEl.textContent = 'רגע...';
+  const res = await fetch('/api/auth/forgot-password', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+  });
+  const data = await res.json();
+  msgEl.style.color = '#1a7a34';
+  msgEl.textContent = data.message;
+  document.getElementById('forgotPasswordBox').style.display = 'none';
+}
+
+async function resendVerification() {
+  const email = document.getElementById('authEmail').value.trim();
+  await fetch('/api/auth/resend-verification', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+  });
+  const msgEl = document.getElementById('authMessage');
+  msgEl.style.color = '#1a7a34';
+  msgEl.textContent = 'אם הכתובת רשומה ועדיין לא אומתה, נשלח אליה מייל אימות חדש';
+  document.getElementById('resendVerificationLink').style.display = 'none';
+}
+
+async function handleLogout() {
+  await doLogout();
+  await refreshAccountUI();
+}
+
+async function refreshAccountUI() {
+  const me = await fetchCurrentUser();
+  document.getElementById('loggedOutView').style.display = me.loggedIn ? 'none' : 'block';
+  document.getElementById('loggedInView').style.display = me.loggedIn ? 'block' : 'none';
+  if (!me.loggedIn) return;
+  document.getElementById('authEmailDisplay').textContent = me.email;
+  await renderHistory();
+}
+
+async function renderHistory() {
+  const el = document.getElementById('historyList');
+  const history = await (await fetch('/api/dashboard/mine', { headers: authHeaders() })).json();
+  if (history.length === 0) {
+    el.innerHTML = '<p style="color:#8b93a6;font-size:13px">עדיין לא שמרת חישובים. חשבו משכנתא בעמוד "משכנתאות" כדי שהיא תישמר כאן.</p>';
+    return;
+  }
+  el.innerHTML = history.map(h => `
+    <div class="history-item">
+      <span>${h.category} · ${Math.round(h.purchasePrice).toLocaleString()} ש"ח <small style="color:#8b93a6">(${new Date(h.createdAt).toLocaleString('he-IL')})</small></span>
+      <span><button class="secondary" onclick="loadFromHistory('${h.id}')">צפייה</button></span>
+    </div>`).join('');
+}
+
+async function loadFromHistory(id) {
+  const res = await fetch(`/api/dashboard/${id}`, { headers: authHeaders() });
+  if (!res.ok) { alert('החישוב הזה כבר לא זמין'); return; }
+  const data = await res.json();
+  const s = data.summary;
+  const fmt = n => n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  alert(`הון עצמי נדרש: ${fmt(s.requiredEquity)} ש"ח\nסה"כ מזומן נדרש: ${fmt(s.totalCashNeeded)} ש"ח\nתשלום חודשי משוער: ${fmt(s.monthlyPayment)} ש"ח\nלחישוב מפורט ועדכני, השתמשו בעמוד "משכנתאות".`);
+}
+
+async function comparePaths() {
+  const availableEquity = numericValue(document.getElementById('cmpEquity'));
+  const monthlyIncome = numericValue(document.getElementById('cmpIncome'));
+  const category = document.getElementById('cmpCategory').value;
+  const termYears = Number(document.getElementById('cmpTermYears').value);
+  const marketValue = numericValue(document.getElementById('cmpMarketValue'));
+  const purchasePrice = numericValue(document.getElementById('cmpPurchasePrice'));
+  const selfBuildBudget = numericValue(document.getElementById('cmpSelfBuildBudget'));
+
+  const scenarios = [
+    { name: 'מחיר למשתכן', marketValue, purchasePrice, subsidized: true },
+    { name: 'שוק חופשי (יד שנייה/קבלן)', marketValue, purchasePrice: marketValue, subsidized: false },
+    { name: 'בנייה עצמית (מכרזי קרקעות)', marketValue: selfBuildBudget, purchasePrice: selfBuildBudget, subsidized: false }
+  ];
+
+  const results = await Promise.all(scenarios.map(async sc => {
+    const equity = await (await fetch('/api/equity/calculate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ availableEquity, monthlyIncome, category, marketValue: sc.marketValue, purchasePrice: sc.purchasePrice, subsidized: sc.subsidized, usedBroker: false })
+    })).json();
+    const loanAmount = Math.max(0, sc.purchasePrice - availableEquity);
+    const payment = await (await fetch('/api/mortgage/monthly-payment', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ loanAmount, termYears, monthlyIncome })
+    })).json();
+    return { name: sc.name, equity, payment };
+  }));
+
+  const fmt = n => Math.round(n).toLocaleString();
+  document.getElementById('pathComparisonResult').innerHTML = `
+    <table>
+      <tr><th>מסלול</th><th>הון עצמי נדרש</th><th>סה"כ מזומן נדרש</th><th>תשלום חודשי משוער</th><th>שיעור החזר מהכנסה</th></tr>
+      ${results.map(r => `
+        <tr>
+          <td>${r.name}</td>
+          <td>${fmt(r.equity.requiredEquity)} ש"ח</td>
+          <td>${fmt(r.equity.totalCashNeeded)} ש"ח ${r.equity.canAfford ? '✅' : '⚠️'}</td>
+          <td>${fmt(r.payment.monthlyPayment)} ש"ח</td>
+          <td>${r.payment.dtiPercent.toFixed(1)}%</td>
+        </tr>`).join('')}
+    </table>
+    <p style="font-size:11px;color:#8b93a6;margin-top:6px">"מחיר למשתכן" ו"שוק חופשי" מבוססים על שווי השוק/מחיר הרכישה שמילאתם למעלה. "בנייה עצמית" הוא אומדן מפושט על סמך תקציב כולל אחד - למספרים מדויקים למכרז ספציפי היכנסו למחשבון הבנייה העצמית בעמוד "מכרזי קרקעות".</p>`;
+}
+
+refreshAccountUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>לוח תוצאות</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+<style>
+  .viz-root {
+    --surface-1: #fcfcfb;
+    --text-primary: #10192e;
+    --text-secondary: #57627a;
+    --text-muted: #8b93a6;
+    --gridline: #e3e9f6;
+    --baseline: #c3c2b7;
+    --series-single: #1c807a;
+  }
+  .chart-wrap { background: var(--surface-1); border-radius: 14px; padding: 12px; }
+  .chart-tooltip { position: fixed; background: #10192e; color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; z-index: 50; display: none; white-space: nowrap; }
+  .bar-single { cursor: pointer; }
+  .bar-single:hover { filter: brightness(1.12); }
+  .axis-label { fill: var(--text-muted); font-size: 10px; }
+  .value-label { fill: var(--text-primary); font-size: 12px; font-weight: 600; }
+  .axis-line { stroke: var(--baseline); stroke-width: 1; }
+  details.table-toggle summary { cursor: pointer; font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
+  .results-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .results-tabs button.tab-btn { background: #fff; color: var(--text-secondary); border: 1px solid var(--border); }
+  .results-tabs button.tab-btn.active { background: var(--series-single, #1c807a); color: #fff; border-color: transparent; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>לוח תוצאות</h1>
+    <p class="subtitle">השוואת ערים - מחיר למשתכן (נתונים היסטוריים) או מכרזי קרקעות (תוצאות אמיתיות שהוכרעו לאחרונה).</p>
+
+    <div class="results-tabs">
+      <button class="tab-btn active" id="tabBtnLottery" onclick="switchTab('lottery')">מחיר למשתכן</button>
+      <button class="tab-btn" id="tabBtnLand" onclick="switchTab('land')">מכרזי קרקעות</button>
+    </div>
+
+    <div class="card" id="lotteryTab">
+      <div class="checkbox-row">
+        <input type="checkbox" id="cityCompareLocal">
+        <label for="cityCompareLocal" style="margin:0">הצג עבור בני מקום</label>
+        <span class="info-tip" tabindex="0" data-tip="תושבים רשומים של אותה עיר מתחרים על מכסת דירות נפרדת מהמכסה הכללית. זה לא תמיד מטיב איתם - בערים מבוקשות המכסה השמורה לבני מקום קטנה יחסית לביקוש המקומי, ואז הסיכוי הכללי (הארצי) יכול להיות דווקא גבוה יותר. סמנו כדי להשוות בין שתי המכסות בכל עיר.">?</span>
+      </div>
+      <p class="subtitle" style="margin-top:-4px;margin-bottom:10px">שימו לב: הדירוג בין הערים משתנה בין "בני מקום" ל"כלל הארץ" - כל עיר יש לה יחס שונה בין מכסת הדירות השמורה לבין כמות הנרשמים אליה, אז אותה עיר יכולה להיות טובה יותר במכסה אחת וגרועה יותר בשנייה.</p>
+      <p class="subtitle" style="margin-bottom:10px">מבוסס על נתוני 2,320 הגרלות אמיתיות ממשרד השיכון - תמונת מצב היסטורית קבועה.</p>
+      <button onclick="loadCityComparison()">רענן השוואה</button>
+      <div id="cityComparisonChart" class="viz-root chart-wrap" style="margin-top:14px"></div>
+    </div>
+
+    <div class="card" id="landTab" style="display:none">
+      <p class="subtitle" style="margin-bottom:10px">מחיר סופי ממוצע למ"ר, לפי עיר, מתוך מכרזי בנייה עצמית שהוכרעו בפועל (זוכה+מחיר סופי) בשלוש השנים האחרונות.
+        <span class="info-tip" tabindex="0" data-tip="בשונה מ'מחיר למשתכן', מכרזי קרקע הם תחרותיים - המחיר הסופי נקבע לפי ההצעה הזוכה בפועל, ויכול להיות גבוה משמעותית ממחיר הבסיס/השמאי. הנתונים כאן מגיעים מתוצאות אמיתיות שפורסמו, לא תחזית.">?</span>
+      </p>
+      <div id="landResultsStatus" style="font-size:13px;color:#8b93a6;margin-bottom:8px"></div>
+      <div id="landResultsChart" class="viz-root chart-wrap"></div>
+    </div>
+
+    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+  </div>
+
+  <nav class="floating-nav">
+    <a href="/lottery.html"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
+    <a href="/land-tenders.html"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
+    <a href="/results-board.html" class="active"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
+    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
+    <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
+    <a href="/account.html"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
+  </nav>
+
+  <div id="chartTooltip" class="chart-tooltip"></div>
+
+<script>
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+  return el;
+}
+const tooltipEl = document.getElementById('chartTooltip');
+function showTooltip(evt, rowsHtml) {
+  tooltipEl.innerHTML = rowsHtml;
+  tooltipEl.style.display = 'block';
+  tooltipEl.style.left = (evt.clientX + 14) + 'px';
+  tooltipEl.style.top = (evt.clientY + 14) + 'px';
+}
+function hideTooltip() { tooltipEl.style.display = 'none'; }
+function niceMax(value) {
+  if (value <= 0) return 1;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
+  const normalized = value / magnitude;
+  const step = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+  return step * magnitude;
+}
+
+let landTabLoaded = false;
+function switchTab(tab) {
+  document.getElementById('lotteryTab').style.display = tab === 'lottery' ? 'block' : 'none';
+  document.getElementById('landTab').style.display = tab === 'land' ? 'block' : 'none';
+  document.getElementById('tabBtnLottery').classList.toggle('active', tab === 'lottery');
+  document.getElementById('tabBtnLand').classList.toggle('active', tab === 'land');
+  if (tab === 'land' && !landTabLoaded) {
+    landTabLoaded = true;
+    loadLandCityResults();
+  }
+}
+
+// ---- תרשים עמודות אופקי גנרי - ערים ממוינות, ערך אחד לעמודה, טבלה מלאה מתקפלת ----
+function renderHorizontalBarChart(containerId, items, opts) {
+  const container = document.getElementById(containerId);
+  if (items.length === 0) {
+    container.innerHTML = '<p style="color:#8b93a6;font-size:13px">אין מספיק נתונים</p>';
+    return;
+  }
+  // רוחב ה-viewBox נמדד מהקונטיינר בפועל (לא קבוע) כדי שגודל הטקסט יישאר קריא במסך צר - אחרת ה-SVG
+  // מוקטן כמכלול על ידי width:100%, וכל טקסט "בפנים" מתכווץ יחד איתו עד שהוא בלתי קריא בנייד.
+  const width = Math.max(280, Math.round(container.clientWidth || 680));
+  const isNarrow = width < 420;
+  const rowH = 28, marginLeft = isNarrow ? 76 : 130, marginRight = isNarrow ? 44 : 60, marginTop = 6;
+  const cityFontSize = isNarrow ? 10 : 12;
+  const maxCityChars = isNarrow ? 9 : 18;
+  const height = marginTop + items.length * rowH + 10;
+  const plotW = width - marginLeft - marginRight;
+  const maxValue = niceMax(Math.max(...items.map(opts.value)));
+
+  const svg = svgEl('svg', { viewBox: `0 0 ${width} ${height}`, width: '100%', height, role: 'img', 'aria-label': opts.ariaLabel });
+
+  items.forEach((item, i) => {
+    const y = marginTop + i * rowH;
+    const barH = 18;
+    const value = opts.value(item);
+    const barLen = (value / maxValue) * plotW;
+
+    const cityLabel = svgEl('text', { class: 'axis-label', x: marginLeft - 10, y: y + barH / 2 + 4, 'text-anchor': 'end', direction: 'ltr', style: `font-size:${cityFontSize}px` });
+    const cityName = opts.city(item);
+    cityLabel.textContent = cityName.length > maxCityChars ? cityName.slice(0, maxCityChars - 1) + '…' : cityName;
+    const cityTitle = svgEl('title', {});
+    cityTitle.textContent = cityName;
+    cityLabel.appendChild(cityTitle);
+    svg.appendChild(cityLabel);
+
+    const rect = svgEl('rect', { class: 'bar-single', x: marginLeft, y, width: Math.max(1, barLen), height: barH, rx: 6, fill: 'var(--series-single)' });
+    rect.addEventListener('pointermove', evt => showTooltip(evt, opts.tooltip(item)));
+    rect.addEventListener('pointerleave', hideTooltip);
+    svg.appendChild(rect);
+
+    const valueLabel = svgEl('text', { class: 'value-label', x: marginLeft + barLen + 10, y: y + barH / 2 + 4, 'text-anchor': 'start', direction: 'ltr', style: `font-size:${isNarrow ? 11 : 12}px` });
+    valueLabel.textContent = opts.valueLabel(item);
+    svg.appendChild(valueLabel);
+  });
+
+  container.innerHTML = '';
+  container.appendChild(svg);
+
+  const details = document.createElement('details');
+  details.className = 'table-toggle';
+  details.innerHTML = `<summary>הצג טבלה מלאה</summary>
+    <div style="overflow-x:auto"><table>
+      <tr>${opts.tableHeaders.map(h => `<th>${h}</th>`).join('')}</tr>
+      ${items.map(item => `<tr>${opts.tableRow(item).map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}
+    </table></div>`;
+  container.appendChild(details);
+}
+
+async function loadCityComparison() {
+  const localResident = document.getElementById('cityCompareLocal').checked;
+  const cities = await (await fetch(`/api/lottery/city-comparison?localResident=${localResident}&minProjects=3&limit=15`)).json();
+  renderHorizontalBarChart('cityComparisonChart', cities, {
+    ariaLabel: 'השוואת סיכויי זכייה ממוצעים לפי עיר',
+    value: c => c.avgOddsPercent,
+    city: c => c.city,
+    valueLabel: c => c.avgOddsPercent.toFixed(1) + '%',
+    tooltip: c => `<b>${c.city}</b><br>סיכוי ממוצע: <b>${c.avgOddsPercent.toFixed(1)}%</b><br>מחיר ממוצע למ"ר: <b>${c.avgPricePerSqm > 0 ? Math.round(c.avgPricePerSqm).toLocaleString() : '—'}</b><br>מס' פרויקטים: <b>${c.projectCount}</b>`,
+    tableHeaders: ['עיר', 'סיכוי ממוצע', 'מחיר ממוצע למ"ר', "מס' פרויקטים"],
+    tableRow: c => [c.city, c.avgOddsPercent.toFixed(1) + '%', c.avgPricePerSqm > 0 ? Math.round(c.avgPricePerSqm).toLocaleString() : '—', c.projectCount]
+  });
+}
+
+async function loadLandCityResults() {
+  const statusEl = document.getElementById('landResultsStatus');
+  statusEl.textContent = 'טוען תוצאות אמיתיות ממכרזי רמ"י (יכול לקחת כמה שניות בפעם הראשונה)...';
+  try {
+    const cities = await (await fetch('/api/land-tenders/city-results')).json();
+    statusEl.textContent = cities.length > 0
+      ? `מבוסס על ${cities.reduce((a, c) => a + c.decidedPlots, 0)} מגרשים שהוכרעו בפועל, ב-${cities.length} ערים.`
+      : 'עדיין אין מספיק תוצאות מוכרעות זמינות.';
+    renderHorizontalBarChart('landResultsChart', cities, {
+      ariaLabel: 'השוואת מחיר סופי ממוצע למ"ר לפי עיר',
+      value: c => c.avgPricePerSqm,
+      city: c => c.city,
+      valueLabel: c => Math.round(c.avgPricePerSqm).toLocaleString(),
+      tooltip: c => `<b>${c.city}</b><br>מחיר ממוצע למ"ר: <b>${Math.round(c.avgPricePerSqm).toLocaleString()} ש"ח</b><br>מחיר סופי ממוצע למגרש: <b>${Math.round(c.avgFinalPrice).toLocaleString()} ש"ח</b><br>מגרשים שהוכרעו: <b>${c.decidedPlots}</b>`,
+      tableHeaders: ['עיר', 'מחיר ממוצע למ"ר', 'מחיר סופי ממוצע למגרש', 'מגרשים שהוכרעו'],
+      tableRow: c => [c.city, Math.round(c.avgPricePerSqm).toLocaleString(), Math.round(c.avgFinalPrice).toLocaleString(), c.decidedPlots]
+    });
+  } catch (e) {
+    statusEl.textContent = 'לא הצלחנו לטעון תוצאות מכרזי קרקע כרגע.';
+  }
+}
+
+loadCityComparison();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "analytics",
+      "runtimeExecutable": "P:\\analytics\\mvnw.cmd",
+      "runtimeArgs": ["-f", "P:\\analytics\\pom.xml", "spring-boot:run"],
+      "port": 8080
+    }
+  ]
+}
