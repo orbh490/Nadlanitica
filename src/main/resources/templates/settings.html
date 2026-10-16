@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:replace="~{fragments/head :: common(title='הגדרות')}"></th:block>
+</head>
+<body>
+  <div th:replace="~{fragments/nav :: help}"></div>
+  <div th:replace="~{fragments/nav :: account(active='settings')}"></div>
+  <div class="page">
+    <h1>הגדרות</h1>
+    <p class="subtitle">ההגדרות הכלליות זמינות לכולם - עם או בלי חשבון.</p>
+
+    <div class="card" id="accountCard">
+      <h2>חשבון</h2>
+      <div id="loggedOutView" style="display:none">
+        <p class="subtitle" style="margin-bottom:10px">אינך מחובר/ת כרגע. אפשר להמשיך להשתמש בכל המחשבונים כאורח/ת, אבל בלי חשבון שום דבר לא נשמר אחרי שסוגרים את הדפדפן.</p>
+        <a href="/account.html"><button>התחברות / הרשמה</button></a>
+      </div>
+      <div id="loggedInView" style="display:none">
+        <p>מחובר/ת כ-<b id="settingsEmail"></b></p>
+        <button class="secondary" onclick="handleLogout()">התנתקות</button>
+        <p class="subtitle" style="margin:14px 0 6px">לשינוי סיסמה נשלח אליך קישור איפוס למייל הרשום.</p>
+        <button class="secondary" onclick="sendPasswordReset()">שלחו לי קישור לשינוי סיסמה</button>
+        <div id="settingsMessage" style="margin-top:8px;font-size:13px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>פרטיות ונתונים</h2>
+      <p class="subtitle" style="margin-bottom:10px">מוחק מהדפדפן הזה את פרטי ההתחברות השמורים (אם יש). לא משפיע על נתונים ששמורים בחשבון שלך בשרת.</p>
+      <button class="secondary" onclick="clearLocalData()">ניקוי נתונים שמורים במכשיר זה</button>
+      <div id="clearMessage" style="margin-top:8px;font-size:13px"></div>
+    </div>
+
+    <div th:replace="~{fragments/nav :: policy}"></div>
+  </div>
+
+  <nav th:replace="~{fragments/nav :: floating(active='settings')}"></nav>
+
+<script src="/app.js"></script>
+<script>
+async function refreshSettingsUI() {
+  const me = await fetchCurrentUser();
+  document.getElementById('loggedOutView').style.display = me.loggedIn ? 'none' : 'block';
+  document.getElementById('loggedInView').style.display = me.loggedIn ? 'block' : 'none';
+  if (!me.loggedIn) return;
+  document.getElementById('settingsEmail').textContent = me.email;
+}
+
+async function handleLogout() {
+  await doLogout();
+  await refreshSettingsUI();
+}
+
+async function sendPasswordReset() {
+  const email = document.getElementById('settingsEmail').textContent;
+  const msgEl = document.getElementById('settingsMessage');
+  msgEl.style.color = '#8b93a6';
+  msgEl.textContent = 'רגע...';
+  const res = await fetch('/api/auth/forgot-password', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+  });
+  const data = await res.json();
+  msgEl.style.color = '#1a7a34';
+  msgEl.textContent = data.message;
+}
+
+function clearLocalData() {
+  clearAuthToken();
+  const msgEl = document.getElementById('clearMessage');
+  msgEl.style.color = '#1a7a34';
+  msgEl.textContent = 'נוקה. מרעננים...';
+  setTimeout(() => location.reload(), 600);
+}
+
+refreshSettingsUI();
+initPageIntro('settings', 'הגדרות',
+  'כאן אפשר לנהל את החשבון שלך, לשנות סיסמה, ולנקות נתונים שמורים במכשיר הזה. ההגדרות הכלליות זמינות לכולם, עם או בלי חשבון.');
+</script>
+</body>
+</html>

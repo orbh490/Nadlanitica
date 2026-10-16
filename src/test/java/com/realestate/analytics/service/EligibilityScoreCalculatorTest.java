@@ -11,25 +11,25 @@ class EligibilityScoreCalculatorTest {
 
     @Test
     void zeroProfileScoresZero() {
-        EligibilityProfile profile = new EligibilityProfile(0, false, false, false, false, false, false, 0, false);
+        EligibilityProfile profile = new EligibilityProfile(0, false, false, false, false, false, false, 0);
         assertThat(calculator.calculateScore(profile)).isEqualTo(0);
     }
 
     @Test
     void childrenCapAtThreeForScoring() {
-        EligibilityProfile profile = new EligibilityProfile(5, false, false, false, false, false, false, 0, false);
+        EligibilityProfile profile = new EligibilityProfile(5, false, false, false, false, false, false, 0);
         assertThat(calculator.calculateScore(profile)).isEqualTo(30); // capped at 3 * 10
     }
 
     @Test
     void failedApplicationsCapAtFour() {
-        EligibilityProfile profile = new EligibilityProfile(0, false, false, false, false, false, false, 10, false);
+        EligibilityProfile profile = new EligibilityProfile(0, false, false, false, false, false, false, 10);
         assertThat(calculator.calculateScore(profile)).isEqualTo(12); // capped at 4 * 3
     }
 
     @Test
     void allCriteriaSumCorrectly() {
-        EligibilityProfile profile = new EligibilityProfile(3, true, true, false, true, false, true, 2, false);
+        EligibilityProfile profile = new EligibilityProfile(3, true, true, false, true, false, true, 2);
         // 30 (children) + 10 (service) + 20 (immigrant) + 15 (disability) + 8 (income) + 6 (2 failed apps)
         assertThat(calculator.calculateScore(profile)).isEqualTo(89);
     }

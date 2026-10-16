@@ -29,6 +29,8 @@ public class EligibilityScoreCalculator {
     public record ScoreBracket(String label, int minScore, Integer maxScore, double unitSharePercent) {
     }
 
+    // חלוקת הדירות בין 3 קבוצות הניקוד (אומת מול "כל-זכות" המצטט את נוהל 08/31 מיום 20.10.2019
+    // ואת תקנון הגרלת בחירת זכאים של משרד הבינוי והשיכון): 11-54 נק'=25%, 55-64 נק'=50%, 65+=25%.
     private static final ScoreBracket BRACKET_LOW = new ScoreBracket("11-54 נקודות", 11, 54, 25.0);
     private static final ScoreBracket BRACKET_MID = new ScoreBracket("55-64 נקודות", 55, 64, 50.0);
     private static final ScoreBracket BRACKET_HIGH = new ScoreBracket("65+ נקודות", 65, null, 25.0);

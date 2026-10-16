@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="he" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--
+  בלוק ה-head המשותף לכל דפי האפליקציה - פאבויקון, מניפסט, גופנים, app.css.
+  לפני המעבר ל-fragments, כל שינוי כאן (כמו הוספת manifest.json) דרש עריכה זהה ב-8 קבצים בנפרד.
+-->
+<th:block th:fragment="common(title)">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title th:text="${title}">המצפן הפיננסי לרוכש הישראלי</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#16324a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</th:block>
+</head>
+<body></body>
+</html>

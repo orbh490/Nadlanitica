@@ -62,7 +62,32 @@
   .nav-grid .nav-tile:nth-child(4) { animation-delay: .17s; }
   .nav-grid .nav-tile:nth-child(5) { animation-delay: .22s; }
   .nav-grid .nav-tile:nth-child(6) { animation-delay: .27s; }
+
+  /* הופעה חלקה לכל בלוק תוצאה שמוזרק דינמית (innerHTML) - קוראים ל-revealResult() אחרי שמציבים את התוכן */
+  @keyframes resultReveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  .reveal-in { animation: resultReveal .45s cubic-bezier(.16,1,.3,1) both; }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .skeleton { animation: shimmer 1.4s ease-in-out infinite; }
 }
+
+/* שורת טעינה "שלד" - למצבי המתנה לנתונים חיים, במקום טקסט "טוען..." יבש */
+.skeleton {
+  display: inline-block;
+  width: 100%;
+  max-width: 220px;
+  height: 14px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--border) 25%, var(--page-bg) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+}
+.skeleton + .skeleton { margin-top: 8px; }
 
 body {
   font-family: var(--font-family);
@@ -73,7 +98,25 @@ body {
   margin: 0;
   padding-bottom: 100px; /* מקום לניווט הצף */
   letter-spacing: -.01em;
+  position: relative;
 }
+
+/* סימני מים של הלוגו ברקע - בלי צבעים, שני בתים בפינות מנוגדות (אחד הפוך), גדולים מספיק שחלקם נכנס מתחת לתוכן */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  width: 85vmin;
+  height: 85vmin;
+  background-image: url('/img/logo.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: grayscale(100%);
+  opacity: .05;
+  pointer-events: none;
+  z-index: -1;
+}
+body::before { bottom: 0; left: 0; background-position: bottom left; }
+body::after { top: 0; right: 0; background-position: top left; transform: rotate(180deg); }
 
 .page {
   max-width: 820px;
@@ -219,6 +262,106 @@ tbody tr:hover { background: var(--primary-50); }
   .floating-nav a .icon { font-size: 17px; }
 }
 
+/* כפתורים עגולים בפינה הימנית העליונה - אזור אישי והגדרות, במקום בניווט הצף */
+.corner-actions {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 200;
+}
+.corner-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, .6);
+  box-shadow: 0 12px 32px rgba(18, 20, 42, .18);
+  color: var(--ink-muted);
+  text-decoration: none;
+  transition: transform .18s ease, color .18s ease, background .18s ease;
+}
+.corner-btn .material-symbols-outlined { font-size: 22px; line-height: 1; }
+.corner-btn.active { color: var(--primary-700); background: var(--primary-50); }
+.corner-btn:hover:not(.active) { color: var(--primary-600); background: var(--white); transform: translateY(-2px); }
+
+@media (max-width: 400px) {
+  .corner-actions { top: 10px; right: 10px; gap: 8px; }
+  .corner-btn { width: 38px; height: 38px; }
+  .corner-btn .material-symbols-outlined { font-size: 19px; }
+}
+
+/* גרסת מראה שמאל - כפתור "?" שמסביר שוב את הדף */
+.corner-actions.left { right: auto; left: 16px; }
+@media (max-width: 400px) {
+  .corner-actions.left { left: 10px; }
+}
+
+/* שני כפתורים קבועים בפינה הימנית התחתונה, אחד מעל השני - קישורי מדיניות בכל דף, במקום שורת הפוטר הישנה */
+.policy-links {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 150;
+}
+@media (max-width: 400px) {
+  .policy-links { bottom: 10px; right: 10px; gap: 6px; }
+}
+a.policy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, .6);
+  box-shadow: 0 8px 20px rgba(18, 20, 42, .1);
+  transition: transform .18s ease, color .18s ease, background .18s ease;
+}
+.policy-btn .icon { font-size: 17px; line-height: 1; }
+a.policy-btn:hover { color: var(--primary-600); background: var(--white); transform: translateY(-2px); }
+
+/* בועת הסבר לדף - קופצת פעם אחת בכניסה הראשונה (ראו initPageIntro ב-app.js), ואפשר לפתוח שוב דרך כפתור "?" */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 45, 66, .45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+.intro-bubble {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card-hover);
+  padding: 26px 24px;
+  max-width: 380px;
+  width: 100%;
+}
+.intro-bubble h2 { font-size: 18px; margin: 0 0 10px; }
+.intro-bubble p { font-size: 14px; color: var(--ink-secondary); line-height: 1.65; margin: 0; }
+.intro-bubble button { width: 100%; justify-content: center; margin-top: 20px; }
+
 /* תיבת חיפוש עם datalist - חיפוש חופשי + מיון אלפביתי מגיע מה-JS שממלא את ה-datalist */
 input[list] { background-image: none; }
 
@@ -246,6 +389,20 @@ input[list] { background-image: none; }
 }
 .hero h1 { font-size: 28px; }
 .hero p { opacity: .92; font-size: 14px; margin-top: 8px; max-width: 46em; }
+
+.hero-logo-badge {
+  width: 60px;
+  height: 60px;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 20px rgba(0,0,0,.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px;
+  margin-bottom: 16px;
+}
+.hero-logo-badge img { width: 100%; height: 100%; object-fit: contain; }
 
 .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 520px) { .nav-grid { grid-template-columns: 1fr; } }

@@ -1,21 +1,15 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>האזור האישי שלי</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
-<link rel="stylesheet" href="/app.css">
+<th:block th:replace="~{fragments/head :: common(title='האזור האישי שלי')}"></th:block>
 <style>
   #historyList { margin-top: 10px; }
   .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 </style>
 </head>
 <body>
+  <div th:replace="~{fragments/nav :: help}"></div>
+  <div th:replace="~{fragments/nav :: account(active='account')}"></div>
   <div class="page">
     <h1>האזור האישי שלי</h1>
     <p class="subtitle">היסטוריית החישובים שלך והשוואת מסלולים - זמין רק כשמחוברים, כדי שהמידע שלך יישמר.</p>
@@ -81,17 +75,10 @@
       </div>
     </div>
 
-    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+    <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
 
-  <nav class="floating-nav">
-    <a href="/lottery.html"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
-    <a href="/land-tenders.html"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
-    <a href="/results-board.html"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
-    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
-    <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
-    <a href="/account.html" class="active"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
-  </nav>
+  <nav th:replace="~{fragments/nav :: floating(active='account')}"></nav>
 
 <script src="/app.js"></script>
 <script>
@@ -252,6 +239,8 @@ async function comparePaths() {
 }
 
 refreshAccountUI();
+initPageIntro('account', 'האזור האישי שלי',
+  'היסטוריית החישובים ששמרת (רק למשתמשים רשומים), והשוואה בין מסלולי רכישה שונים - מחיר למשתכן מול שוק חופשי מול בנייה עצמית.');
 </script>
 </body>
 </html>

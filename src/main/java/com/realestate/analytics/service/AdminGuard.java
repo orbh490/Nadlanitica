@@ -5,6 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 /**
  * ה"אדמין" היחיד באפליקציה הזו הוא בעל האתר עצמו - אין מערכת הרשאות תפקידים.
  * לכן במקום מנגנון תפקידים מלא, נקודות קצה ניהוליות (רשימת לידים וכו') מוגנות במפתח סוד יחיד
@@ -20,7 +23,10 @@ public class AdminGuard {
     }
 
     public void check(String providedKey) {
-        if (adminKey.isBlank() || providedKey == null || !adminKey.equals(providedKey)) {
+        // MessageDigest.isEqual במקום String.equals - משווה בזמן קבוע כדי לא לדלוף מידע על המפתח
+        // דרך הבדל בזמן תגובה (timing attack).
+        if (adminKey.isBlank() || providedKey == null
+                || !MessageDigest.isEqual(adminKey.getBytes(StandardCharsets.UTF_8), providedKey.getBytes(StandardCharsets.UTF_8))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "גישה נדחתה");
         }
     }

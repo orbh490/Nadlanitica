@@ -22,7 +22,10 @@ class MortgageRuleEngineTest {
     void replacementApartmentRequires30Percent() {
         BuyerProfile buyer = new BuyerProfile(0, 0, ApartmentCategory.REPLACEMENT);
         Property property = new Property(1_500_000, 1_400_000, false);
-        assertThat(engine.calculateRequiredEquity(buyer, property)).isEqualTo(420_000.0); // 30% of purchase price
+        // isCloseTo ולא isEqualTo - 0.30 לא מיוצג בדיוק בבינארי (בניגוד ל-0.25 בטסט למעלה), אז המכפלה
+        // האמיתית יוצאת 420000.00000000006 ולא 420000.0 בדיוק. זו תקלת דיוק בטסט, לא בחישוב עצמו.
+        assertThat(engine.calculateRequiredEquity(buyer, property))
+                .isCloseTo(420_000.0, org.assertj.core.data.Offset.offset(0.01)); // 30% of purchase price
     }
 
     @Test

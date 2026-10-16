@@ -33,6 +33,7 @@ class LotteryOddsEngineTest {
         assertThat(engine.calculateOddsPercent(project, true)).isEqualTo(100.0);
     }
 
+
     @Test
     void loadsRealMinistryOfHousingDataFromClasspath() {
         assertThat(engine.allProjects()).hasSizeGreaterThan(2000);

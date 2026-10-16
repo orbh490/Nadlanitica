@@ -7,8 +7,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
@@ -32,13 +32,13 @@ class AdminLeadsController {
     }
 
     @GetMapping
-    List<MortgageLead> list(@RequestParam String key) {
+    List<MortgageLead> list(@RequestHeader("X-Admin-Key") String key) {
         adminGuard.check(key);
         return repository.findAllByOrderByCreatedAtDesc();
     }
 
     @GetMapping("/export.csv")
-    ResponseEntity<byte[]> exportCsv(@RequestParam String key) {
+    ResponseEntity<byte[]> exportCsv(@RequestHeader("X-Admin-Key") String key) {
         adminGuard.check(key);
         StringBuilder csv = new StringBuilder();
         csv.append((char) 0xFEFF);
@@ -59,6 +59,9 @@ class AdminLeadsController {
 
     private static String csvField(String value) {
         if (value == null) return "";
-        return "\"" + value.replace("\"", "\"\"") + "\"";
+        // מניעת CSV/Formula Injection: שדה שמתחיל ב-=+-@ מתפרש כנוסחה ע"י Excel/Sheets כשפותחים את
+        // הקובץ - והשדות האלה מגיעים ישירות ממשתמש לא-מאומת (טופס הלידים הציבורי). תו ' מוביל מנטרל זאת.
+        String safe = value.matches("^[=+\\-@].*") ? "'" + value : value;
+        return "\"" + safe.replace("\"", "\"\"") + "\"";
     }
 }

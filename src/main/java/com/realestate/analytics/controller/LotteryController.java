@@ -18,7 +18,7 @@ record ProjectSummary(String city, String projectName, String projectId, String 
 }
 
 record LotteryOddsResponse(String city, String projectName, boolean localResident, double winProbabilityPercent,
-        Double actualHistoricalWinRatePercent, boolean peripheryGrantEligibleCity) {
+        Double actualHistoricalWinRatePercent, boolean peripheryGrantEligibleCity, int poolUnits, int poolApplicants) {
 }
 
 record LiveStatusResponse(boolean hasLiveData, LotteryLiveService.LiveLotteryProject liveProject) {
@@ -65,10 +65,11 @@ class LotteryController {
         LotteryProject p = engine.findProject(city, project)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "פרויקט לא נמצא: " + city + " / " + project));
         OptionalDouble historical = engine.actualHistoricalOddsPercent(p, localResident);
+        LotteryOddsEngine.OddsPool pool = engine.poolFor(p, localResident);
         return new LotteryOddsResponse(p.getCity(), p.getProjectName(), localResident,
                 engine.calculateOddsPercent(p, localResident),
                 historical.isPresent() ? historical.getAsDouble() : null,
-                peripheryGrantCities.isEligible(p.getCity()));
+                peripheryGrantCities.isEligible(p.getCity()), pool.units(), pool.applicants());
     }
 
     @GetMapping("/city-comparison")

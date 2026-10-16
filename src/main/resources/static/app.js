@@ -26,6 +26,63 @@ function initMoneyInputs() {
 
 document.addEventListener('DOMContentLoaded', initMoneyInputs);
 
+// ---- בועת הסבר לדף - קופצת פעם אחת בכניסה הראשונה לכל דף (נשמר ב-localStorage לפי מפתח ייחודי),
+// וכפתור "?" קבוע (id="helpBtn") פותח אותה שוב בכל זמן ----
+function initPageIntro(pageKey, title, bodyHtml) {
+  const seenKey = 'introSeen:' + pageKey;
+
+  function showIntro() {
+    const overlay = document.createElement('div');
+    overlay.className = 'intro-overlay';
+    overlay.innerHTML = `
+      <div class="intro-bubble">
+        <h2>${title}</h2>
+        <p>${bodyHtml}</p>
+        <button type="button">הבנתי, בוא נמשיך</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('button').addEventListener('click', () => {
+      localStorage.setItem(seenKey, '1');
+      overlay.remove();
+    });
+  }
+
+  const helpBtn = document.getElementById('helpBtn');
+  if (helpBtn) helpBtn.addEventListener('click', e => { e.preventDefault(); showIntro(); });
+
+  if (localStorage.getItem(seenKey) !== '1') showIntro();
+}
+
+// ---- הופעה חלקה לכל בלוק תוצאה שמוזרק דינמית - קוראים לזה מיד אחרי שמציבים innerHTML על אלמנט תוצאה ----
+function revealResult(el) {
+  if (!el) return;
+  el.classList.remove('reveal-in');
+  void el.offsetWidth; // מאלץ reflow כדי שהאנימציה תתחיל מחדש גם אם קוראים לזה פעמיים ברצף על אותו אלמנט
+  el.classList.add('reveal-in');
+}
+
+// ---- אנימציית "ספירה" למספר בודד - הופכת תוצאה כספית/אחוז לתחושה "חיה" במקום קפיצה מיידית ----
+function animateNumber(el, target, opts = {}) {
+  if (!el) return;
+  const duration = opts.duration ?? 1100;
+  const decimals = opts.decimals ?? 0;
+  const prefix = opts.prefix ?? '';
+  const suffix = opts.suffix ?? '';
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = prefix + target.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
+    return;
+  }
+  const startTime = performance.now();
+  function frame(now) {
+    const progress = Math.min(1, (now - startTime) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const value = target * eased;
+    el.textContent = prefix + value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
+    if (progress < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
 // ---- התחברות משותפת: טוקן ב-localStorage (נשאר בין ביקורים, כמו כל "זכור אותי"),
 // כל בקשה מאומתת שולחת אותו כ-Authorization: Bearer <token> ----
 const AUTH_TOKEN_KEY = 'financialCompassAuthToken';

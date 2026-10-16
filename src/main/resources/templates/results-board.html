@@ -1,15 +1,7 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>לוח תוצאות</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
-<link rel="stylesheet" href="/app.css">
+<th:block th:replace="~{fragments/head :: common(title='לוח תוצאות')}"></th:block>
 <style>
   .viz-root {
     --surface-1: #fcfcfb;
@@ -34,6 +26,8 @@
 </style>
 </head>
 <body>
+  <div th:replace="~{fragments/nav :: help}"></div>
+  <div th:replace="~{fragments/nav :: account(active='results-board')}"></div>
   <div class="page">
     <h1>לוח תוצאות</h1>
     <p class="subtitle">השוואת ערים - מחיר למשתכן (נתונים היסטוריים) או מכרזי קרקעות (תוצאות אמיתיות שהוכרעו לאחרונה).</p>
@@ -63,20 +57,14 @@
       <div id="landResultsChart" class="viz-root chart-wrap"></div>
     </div>
 
-    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+    <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
 
-  <nav class="floating-nav">
-    <a href="/lottery.html"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
-    <a href="/land-tenders.html"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
-    <a href="/results-board.html" class="active"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
-    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
-    <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
-    <a href="/account.html"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
-  </nav>
+  <nav th:replace="~{fragments/nav :: floating(active='results-board')}"></nav>
 
   <div id="chartTooltip" class="chart-tooltip"></div>
 
+<script src="/app.js"></script>
 <script>
 const SVG_NS = 'http://www.w3.org/2000/svg';
 function svgEl(tag, attrs) {
@@ -206,6 +194,8 @@ async function loadLandCityResults() {
 }
 
 loadCityComparison();
+initPageIntro('results-board', 'לוח תוצאות',
+  'השוואה בין ערים לפי סיכויי זכייה ממוצעים ומחירים בפרויקטי מחיר למשתכן ומכרזי קרקע, כדי לעזור להחליט איפה כדאי להירשם.');
 </script>
 </body>
 </html>

@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "analytics",
-      "runtimeExecutable": "P:\\analytics\\mvnw.cmd",
-      "runtimeArgs": ["-f", "P:\\analytics\\pom.xml", "spring-boot:run"],
+      "runtimeExecutable": "C:\\Users\\Or_Ben_Hamo\\Desktop\\projects\\analytics\\mvnw.cmd",
+      "runtimeArgs": ["spring-boot:run"],
       "port": 8080
     }
   ]

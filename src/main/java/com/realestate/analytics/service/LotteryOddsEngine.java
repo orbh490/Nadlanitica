@@ -21,6 +21,10 @@ public class LotteryOddsEngine {
     public record CityStats(String city, int projectCount, double avgOddsPercent, double avgPricePerSqm) {
     }
 
+    // המכסה שמולה מחשבים את הסיכוי - כמה יחידות פנויות מול כמה נרשמים מתחרים עליהן, לפי בן מקום/כלל הארץ
+    public record OddsPool(int units, int applicants) {
+    }
+
     // עמודות בקובץ הרשמי של משרד השיכון (תוצאות הגרלות מחיר למשתכן, data.gov.il)
     private static final int COL_WINNERS_BNEY_MAKOM = 5;
     private static final int COL_WINNERS = 6;
@@ -47,13 +51,18 @@ public class LotteryOddsEngine {
                 .findFirst();
     }
 
-    public double calculateOddsPercent(LotteryProject project, boolean isLocalResident) {
+    public OddsPool poolFor(LotteryProject project, boolean isLocalResident) {
         int poolUnits = isLocalResident ? project.getLocalQuotaUnits() : project.getTotalUnits() - project.getLocalQuotaUnits();
         int poolApplicants = isLocalResident ? project.getLocalApplicants() : project.getTotalApplicants() - project.getLocalApplicants();
-        if (poolApplicants <= 0) {
-            return poolUnits > 0 ? 100.0 : 0.0;
+        return new OddsPool(poolUnits, poolApplicants);
+    }
+
+    public double calculateOddsPercent(LotteryProject project, boolean isLocalResident) {
+        OddsPool pool = poolFor(project, isLocalResident);
+        if (pool.applicants() <= 0) {
+            return pool.units() > 0 ? 100.0 : 0.0;
         }
-        return Math.min(100.0, (poolUnits * 100.0) / poolApplicants);
+        return Math.min(100.0, (pool.units() * 100.0) / pool.applicants());
     }
 
     // שיעור הזכייה בפועל בהגרלה הזו (בדיעבד), אם הנתון פורסם - לצורך השוואה מול האומדן החזוי

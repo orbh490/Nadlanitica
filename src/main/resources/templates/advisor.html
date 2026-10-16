@@ -1,17 +1,11 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ייעוץ משכנתאות</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
-<link rel="stylesheet" href="/app.css">
+<th:block th:replace="~{fragments/head :: common(title='ייעוץ משכנתאות')}"></th:block>
 </head>
 <body>
+  <div th:replace="~{fragments/nav :: help}"></div>
+  <div th:replace="~{fragments/nav :: account(active='advisor')}"></div>
   <div class="page">
     <h1>ייעוץ משכנתאות מקצועי</h1>
     <p class="subtitle">תמהיל משכנתא נכון (קבועה / משתנה / פריים / צמודת מדד) יכול לחסוך לכם עשרות אלפי שקלים. השאירו פרטים ויועץ מומחה יחזור אליכם.</p>
@@ -22,22 +16,17 @@
       <label>טלפון <input type="tel" id="phone"></label>
       <label>אימייל <input type="email" id="email"></label>
       <label>הודעה (אופציונלי) <textarea id="message" rows="3" style="resize:none"></textarea></label>
+      <p style="font-size:12px;color:#8b93a6;margin-top:10px">⚠ אנחנו רק מחברים אתכם ליועץ משכנתאות חיצוני - אנחנו לא גובים תשלום, אבל הייעוץ עצמו עלול להיות כרוך בעמלה מטעם היועץ. בדקו את התנאים והעלות מולו ישירות לפני שמתחייבים.</p>
       <button onclick="submitLead()">שלחו לי יועץ</button>
       <div id="leadResult" style="margin-top:14px"></div>
     </div>
 
-    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+    <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
 
-  <nav class="floating-nav">
-    <a href="/lottery.html"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
-    <a href="/land-tenders.html"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
-    <a href="/results-board.html"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
-    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
-    <a href="/advisor.html" class="active"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
-    <a href="/account.html"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
-  </nav>
+  <nav th:replace="~{fragments/nav :: floating(active='advisor')}"></nav>
 
+<script src="/app.js"></script>
 <script>
 async function submitLead() {
   const fullName = document.getElementById('fullName').value.trim();
@@ -64,6 +53,9 @@ async function submitLead() {
   document.getElementById('email').value = '';
   document.getElementById('message').value = '';
 }
+
+initPageIntro('advisor', 'ייעוץ משכנתאות',
+  'כאן אפשר להשאיר פרטים ולקבל תמהיל משכנתא מותאם אישית מיועץ מומחה. החיבור ליועץ דרכנו הוא בחינם, אבל הייעוץ עצמו עלול להיות כרוך בעמלה מטעם היועץ - כדאי לברר את זה ישירות מולו.');
 </script>
 </body>
 </html>

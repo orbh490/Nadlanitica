@@ -10,11 +10,10 @@ public class EligibilityProfile {
     private boolean earningIncapacity75Plus;
     private boolean lowIncomeHousehold;
     private int failedPriorApplications;
-    private boolean reservistEligible;
 
     public EligibilityProfile(int numberOfChildren, boolean completedMilitaryOrNationalService, boolean newImmigrant,
             boolean disabledCoupleExemptFromService, boolean medicalDisability65Plus, boolean earningIncapacity75Plus,
-            boolean lowIncomeHousehold, int failedPriorApplications, boolean reservistEligible) {
+            boolean lowIncomeHousehold, int failedPriorApplications) {
         this.numberOfChildren = numberOfChildren;
         this.completedMilitaryOrNationalService = completedMilitaryOrNationalService;
         this.newImmigrant = newImmigrant;
@@ -23,7 +22,6 @@ public class EligibilityProfile {
         this.earningIncapacity75Plus = earningIncapacity75Plus;
         this.lowIncomeHousehold = lowIncomeHousehold;
         this.failedPriorApplications = failedPriorApplications;
-        this.reservistEligible = reservistEligible;
     }
 
     public int getNumberOfChildren() { return numberOfChildren; }
@@ -34,5 +32,4 @@ public class EligibilityProfile {
     public boolean isEarningIncapacity75Plus() { return earningIncapacity75Plus; }
     public boolean isLowIncomeHousehold() { return lowIncomeHousehold; }
     public int getFailedPriorApplications() { return failedPriorApplications; }
-    public boolean isReservistEligible() { return reservistEligible; }
 }

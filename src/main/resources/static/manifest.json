@@ -1,0 +1,23 @@
+{
+  "name": "המצפן הפיננסי לרוכש הישראלי",
+  "short_name": "המצפן הפיננסי",
+  "description": "הון עצמי, מס רכישה, סיכויי הגרלה ותשלום חודשי - כל התמונה האמיתית לפני שיוצאים לדרך.",
+  "start_url": "/home.html",
+  "display": "standalone",
+  "background_color": "#f4f8fa",
+  "theme_color": "#16324a",
+  "dir": "rtl",
+  "lang": "he",
+  "icons": [
+    {
+      "src": "/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

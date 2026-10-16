@@ -1,17 +1,11 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>מחיר למשתכן - סיכויי זכייה</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
-<link rel="stylesheet" href="/app.css">
+<th:block th:replace="~{fragments/head :: common(title='מחיר למשתכן - סיכויי זכייה')}"></th:block>
 </head>
 <body>
+  <div th:replace="~{fragments/nav :: help}"></div>
+  <div th:replace="~{fragments/nav :: account(active='lottery')}"></div>
   <div class="page">
     <h1>מחיר למשתכן</h1>
     <p class="subtitle">חפשו פרויקט ובדקו את הסיכוי הריאלי שלכם לזכות - כולל ניקוד הזכאות האישי שלכם, לא רק ממוצע כללי.</p>
@@ -52,13 +46,8 @@
         </div>
         <div class="checkbox-row">
           <input type="checkbox" id="lowIncomeHousehold">
-          <label for="lowIncomeHousehold" style="margin:0">הכנסה מתחת לחמישון 5</label>
-          <span class="info-tip" tabindex="0" data-tip="חמישון 5 = החמישון החמישי (מתוך 5) בהתפלגות ההכנסות בישראל. אם ההכנסה המשותפת שלכם נמוכה יחסית, זה מוסיף נקודות.">?</span>
-        </div>
-        <div class="checkbox-row">
-          <input type="checkbox" id="reservistEligible">
-          <label for="reservistEligible" style="margin:0">מילואימניק/ית פעיל/ה (60+ ימי שירות מ-7/10/23)</label>
-          <span class="info-tip" tabindex="0" data-tip="לא חלק מהניקוד עצמו, אלא מכסה נפרדת: עד 50% מהדירות בהגרלות הנוכחיות (2026) מוקצות בעדיפות למשרתי מילואים.">?</span>
+          <label for="lowIncomeHousehold" style="margin:0">הכנסה עד עשירון 5</label>
+          <span class="info-tip" tabindex="0" data-tip="עשירון 5 = תקרת העשירון החמישי (מתוך 10) בהתפלגות ההכנסות בישראל - בערך החציון. אם ההכנסה המשותפת שלכם לא עוברת את זה, זה מוסיף נקודות.">?</span>
         </div>
         <button onclick="calculateScore()">חשב ניקוד</button>
         <div id="scoreResult" style="margin-top:16px"></div>
@@ -101,17 +90,10 @@
       </table>
     </div>
 
-    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+    <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
 
-  <nav class="floating-nav">
-    <a href="/lottery.html" class="active"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
-    <a href="/land-tenders.html"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
-    <a href="/results-board.html"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
-    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
-    <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
-    <a href="/account.html"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
-  </nav>
+  <nav th:replace="~{fragments/nav :: floating(active='lottery')}"></nav>
 
 <script src="/app.js"></script>
 <script>
@@ -162,29 +144,83 @@ async function calculateScore() {
     medicalDisability65Plus: document.getElementById('medicalDisability65Plus').checked,
     earningIncapacity75Plus: document.getElementById('earningIncapacity75Plus').checked,
     lowIncomeHousehold: document.getElementById('lowIncomeHousehold').checked,
-    failedPriorApplications: Number(document.getElementById('failedPriorApplications').value),
-    reservistEligible: document.getElementById('reservistEligible').checked
+    failedPriorApplications: Number(document.getElementById('failedPriorApplications').value)
   };
   const data = await (await fetch('/api/lottery/eligibility-score', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   })).json();
   lastScoreInfo = data;
   const resultEl = document.getElementById('scoreResult');
-  const reservistLine = data.reservistEligible
-    ? '<br><small>כמילואימניק/ית את/ה בקבוצת עדיפות נפרדת - עד 50% מהדירות בהגרלות הנוכחיות (2026) מוקצות לזכאי מילואים, מעבר לחלוקת קבוצות הניקוד הרגילה.</small>' : '';
   if (!data.meetsMinimumThreshold) {
-    resultEl.innerHTML = `<div class="badge bad">ניקוד: ${data.score}</div><p style="font-size:13px;margin-top:8px">ניקוד זה נמוך מסף הרישום המינימלי (11 נקודות) במסלול הכללי.${reservistLine}</p>`;
+    resultEl.innerHTML = `<div class="badge bad">ניקוד: <span id="scoreValue">0</span></div><p style="font-size:13px;margin-top:8px">ניקוד זה נמוך מסף הרישום המינימלי (11 נקודות) במסלול הכללי.</p>`;
+    revealResult(resultEl);
+    animateNumber(document.getElementById('scoreValue'), data.score, { duration: 400 });
     return;
   }
   resultEl.innerHTML = `
-    <div class="badge ok">ניקוד: ${data.score}</div>
-    <p style="font-size:13px;margin-top:8px">את/ה בקבוצת <b>${data.bracketLabel}</b>, שמקבלת <b>${data.unitSharePercent}%</b> מהדירות בכל הגרלה. ההגרלה בתוך הקבוצה אקראית לחלוטין.${reservistLine}</p>`;
+    <div class="badge ok">ניקוד: <span id="scoreValue">0</span></div>
+    <p style="font-size:13px;margin-top:8px">את/ה בקבוצת <b>${data.bracketLabel}</b>, שמקבלת <b>${data.unitSharePercent}%</b> מהדירות בכל הגרלה. ההגרלה בתוך הקבוצה אקראית לחלוטין.</p>`;
+  revealResult(resultEl);
+  animateNumber(document.getElementById('scoreValue'), data.score, { duration: 400 });
 }
 
 function fmtDate(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
   return d.toLocaleDateString('he-IL');
+}
+
+// העוגה לא ממלאת לפי האחוז המוחלט (שם היא תמיד נראית ריקה - סיכויים אמיתיים נעים סביב כמה אחוזים בודדים).
+// במקום זה, כשיש נתון היסטורי אמיתי, היא מחלקת את הטבעת בין שני נתונים אמיתיים בלבד - הסיכוי החזוי מול
+// שיעור הזכייה שהיה בפועל בעבר - ביחס זה לזה, כדי שההשוואה תהיה קריאה. בלי "פירוק לגורמים" מומצא.
+function oddsDonutHtml(predictedPercent, historicalPercent, poolUnits, poolApplicants) {
+  const size = 180, strokeWidth = 20, radius = (size - strokeWidth) / 2, center = size / 2;
+  const circumference = 2 * Math.PI * radius;
+  const hasCompetitors = poolApplicants > poolUnits && poolApplicants > 0;
+  const legendPool = `<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--primary-500);margin-inline-end:5px"></span>${poolUnits.toLocaleString()} יחידות בקבוצה שלך</span>
+        ${hasCompetitors ? `<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--border);margin-inline-end:5px"></span>${poolApplicants.toLocaleString()} נרשמים מתחרים בקבוצה</span>` : ''}`;
+
+  if (historicalPercent == null) {
+    const wonFraction = Math.max(0, Math.min(1, predictedPercent / 100));
+    const wonLength = circumference * wonFraction;
+    return `
+      <div style="display:flex;flex-direction:column;align-items:center;margin-top:8px">
+        <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="סיכוי זכייה חזוי ${predictedPercent.toFixed(1)} אחוז">
+          <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="var(--border)" stroke-width="${strokeWidth}" />
+          <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="var(--primary-500)" stroke-width="${strokeWidth}"
+            stroke-dasharray="${wonLength.toFixed(1)} ${(circumference - wonLength).toFixed(1)}" stroke-linecap="round"
+            transform="rotate(-90 ${center} ${center})" />
+          <text x="${center}" y="${center - 2}" text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)" id="oddsDonutPercent">0%</text>
+          <text x="${center}" y="${center + 22}" text-anchor="middle" font-size="12" fill="var(--ink-secondary)">סיכוי חזוי</text>
+        </svg>
+        <div style="display:flex;gap:18px;margin-top:10px;font-size:12px;color:var(--ink-secondary);flex-wrap:wrap;justify-content:center">${legendPool}</div>
+      </div>`;
+  }
+
+  // שני פלחים אמיתיים בלבד, ביחס זה לזה (לא ליחס מתוך 100) - כדי שההשוואה תיראה גם כששני המספרים קטנים
+  const total = predictedPercent + historicalPercent;
+  const predictedFraction = total > 0 ? predictedPercent / total : 0.5;
+  const predictedLength = circumference * predictedFraction;
+  const historicalLength = circumference - predictedLength;
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;margin-top:8px">
+      <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="סיכוי חזוי ${predictedPercent.toFixed(1)} אחוז, שיעור זכייה בפועל בעבר ${historicalPercent.toFixed(1)} אחוז">
+        <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="var(--border)" stroke-width="${strokeWidth}" />
+        <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="var(--primary-500)" stroke-width="${strokeWidth}"
+          stroke-dasharray="${predictedLength.toFixed(1)} ${(circumference - predictedLength).toFixed(1)}" stroke-linecap="round"
+          transform="rotate(-90 ${center} ${center})" />
+        <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#e08a2c" stroke-width="${strokeWidth}"
+          stroke-dasharray="${historicalLength.toFixed(1)} ${(circumference - historicalLength).toFixed(1)}" stroke-linecap="round"
+          transform="rotate(${-90 + predictedFraction * 360} ${center} ${center})" />
+        <text x="${center}" y="${center - 2}" text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)" id="oddsDonutPercent">0%</text>
+        <text x="${center}" y="${center + 22}" text-anchor="middle" font-size="12" fill="var(--ink-secondary)">סיכוי חזוי</text>
+      </svg>
+      <div style="display:flex;gap:18px;margin-top:10px;font-size:12px;color:var(--ink-secondary);flex-wrap:wrap;justify-content:center">
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--primary-500);margin-inline-end:5px"></span>${predictedPercent.toFixed(1)}% סיכוי חזוי</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e08a2c;margin-inline-end:5px"></span>${historicalPercent.toFixed(1)}% זכייה בפועל בעבר</span>
+      </div>
+      <div style="display:flex;gap:18px;margin-top:6px;font-size:12px;color:var(--ink-secondary);flex-wrap:wrap;justify-content:center">${legendPool}</div>
+    </div>`;
 }
 
 function liveStatusHtml(live) {
@@ -224,27 +260,32 @@ async function calculateOdds() {
     ? fetch(`/api/lottery/live-status?projectId=${encodeURIComponent(p.projectId)}`).then(r => r.json())
     : Promise.resolve({ hasLiveData: false });
   const [data, live] = await Promise.all([oddsPromise, livePromise]);
-  const historicalLine = data.actualHistoricalWinRatePercent != null
-    ? `שיעור זכייה בפועל בהגרלה זו (נתון היסטורי): <b>${data.actualHistoricalWinRatePercent.toFixed(2)}%</b>`
-    : '<small style="color:#8b93a6">אין נתון זכייה בפועל זמין להגרלה זו</small>';
+  const historicalLine = data.actualHistoricalWinRatePercent == null
+    ? '<p style="font-size:13px;margin-top:10px;text-align:center"><small style="color:#8b93a6">אין נתון זכייה בפועל זמין להגרלה זו</small></p>'
+    : '';
+  // המספר למעלה הוא הממוצע האמיתי של כלל הנרשמים בקבוצה (בן מקום/כלל הארץ) - לא לפי קבוצת הניקוד.
+  // אין נתון רשמי על כמה נרשמים נמצאים בכל קבוצת ניקוד בהגרלה הספציפית הזו, ולכן אי אפשר לחשב באופן אמין
+  // סיכוי מדויק לקבוצת הניקוד שלך - רק להציג איזה חלק מהדירות (מתוך התקנון) שמור לה.
   const scoreNote = lastScoreInfo && lastScoreInfo.meetsMinimumThreshold
-    ? `<p style="font-size:12px;color:#8b93a6;margin-top:10px">שימו לב: המספר הזה הוא ממוצע כלל-הנרשמים. הניקוד שלך (${lastScoreInfo.score}, קבוצת ${lastScoreInfo.bracketLabel}) קובע איזה חלק מהדירות פתוח בשבילך בפועל.</p>`
-    : '<p style="font-size:12px;color:#8b93a6;margin-top:10px">חשבו קודם את הניקוד שלכם למעלה כדי לקבל תמונה מדויקת יותר.</p>';
+    ? `<p style="font-size:12px;color:#8b93a6;margin-top:10px">המספר הזה הוא הממוצע האמיתי של כלל הנרשמים בקבוצה שלך - לא מותאם לניקוד, כי אין נתון רשמי על פילוג הנרשמים בין קבוצות הניקוד. מה שכן ידוע: הניקוד שלך (${lastScoreInfo.score}, קבוצת ${lastScoreInfo.bracketLabel}) מזכה אתכם ב-${lastScoreInfo.unitSharePercent}% מהדירות בהגרלה, וההגרלה בתוך הקבוצה אקראית לחלוטין.</p>`
+    : '<p style="font-size:12px;color:#8b93a6;margin-top:10px">חשבו קודם את הניקוד שלכם למעלה כדי לדעת איזה חלק מהדירות שמור לקבוצת הניקוד שלכם.</p>';
   const peripheryNote = data.peripheryGrantEligibleCity
-    ? '<p style="font-size:12px;color:#1a7a34;margin-top:6px">🎁 עיר זו מוכרת כישוב עדיפות לאומית - ייתכן שתהיו זכאים למענק מותנה של כ-40,000-60,000 ש"ח, שבנק ישראל מכיר בו כחלק מההון העצמי (בכפוף למגורים בדירה 5-7 שנים). בדקו זכאות מדויקת מול משרד השיכון.</p>'
+    ? '<p style="font-size:12px;color:#1a7a34;margin-top:6px">🎁 עיר זו מוכרת כישוב עדיפות לאומית - ייתכן שתהיו זכאים למענק מותנה של כ-50,000-60,000 ש"ח, שבנק ישראל מכיר בו כחלק מההון העצמי (בכפוף למגורים בדירה 5-7 שנים). בדקו זכאות מדויקת מול משרד השיכון.</p>'
     : '';
   resultEl.innerHTML = `
     <div class="badge ok">${data.city} - ${data.projectName}</div>
-    <table>
-      <tr><td>סיכוי זכייה חזוי (ממוצע)</td><td><b>${data.winProbabilityPercent.toFixed(2)}%</b></td></tr>
-      <tr><td>נתון היסטורי</td><td>${historicalLine}</td></tr>
-    </table>
+    ${oddsDonutHtml(data.winProbabilityPercent, data.actualHistoricalWinRatePercent, data.poolUnits, data.poolApplicants)}
+    ${historicalLine}
     ${liveStatusHtml(live)}
     ${scoreNote}
     ${peripheryNote}`;
+  revealResult(resultEl);
+  animateNumber(document.getElementById('oddsDonutPercent'), data.winProbabilityPercent, { decimals: 1, suffix: '%' });
 }
 
 loadProjects();
+initPageIntro('lottery', 'מחיר למשתכן - סיכויי זכייה',
+  'כאן בודקים את הסיכוי הריאלי שלך לזכות בהגרלת מחיר למשתכן לפרויקט ספציפי. קודם מחשבים את הניקוד האישי שלך, ואז בוחרים פרויקט כדי לראות את הסיכוי המדויק - כולל השוואה לנתון ההיסטורי האמיתי של ההגרלה הזו, לא רק הערכה תיאורטית.');
 </script>
 </body>
 </html>

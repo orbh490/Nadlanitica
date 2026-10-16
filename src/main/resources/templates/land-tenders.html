@@ -1,20 +1,14 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>מכרזי קרקעות ובנייה עצמית</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
-<link rel="stylesheet" href="/app.css">
+<th:block th:replace="~{fragments/head :: common(title='מכרזי קרקעות ובנייה עצמית')}"></th:block>
 <style>
   details.table-toggle summary { cursor: pointer; font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
 </style>
 </head>
 <body>
+  <div th:replace="~{fragments/nav :: help}"></div>
+  <div th:replace="~{fragments/nav :: account(active='land-tenders')}"></div>
   <div class="page">
     <h1>מכרזי קרקעות ובנייה עצמית</h1>
     <p class="subtitle">רשימה חיה של מכרזי קרקע פעילים למגרשי בנייה נמוכה/צמודת קרקע, ישירות מ-API של רשות מקרקעי ישראל - לא תמונת מצב קפואה.
@@ -29,7 +23,7 @@
           onblur="if (!this.value) this.value = this.dataset.prev || '';">
         <datalist id="tenderOptions"></datalist>
       </label>
-      <div id="tenderListStatus" style="font-size:13px;color:#8b93a6;margin-top:6px">טוען מכרזים פעילים...</div>
+      <div id="tenderListStatus" style="font-size:13px;color:#8b93a6;margin-top:6px"><span class="skeleton"></span></div>
       <button onclick="loadTenderDetail()">הצג פרטי מכרז</button>
     </div>
 
@@ -114,7 +108,10 @@
       <div id="selfBuildResult" style="margin-top:16px"></div>
     </div>
 
-    <p style="text-align:center;font-size:11px;color:#8b93a6;margin-top:28px">המידע כאן הוא כלי עזר בלבד ואינו ייעוץ מקצועי מוסמך. <a href="/disclaimer.html">גילוי נאות מלא</a> · <a href="/privacy.html">מדיניות פרטיות</a></p>
+    <div class="policy-links">
+      <a href="/disclaimer.html" class="policy-btn"><span class="material-symbols-outlined icon">gavel</span>גילוי נאות מלא</a>
+      <a href="/privacy.html" class="policy-btn"><span class="material-symbols-outlined icon">privacy_tip</span>מדיניות פרטיות</a>
+    </div>
   </div>
 
   <nav class="floating-nav">
@@ -123,7 +120,6 @@
     <a href="/results-board.html"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
     <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
     <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
-    <a href="/account.html"><span class="material-symbols-outlined icon">person</span>אזור אישי</a>
   </nav>
 
 <script src="/app.js"></script>
@@ -326,6 +322,8 @@ async function calculateSelfBuild() {
 }
 
 loadTenders();
+initPageIntro('land-tenders', 'מכרזי קרקעות - בנייה עצמית',
+  'רשימה חיה של מכרזי קרקע פעילים מרשות מקרקעי ישראל, עם מחשבון שמעריך את העלות הכוללת של בנייה עצמית - מחיר הקרקע, היטלי פיתוח ועלויות בנייה - כדי להשוות מול אפשרויות רכישה אחרות.');
 </script>
 </body>
 </html>

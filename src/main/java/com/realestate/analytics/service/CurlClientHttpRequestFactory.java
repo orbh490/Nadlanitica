@@ -51,8 +51,10 @@ class CurlClientHttpRequestFactory implements ClientHttpRequestFactory {
 
         @Override
         protected ClientHttpResponse executeInternal(HttpHeaders headers, byte[] bufferedOutput) throws IOException {
-            List<String> command = new ArrayList<>(List.of("curl.exe", "-s", "-S", "-X", method.name(),
-                    "-w", "\nHTTP_STATUS:%{http_code}"));
+            // --max-time/--connect-timeout הם ההגנה האמיתית מפני תקיעה - בלעדיהם, שרת שלא עונה תוקע את
+            // ה-readAllBytes() החוסם למטה לנצח, וה-waitFor(20s) בסוף אף פעם לא נבדק כי אין EOF על stdout.
+            List<String> command = new ArrayList<>(List.of("curl.exe", "-s", "-S", "--connect-timeout", "10", "--max-time", "20",
+                    "-X", method.name(), "-w", "\nHTTP_STATUS:%{http_code}"));
             headers.forEach((name, values) -> values.forEach(value -> {
                 command.add("-H");
                 command.add(name + ": " + value);
