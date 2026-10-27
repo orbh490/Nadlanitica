@@ -4,31 +4,31 @@
 <th:block th:replace="~{fragments/head :: common(title='המשכנתא שלי')}"></th:block>
 <style>
   .viz-root {
-    --surface-1: #fcfcfb;
-    --text-primary: #10192e;
-    --text-secondary: #57627a;
-    --text-muted: #8b93a6;
-    --gridline: #e3e9f6;
-    --baseline: #c3c2b7;
-    --series-principal: #1c807a;
-    --series-interest: #16324a;
+    --surface-1: #FFFFFF;
+    --text-primary: #10263A;
+    --text-secondary: #4D6478;
+    --text-muted: #6B8193;
+    --gridline: #DCE7EC;
+    --baseline: #C9D8E0;
+    --series-principal: #0F3150;
+    --series-interest: #1BB2BB;
   }
   .chart-wrap { background: var(--surface-1); border-radius: 14px; padding: 12px; }
   .chart-legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
   .chart-legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-inline-end: 5px; vertical-align: middle; }
-  .chart-tooltip { position: fixed; background: #10192e; color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; z-index: 50; display: none; white-space: nowrap; }
+  .chart-tooltip { position: fixed; background: #10263A; color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; z-index: 50; display: none; white-space: nowrap; }
   .bar-seg { cursor: pointer; }
   .bar-seg:hover { filter: brightness(1.12); }
-  .axis-label { fill: var(--text-muted); font-size: 10px; }
+  .axis-label { fill: var(--text-muted); font-size: 12px; direction: ltr; unicode-bidi: isolate; }
   .axis-line { stroke: var(--baseline); stroke-width: 1; }
   .grid-line { stroke: var(--gridline); stroke-width: 1; }
   details.table-toggle summary { cursor: pointer; font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
 </style>
 </head>
 <body>
-  <div th:replace="~{fragments/nav :: help}"></div>
-  <div th:replace="~{fragments/nav :: account(active='dashboard')}"></div>
+  <div th:replace="~{fragments/nav :: topbar(active='dashboard')}"></div>
   <div class="page">
+    <div class="hero-art" aria-hidden="true"><svg class="art-house" viewBox="0 0 150 150"><path class="d1" pathLength="100" d="M18 74 L75 26 L132 74"/><path class="d2" pathLength="100" d="M36 66 V128 H114 V66"/><path class="d3 teal" pathLength="100" d="M64 128 V98 H86 V128"/></svg></div>
     <h1>המשכנתא שלי</h1>
     <p class="subtitle">הון עצמי, מס רכישה, החזר חודשי ועוד - כל התמונה של המשכנתא שלך במקום אחד. <a href="/account.html">ההיסטוריה שלך והשוואת מסלולים נמצאות באזור האישי</a>.</p>
 
@@ -71,11 +71,16 @@
       </div>
       <label>תקופת משכנתא (שנים) <input type="number" id="termYears" value="20" min="1" max="40"></label>
       <button onclick="submitProfile()">חשב משכנתא</button>
-      <div id="saveNote" style="margin-top:8px;font-size:12px;color:#8b93a6"></div>
+      <div id="saveNote" style="margin-top:8px;font-size:12px;color:#6B8193"></div>
     </div>
 
     <div class="card" id="resultsSection" style="display:none">
       <h2>התמונה המלאה שלך</h2>
+      <div class="calc-bubbles" id="calcBubbles" style="display:none">
+        <div class="bubble"><span class="bubble-label">מזומן נדרש היום</span><b id="bubbleCash">0 ש"ח</b><span class="bubble-note">הון עצמי, מס רכישה ועלויות סגירה</span></div>
+        <div class="bubble"><span class="bubble-label">החזר חודשי</span><b id="bubbleMonthly">0 ש"ח</b><span class="bubble-note">קרן וריבית, בלי ביטוח</span></div>
+        <div class="bubble"><span class="bubble-label">שיעור מההכנסה</span><b id="bubbleDti">0%</b><span class="bubble-note" id="bubbleDtiNote"></span></div>
+      </div>
       <div id="affordabilitySummary"></div>
       <div id="paymentSummary" style="margin-top:14px"></div>
 
@@ -125,8 +130,6 @@
 
     <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
-
-  <nav th:replace="~{fragments/nav :: floating(active='dashboard')}"></nav>
 
   <div id="chartTooltip" class="chart-tooltip"></div>
 
@@ -183,12 +186,19 @@ function renderResults(s) {
       <tr><td><small>ביטוח חיים + מבנה (אומדן שוק)</small></td><td><small>${fmt(s.insuranceEstimate.totalMonthly)} ש"ח לחודש</small></td></tr>
       <tr><td><b>סה"כ עלות חודשית משוערת</b></td><td><b id="totalMonthlyValue">0 ש"ח</b></td></tr>
     </table>
-    <p style="font-size:11px;color:#8b93a6;margin-top:4px">ביטוח המשכנתא הוא אומדן שוק בלבד (תלוי גיל ובריאות) - ניתן לרכוש פוליסה חיצונית לבנק.</p>
+    <p style="font-size:11px;color:#6B8193;margin-top:4px">ביטוח המשכנתא הוא אומדן שוק בלבד (תלוי גיל ובריאות) - ניתן לרכוש פוליסה חיצונית לבנק.</p>
 `;
   animateNumber(document.getElementById('totalMonthlyValue'), s.totalMonthlyWithInsurance, { suffix: ' ש"ח' });
 
   document.getElementById('trackMixLoanAmount').value = Math.round(s.loanAmount).toLocaleString('en-US');
   document.getElementById('trackMixTermYears').value = s.termYears;
+
+  document.getElementById('calcBubbles').style.display = 'grid';
+  animateNumber(document.getElementById('bubbleCash'), s.totalCashNeeded, { suffix: ' ש"ח' });
+  animateNumber(document.getElementById('bubbleMonthly'), s.monthlyPayment, { suffix: ' ש"ח' });
+  document.getElementById('bubbleDti').textContent = s.dtiPercent.toFixed(1) + '%';
+  document.getElementById('bubbleDti').className = s.withinLegalDtiLimit ? 'good' : 'bad';
+  document.getElementById('bubbleDtiNote').textContent = s.withinLegalDtiLimit ? 'בתוך מגבלת ההחזר של 50%' : 'חורג ממגבלת ההחזר של 50%';
 
   renderAmortizationChart(s.loanAmount, s.termYears);
   loadRateStressTest(s.loanAmount, s.termYears);
@@ -217,7 +227,7 @@ async function loadRateStressTest(loanAmount, termYears) {
           <td>${sc.dtiPercent.toFixed(1)}% ${sc.withinLegalDtiLimit ? '✅' : '⚠️ חורג מ-50%'}</td>
         </tr>`).join('')}
     </table>
-    <p style="font-size:11px;color:#8b93a6;margin-top:6px">התרחישים כאן להמחשה בלבד - כדי לבדוק אם תוכלו לעמוד בתשלום גם אם הריבית תעלה, לפני שבוחרים כמה מהמשכנתא לשים במסלול צמוד-ריבית (פריים) בתמהיל למטה.</p>`;
+    <p style="font-size:11px;color:#6B8193;margin-top:6px">התרחישים כאן להמחשה בלבד - כדי לבדוק אם תוכלו לעמוד בתשלום גם אם הריבית תעלה, לפני שבוחרים כמה מהמשכנתא לשים במסלול צמוד-ריבית (פריים) בתמהיל למטה.</p>`;
 }
 
 // ---- SVG helpers ----
@@ -255,12 +265,12 @@ async function renderAmortizationChart(loanAmount, termYears) {
   // ב-results-board.html שבה אותה בעיה בדיוק גרמה לתוויות בלתי קריאות בנייד.
   const width = Math.max(280, Math.round(container.clientWidth || 640));
   const isNarrow = width < 420;
-  const height = 260, marginTop = 10, marginBottom = 24, marginLeft = isNarrow ? 38 : 44, marginRight = 8;
+  const height = 260, marginTop = 10, marginBottom = 24, marginLeft = isNarrow ? 52 : 60, marginRight = 8;
   const plotW = width - marginLeft - marginRight, plotH = height - marginTop - marginBottom;
   const maxYearTotal = Math.max(...schedule.map(y => y.principalPaid + y.interestPaid));
   const yMax = niceMax(maxYearTotal);
   const bandW = plotW / schedule.length;
-  const barW = Math.min(24, bandW * 0.7);
+  const barW = Math.min(16, bandW * 0.5);
   const gap = 2;
   const fmt0 = n => Math.round(n).toLocaleString();
 
@@ -332,7 +342,7 @@ async function calculateTrackMix() {
   const resultEl = document.getElementById('trackMixResult');
   const sum = fixedPercent + cpiPercent + primePercent;
   if (Math.round(sum) !== 100) {
-    resultEl.innerHTML = `<p style="color:#b02a2a;font-size:13px">האחוזים חייבים להסתכם ל-100% (כרגע: ${sum}%)</p>`;
+    resultEl.innerHTML = `<p style="color:#B3261E;font-size:13px">האחוזים חייבים להסתכם ל-100% (כרגע: ${sum}%)</p>`;
     return;
   }
   const body = {
@@ -347,7 +357,7 @@ async function calculateTrackMix() {
   })).json();
   const fmt = n => n.toLocaleString(undefined, {maximumFractionDigits: 0});
   const capWarning = data.exceedsVariableRateCap
-    ? '<p style="font-size:12px;color:#b02a2a;margin-top:8px">⚠ מסלול הפריים חורג מ-66.66% מההלוואה - הוראה 329 של בנק ישראל אוסרת על הבנק לאשר תמהיל כזה.</p>'
+    ? '<p style="font-size:12px;color:#B3261E;margin-top:8px">⚠ מסלול הפריים חורג מ-66.66% מההלוואה - הוראה 329 של בנק ישראל אוסרת על הבנק לאשר תמהיל כזה.</p>'
     : '';
   resultEl.innerHTML = `
     <div class="badge ok">ריבית ממוצעת משוקללת: ${data.blendedAnnualRatePercent.toFixed(2)}%</div>

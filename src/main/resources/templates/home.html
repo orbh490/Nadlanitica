@@ -1,58 +1,91 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<th:block th:replace="~{fragments/head :: common(title='המצפן הפיננסי לרוכש הישראלי')}"></th:block>
+<th:block th:replace="~{fragments/head :: common(title='נדלניטיקה')}"></th:block>
 </head>
 <body>
-  <div th:replace="~{fragments/nav :: account(active='home')}"></div>
-  <div class="page">
-    <div class="hero">
-      <div class="hero-logo-badge"><img src="/img/logo.png" alt="לוגו המצפן הפיננסי לרוכש הישראלי"></div>
-      <h1>המצפן הפיננסי לרוכש הישראלי</h1>
-      <p>עושים סדר בבלגן: הון עצמי, מס רכישה, סיכויי הגרלה ותשלום חודשי - כל התמונה האמיתית לפני שיוצאים לדרך.</p>
-    </div>
+  <div th:replace="~{fragments/nav :: topbar(active='home')}"></div>
 
+  <section class="home-hero">
+    <div class="home-hero-grid">
+      <div>
+        <div class="home-eyebrow">לרוכשי דירה בישראל</div>
+        <h1>עושים סדר בבלגן לפני שיוצאים לדרך</h1>
+        <p>הון עצמי, מס רכישה, סיכויי הגרלה והחזר חודשי. כל התמונה האמיתית במקום אחד, על בסיס נתונים רשמיים.</p>
+        <div class="home-cta">
+          <a class="primary" href="#how">איך זה עובד</a>
+        </div>
+      </div>
+      <div class="home-card" aria-label="דוגמה לחישוב">
+        <div class="label">החזר חודשי משוער</div>
+        <div class="amount">₪ 7,850</div>
+        <div class="split"><span></span><span></span></div>
+        <div class="legend"><span>קרן 55%</span><span>ריבית 45%</span></div>
+        <div class="row"><span>הון עצמי נדרש</span><b>₪ 612,000</b></div>
+        <div class="row"><span>מס רכישה משוער</span><b>₪ 44,300</b></div>
+        <div class="note">דוגמה בלבד. החישוב האישי מתבצע בדף המשכנתא.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-tiles" id="tiles">
+    <div class="tile-grid">
+      <a class="tile" href="/lottery.html">
+        <span class="material-symbols-outlined">apartment</span>
+        <div class="t">מחיר למשתכן</div>
+        <div class="d">בדקו את סיכויי הזכייה שלכם בפרויקט ספציפי</div>
+      </a>
+      <a class="tile" href="/results-board.html">
+        <span class="material-symbols-outlined">leaderboard</span>
+        <div class="t">לוח תוצאות</div>
+        <div class="d">השוואת ערים לפי סיכויי זכייה ומחירים</div>
+      </a>
+      <a class="tile" href="/land-tenders.html">
+        <span class="material-symbols-outlined">landscape</span>
+        <div class="t">מכרזי קרקעות</div>
+        <div class="d">מכרזי בנייה עצמית חיים ממשרד רשות מקרקעי ישראל, כולל מחשבון</div>
+      </a>
+      <a class="tile" href="/dashboard.html">
+        <span class="material-symbols-outlined">account_balance</span>
+        <div class="t">משכנתאות</div>
+        <div class="d">חשבו הון עצמי, תשלום חודשי, ובדקו רגישות לריבית</div>
+      </a>
+      <a class="tile" href="/advisor.html">
+        <span class="material-symbols-outlined">support_agent</span>
+        <div class="t">ייעוץ משכנתאות</div>
+        <div class="d">קבלו תמהיל מדויק מיועץ מומחה</div>
+      </a>
+      <a class="tile soft" href="/account.html">
+        <span class="material-symbols-outlined">person</span>
+        <div class="t">אזור אישי</div>
+        <div class="d">היסטוריית החישובים שלכם והשוואת מסלולים (רשומים בלבד)</div>
+      </a>
+    </div>
+  </section>
+
+
+  <section class="home-steps" id="how">
+    <div class="home-eyebrow" style="color:var(--teal-ink,#0E7C84)">איך זה עובד</div>
+    <h2 class="steps-title">שלושה צעדים, בלי להתחייב לשום דבר</h2>
+    <div class="steps-grid">
+      <div class="step"><div class="n">1</div><h3>בוחרים כלי</h3><p>מחיר למשתכן, מכרז קרקע או משכנתא, לפי השלב שאתם נמצאים בו.</p></div>
+      <div class="step"><div class="n">2</div><h3>מזינים את הנתונים שלכם</h3><p>הון עצמי, הכנסה, שווי הדירה או ניקוד הזכאות. לכל שדה יש הסבר בעברית פשוטה.</p></div>
+      <div class="step"><div class="n">3</div><h3>רואים את התמונה המלאה</h3><p>מה נדרש בפועל, לאן הכסף הולך לאורך זמן, ואיפה הסיכון. ההחלטה נשארת אצלכם.</p></div>
+    </div>
+  </section>
+
+  <section class="home-section">
     <div class="card">
       <h2>למה בנינו את זה</h2>
-      <p class="subtitle">רכישת דירה ראשונה בישראל - ובטח דירה במסלול "מחיר למשתכן" - מלאה בחישובים שקשה להבין לבד: כמה הון עצמי צריך באמת, כמה מס רכישה משלמים, מה הסיכוי הריאלי לזכות בהגרלה, ואיך כל זה מתורגם להחזר החודשי שישלם על המשכנתא. הרבה מהמידע הזה פזור, לא מעודכן, או דורש יועץ בתשלום כדי לקבל תשובה.<br><br>
-      המצפן הפיננסי מרכז את כל זה במקום אחד, מבוסס על נתונים רשמיים (בנק ישראל, רשות המסים, משרד השיכון) ועל הרגולציה העדכנית ביותר - כדי שתדעו בדיוק איפה אתם עומדים, בעברית פשוטה, לפני שאתם מקבלים החלטה כלכלית שתלווה אתכם עשרות שנים.</p>
+      <p class="why-text">קניית דירה בישראל היא אחת ההחלטות הכי גדולות שאנשים מקבלים, ובכל זאת המידע עליה מפוזר: משכנתא בבנק, הגרלות של מחיר למשתכן, מכרזי קרקעות ולוחות תוצאות שכל אחד מהם בנוי אחרת. נדלניטיקה נוצרה כדי לרכז את המספרים האלה במקום אחד, להראות מה המשמעות שלהם בשקלים ובשנים, ולעזור לכם להבין את ההחלטה לפני שאתם מתחייבים אליה. הכלים כאן הם להמחשה ולא מחליפים ייעוץ מקצועי.</p>
     </div>
+  </section>
 
-    <div class="nav-grid">
-      <a class="nav-tile" href="/lottery.html">
-        <div class="material-symbols-outlined icon">apartment</div>
-        <div class="title">מחיר למשתכן</div>
-        <div class="desc">בדקו את סיכויי הזכייה שלכם בפרויקט ספציפי</div>
-      </a>
-      <a class="nav-tile" href="/results-board.html">
-        <div class="material-symbols-outlined icon">leaderboard</div>
-        <div class="title">לוח תוצאות</div>
-        <div class="desc">השוואת ערים לפי סיכויי זכייה ומחירים</div>
-      </a>
-      <a class="nav-tile" href="/land-tenders.html">
-        <div class="material-symbols-outlined icon">landscape</div>
-        <div class="title">מכרזי קרקעות</div>
-        <div class="desc">מכרזי בנייה עצמית חיים ממשרד רשות מקרקעי ישראל, כולל מחשבון</div>
-      </a>
-      <a class="nav-tile" href="/dashboard.html">
-        <div class="material-symbols-outlined icon">account_balance</div>
-        <div class="title">משכנתאות</div>
-        <div class="desc">חשבו הון עצמי, תשלום חודשי, ובדקו רגישות לריבית</div>
-      </a>
-      <a class="nav-tile" href="/advisor.html">
-        <div class="material-symbols-outlined icon">support_agent</div>
-        <div class="title">ייעוץ משכנתאות</div>
-        <div class="desc">קבלו תמהיל מדויק מיועץ מומחה</div>
-      </a>
-      <a class="nav-tile" href="/account.html">
-        <div class="material-symbols-outlined icon">person</div>
-        <div class="title">אזור אישי</div>
-        <div class="desc">היסטוריית החישובים שלכם והשוואת מסלולים (רשומים בלבד)</div>
-      </a>
-    </div>
-
-    <div th:replace="~{fragments/nav :: policy}"></div>
-  </div>
-
+  <div th:replace="~{fragments/nav :: policy}"></div>
+<script src="/app.js"></script>
+<script>
+initPageIntro('home', 'ברוכים הבאים לנדלניטיקה',
+  'כאן תמצאו כלים לבדוק לפני החלטה: חישוב משכנתא, סיכויי זכייה במחיר למשתכן, מכרזי קרקעות ולוח תוצאות. בחרו כלי מהתפריט למעלה, או התחילו מ"איך זה עובד".');
+</script>
 </body>
 </html>

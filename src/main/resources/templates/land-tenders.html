@@ -7,12 +7,11 @@
 </style>
 </head>
 <body>
-  <div th:replace="~{fragments/nav :: help}"></div>
-  <div th:replace="~{fragments/nav :: account(active='land-tenders')}"></div>
+  <div th:replace="~{fragments/nav :: topbar(active='land-tenders')}"></div>
   <div class="page">
+    <div class="hero-art land-art" aria-hidden="true"><svg class="art-plot" viewBox="0 0 380 155"><defs><pattern id="bpGrid" width="14" height="14" patternUnits="userSpaceOnUse"><rect x=".5" y=".5" width="13" height="13" fill="none" stroke="rgba(205,239,242,.12)" stroke-width=".6"/></pattern></defs><rect class="roll" x="30" y="12" width="18" height="131" rx="9"/><rect class="roll" x="332" y="12" width="18" height="131" rx="9"/><g class="sheet"><rect x="44" y="16" width="292" height="123" fill="#163F6E" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/><rect x="44" y="16" width="292" height="123" fill="url(#bpGrid)"/><path class="edge parcel" pathLength="100" d="M70 40 H150 V88 H70 Z"/><path class="edge parcel" pathLength="100" d="M158 40 H238 V88 H158 Z" style="fill:rgba(27,178,187,.35)"/><path class="edge parcel" pathLength="100" d="M246 40 H322 V110 H246 Z"/><path class="edge parcel" pathLength="100" d="M70 96 H150 V124 H70 Z"/><path class="edge parcel" pathLength="100" d="M158 96 H238 V124 H158 Z"/><path class="edge parcel" pathLength="100" d="M246 118 H322 V124 H246 Z"/><path class="edge icon" pathLength="100" d="M92 72 L100 62 L108 72 V82 H92 Z M98 82 V75 H102 V82"/><path class="edge icon" pathLength="100" d="M184 110 V102 L194 94 L204 102 V110 Z M190 110 V104 H198 V110"/><path class="edge icon" pathLength="100" d="M266 62 V72 M266 52 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/><path class="edge icon" pathLength="100" d="M300 84 V94 M300 76 m-5 0 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0"/><path class="edge icon" pathLength="100" d="M116 112 H136 M120 112 V106 H132 V112"/></g></svg></div>
     <h1>מכרזי קרקעות ובנייה עצמית</h1>
-    <p class="subtitle">רשימה חיה של מכרזי קרקע פעילים למגרשי בנייה נמוכה/צמודת קרקע, ישירות מ-API של רשות מקרקעי ישראל - לא תמונת מצב קפואה.
-      <span class="info-tip" tabindex="0" data-tip="בשונה מ'מחיר למשתכן' (תוכנית קבועה עם נתונים היסטוריים), מכרזי קרקע נפתחים ונסגרים כל הזמן, כל אחד בתנאים משלו. הרשימה כאן נטענת בזמן אמת משרת רשות מקרקעי ישראל בכל טעינת הדף.">?</span>
+    <p class="subtitle">רשימה חיה של מכרזי קרקע פעילים למגרשי בנייה נמוכה/צמודת קרקע, ישירות מהאתר של רשות מקרקעי ישראל - לא תמונת מצב קפואה.
     </p>
 
     <div class="card">
@@ -23,7 +22,7 @@
           onblur="if (!this.value) this.value = this.dataset.prev || '';">
         <datalist id="tenderOptions"></datalist>
       </label>
-      <div id="tenderListStatus" style="font-size:13px;color:#8b93a6;margin-top:6px"><span class="skeleton"></span></div>
+      <div id="tenderListStatus" style="font-size:13px;color:#6B8193;margin-top:6px"><span class="skeleton"></span></div>
       <button onclick="loadTenderDetail()">הצג פרטי מכרז</button>
     </div>
 
@@ -36,7 +35,7 @@
         <h3>הנחות לאוכלוסיות עדיפות במכרז זה
           <span class="info-tip" tabindex="0" data-tip="חיפשנו אוטומטית בחוברת המכרז המקורית קטעים שמזכירים הנחה ליד מילת מפתח (מילואים/חסרי דיור/נכות וכו'). זה חיפוש טקסט, לא חישוב - יכול להיות לא מדויק או לא שלם, ולפעמים כמה הנחות חלות יחד. תמיד אמתו מול החוברת המלאה (קישור למטה) לפני שמסתמכים על המספר.">?</span>
         </h3>
-        <div id="discountsStatus" style="font-size:13px;color:#8b93a6">מחפש הנחות בחוברת המכרז...</div>
+        <div id="discountsStatus" style="font-size:13px;color:#6B8193">מחפש הנחות בחוברת המכרז...</div>
         <a id="discountsPageLink" class="secondary" style="display:none;margin-top:8px;text-decoration:none">📄 צפייה בכל הקטעים שנמצאו</a>
       </div>
       <div id="bookletLinkWrap" style="margin-top:10px"></div>
@@ -114,14 +113,6 @@
     </div>
   </div>
 
-  <nav class="floating-nav">
-    <a href="/lottery.html"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
-    <a href="/land-tenders.html" class="active"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
-    <a href="/results-board.html"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
-    <a href="/dashboard.html"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
-    <a href="/advisor.html"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
-  </nav>
-
 <script src="/app.js"></script>
 <script>
 function toggleDiscount() {
@@ -177,8 +168,8 @@ async function loadTenderDetail() {
     </p>`;
 
   document.getElementById('populationsNote').innerHTML = detail.priorityPopulations.length > 0
-    ? `<p style="font-size:13px;color:#1a7a34">🎯 במכרז זה יש עדיפות/מכסה נפרדת לאוכלוסיות: ${detail.priorityPopulations.map(p => p.label).join(', ')}. אפשר לבחור את הקטגוריה שלכם במחשבון למטה ולקבל הצעה לאחוז ההנחה.</p>`
-    : `<p style="font-size:13px;color:#8b93a6">לא צוינה במכרז זה עדיפות לאוכלוסייה מסוימת.</p>`;
+    ? `<p style="font-size:13px;color:#12805A">🎯 במכרז זה יש עדיפות/מכסה נפרדת לאוכלוסיות: ${detail.priorityPopulations.map(p => p.label).join(', ')}. אפשר לבחור את הקטגוריה שלכם במחשבון למטה ולקבל הצעה לאחוז ההנחה.</p>`
+    : `<p style="font-size:13px;color:#6B8193">לא צוינה במכרז זה עדיפות לאוכלוסייה מסוימת.</p>`;
 
   const categoryWrap = document.getElementById('discountCategoryWrap');
   const categorySelect = document.getElementById('discountCategory');
@@ -213,14 +204,14 @@ async function loadTenderDetail() {
       document.getElementById('discountsStatus').textContent = 'לא הצלחנו לחפש הנחות בחוברת כרגע.';
     });
   } else {
-    bookletWrap.innerHTML = '<p style="font-size:13px;color:#8b93a6">חוברת המכרז טרם פורסמה במערכת רמ"י.</p>';
+    bookletWrap.innerHTML = '<p style="font-size:13px;color:#6B8193">חוברת המכרז טרם פורסמה במערכת רמ"י.</p>';
     discountsSection.style.display = 'none';
   }
 
   const plotsEl = document.getElementById('plotsTable');
-  const fmtMoney = n => n == null ? '<span style="color:#b02a2a">טרם פורסם ע"י רמ"י</span>' : fmt(n) + ' ש"ח';
+  const fmtMoney = n => n == null ? '<span style="color:#B3261E">טרם פורסם ע"י רמ"י</span>' : fmt(n) + ' ש"ח';
   if (detail.plots.length === 0) {
-    plotsEl.innerHTML = '<p style="color:#8b93a6;font-size:13px">אין עדיין נתוני מגרשים מפורטים למכרז זה</p>';
+    plotsEl.innerHTML = '<p style="color:#6B8193;font-size:13px">אין עדיין נתוני מגרשים מפורטים למכרז זה</p>';
   } else {
     const anyMissingPrice = detail.plots.some(p => p.appraisedPrice == null);
     const rowHtml = (p, i) => `
@@ -236,7 +227,7 @@ async function loadTenderDetail() {
     const firstRows = detail.plots.slice(0, PLOTS_SHOWN_INITIALLY).map(rowHtml).join('');
     const restRows = detail.plots.slice(PLOTS_SHOWN_INITIALLY).map(rowHtml).join('');
     plotsEl.innerHTML = `
-      ${anyMissingPrice ? '<p style="font-size:12px;color:#8b93a6;margin-bottom:8px">חלק מהמגרשים עדיין ללא מחיר שמאי מפורסם במערכת רמ"י (לא קשור לתקלה אצלנו - חסר גם באתר הרשמי) - אפשר להזין הערכה ידנית במחשבון למטה.</p>' : ''}
+      ${anyMissingPrice ? '<p style="font-size:12px;color:#6B8193;margin-bottom:8px">חלק מהמגרשים עדיין ללא מחיר שמאי מפורסם במערכת רמ"י (לא קשור לתקלה אצלנו - חסר גם באתר הרשמי) - אפשר להזין הערכה ידנית במחשבון למטה.</p>' : ''}
       <div style="overflow-x:auto">
       <table>
       <tr><th>מגרש</th><th>שטח (מ"ר)</th><th>מחיר סף/שמאי</th><th>עלות פיתוח</th><th>ערבות</th><th></th></tr>
@@ -259,21 +250,21 @@ async function loadDiscountSuggestion() {
     noteEl.innerHTML = '';
     return;
   }
-  noteEl.style.color = '#8b93a6';
+  noteEl.style.color = '#6B8193';
   noteEl.textContent = 'מחפש הצעה בחוברת המכרז...';
   try {
     const suggestion = await (await fetch(`/api/land-tenders/${selectedTenderId}/discount-suggestion?populationCode=${code}`)).json();
     if (suggestion.suggestedPercent == null) {
-      noteEl.style.color = '#8b93a6';
+      noteEl.style.color = '#6B8193';
       noteEl.innerHTML = 'לא נמצאה אוטומטית הצעה לקטגוריה זו - בדקו את חוברת המכרז והזינו את האחוז ידנית למטה.';
       return;
     }
     document.getElementById('discountPercent').value = suggestion.suggestedPercent;
-    noteEl.style.color = '#1a7a34';
+    noteEl.style.color = '#12805A';
     noteEl.innerHTML = `הצעה למילוי אוטומטי: <b>${suggestion.suggestedPercent}%</b> (ניתן לערוך למטה). מבוסס על הקטע הבא בחוברת - יש לאשר:<br>
-      <span style="display:block;background:#f7f8fb;border-radius:8px;padding:8px 10px;margin-top:4px;color:#333">${suggestion.sourceSnippet}</span>`;
+      <span style="display:block;background:#F4F8FA;border-radius:8px;padding:8px 10px;margin-top:4px;color:#333">${suggestion.sourceSnippet}</span>`;
   } catch (e) {
-    noteEl.style.color = '#8b93a6';
+    noteEl.style.color = '#6B8193';
     noteEl.textContent = 'לא הצלחנו לחפש הצעה כרגע - הזינו את האחוז ידנית לפי החוברת.';
   }
 }
@@ -318,7 +309,7 @@ async function calculateSelfBuild() {
       <tr><td>תשלום חודשי משוער</td><td>${fmt(data.monthlyPayment)} ש"ח</td></tr>
       <tr><td>שיעור החזר מהכנסה</td><td>${data.dtiPercent.toFixed(1)}% ${data.withinLegalDtiLimit ? '(בתוך המגבלה)' : '(חורג מהמגבלה הבנקאית של 50%!)'}</td></tr>
     </table>
-    <p style="font-size:11px;color:#8b93a6;margin-top:6px">הערכה בלבד: תקציב הבנייה הוא הזנה ידנית שלכם, ומדיניות הבנק המדויקת למשכנתא לבנייה עצמית (למשל פריסת ההלוואה לשלבים) משתנה בין בנקים.</p>`;
+    <p style="font-size:11px;color:#6B8193;margin-top:6px">הערכה בלבד: תקציב הבנייה הוא הזנה ידנית שלכם, ומדיניות הבנק המדויקת למשכנתא לבנייה עצמית (למשל פריסת ההלוואה לשלבים) משתנה בין בנקים.</p>`;
 }
 
 loadTenders();

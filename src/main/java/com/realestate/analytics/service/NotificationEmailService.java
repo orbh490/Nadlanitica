@@ -31,7 +31,7 @@ public class NotificationEmailService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);
-            message.setSubject("[המצפן הפיננסי] " + subject);
+            message.setSubject("[נדלניטיקה] " + subject);
             message.setText(body);
             mailSender.send(message);
             log.info("מייל נשלח בהצלחה אל {}: {}", to, subject);

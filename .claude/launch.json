@@ -6,6 +6,12 @@
       "runtimeExecutable": "C:\\Users\\Or_Ben_Hamo\\Desktop\\projects\\analytics\\mvnw.cmd",
       "runtimeArgs": ["spring-boot:run"],
       "port": 8080
+    },
+    {
+      "name": "analytics-redesign-audit",
+      "runtimeExecutable": "C:\\Users\\Or_Ben_Hamo\\Desktop\\projects\\analytics-redesign\\mvnw.cmd",
+      "runtimeArgs": ["spring-boot:run", "-Dspring-boot.run.arguments=--server.port=8090 --spring.datasource.url=jdbc:h2:mem:audit"],
+      "port": 8090
     }
   ]
 }

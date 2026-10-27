@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.SecureRandom;
@@ -162,6 +163,8 @@ public class AuthService {
         });
     }
 
+    // derived deleteAllByUserId needs a transaction, otherwise the reset fails after saving the new password
+    @Transactional
     public AuthResult resetPassword(String token, String newPassword) {
         if (newPassword == null || newPassword.length() < 6) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "הסיסמה חייבת להכיל לפחות 6 תווים");
@@ -185,7 +188,7 @@ public class AuthService {
         tokenRepository.save(new AccountToken(token, user.getId(), PURPOSE_VERIFY, Instant.now().plus(VERIFY_TOKEN_TTL)));
         String link = baseUrl + "/api/auth/verify?token=" + token;
         emailService.send(user.getEmail(), "אימות כתובת אימייל",
-                "תודה שנרשמתם למצפן הפיננסי לרוכש הישראלי!\n\nלאימות כתובת האימייל, לחצו על הקישור הבא:\n" + link +
+                "תודה שנרשמתם לנדלניטיקה!\n\nלאימות כתובת האימייל, לחצו על הקישור הבא:\n" + link +
                         "\n\nהקישור בתוקף ל-48 שעות.");
     }
 

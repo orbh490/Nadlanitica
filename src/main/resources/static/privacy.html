@@ -13,10 +13,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
 <link rel="stylesheet" href="/app.css">
+<link rel="stylesheet" href="/prefs.css">
+<script src="/prefs.js"></script>
+<style>.card { border-top: 5px solid var(--teal, #1BB2BB); }</style>
+<script>try { if (JSON.parse(localStorage.getItem('displayPrefs') || '{}').dark) document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {}</script>
 </head>
 <body>
   <div class="page">
-    <p><a href="/home.html" class="btn secondary">← לעמוד הבית</a></p>
+    <a href="/home.html" class="back-home">לעמוד הבית</a>
     <h1>מדיניות פרטיות</h1>
     <p class="subtitle">עודכן לאחרונה: 2 בספטמבר 2026</p>
 

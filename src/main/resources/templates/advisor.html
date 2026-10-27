@@ -4,9 +4,9 @@
 <th:block th:replace="~{fragments/head :: common(title='ייעוץ משכנתאות')}"></th:block>
 </head>
 <body>
-  <div th:replace="~{fragments/nav :: help}"></div>
-  <div th:replace="~{fragments/nav :: account(active='advisor')}"></div>
+  <div th:replace="~{fragments/nav :: topbar(active='advisor')}"></div>
   <div class="page">
+    <div class="hero-art" aria-hidden="true"><div class="art-chat"><span class="me" style="--d:.2s">כמה אפשר לחסוך במשכנתא?</span><span style="--d:.9s">בואו נבדוק את התמהיל שלכם</span><div class="dots"><i></i><i></i><i></i></div></div></div>
     <h1>ייעוץ משכנתאות מקצועי</h1>
     <p class="subtitle">תמהיל משכנתא נכון (קבועה / משתנה / פריים / צמודת מדד) יכול לחסוך לכם עשרות אלפי שקלים. השאירו פרטים ויועץ מומחה יחזור אליכם.</p>
 
@@ -16,15 +16,13 @@
       <label>טלפון <input type="tel" id="phone"></label>
       <label>אימייל <input type="email" id="email"></label>
       <label>הודעה (אופציונלי) <textarea id="message" rows="3" style="resize:none"></textarea></label>
-      <p style="font-size:12px;color:#8b93a6;margin-top:10px">⚠ אנחנו רק מחברים אתכם ליועץ משכנתאות חיצוני - אנחנו לא גובים תשלום, אבל הייעוץ עצמו עלול להיות כרוך בעמלה מטעם היועץ. בדקו את התנאים והעלות מולו ישירות לפני שמתחייבים.</p>
+      <p style="font-size:12px;color:#6B8193;margin-top:10px">⚠ אנחנו רק מחברים אתכם ליועץ משכנתאות חיצוני - אנחנו לא גובים תשלום, אבל הייעוץ עצמו עלול להיות כרוך בעמלה מטעם היועץ. בדקו את התנאים והעלות מולו ישירות לפני שמתחייבים.</p>
       <button onclick="submitLead()">שלחו לי יועץ</button>
       <div id="leadResult" style="margin-top:14px"></div>
     </div>
 
     <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
-
-  <nav th:replace="~{fragments/nav :: floating(active='advisor')}"></nav>
 
 <script src="/app.js"></script>
 <script>
@@ -33,7 +31,7 @@ async function submitLead() {
   const phone = document.getElementById('phone').value.trim();
   const resultEl = document.getElementById('leadResult');
   if (!fullName || !phone) {
-    resultEl.innerHTML = '<p style="color:#b02a2a;font-size:13px">נא למלא שם וטלפון</p>';
+    resultEl.innerHTML = '<p style="color:#B3261E;font-size:13px">נא למלא שם וטלפון</p>';
     return;
   }
   const body = {

@@ -4,8 +4,7 @@
 <th:block th:replace="~{fragments/head :: common(title='הגדרות')}"></th:block>
 </head>
 <body>
-  <div th:replace="~{fragments/nav :: help}"></div>
-  <div th:replace="~{fragments/nav :: account(active='settings')}"></div>
+  <div th:replace="~{fragments/nav :: topbar(active='settings')}"></div>
   <div class="page">
     <h1>הגדרות</h1>
     <p class="subtitle">ההגדרות הכלליות זמינות לכולם - עם או בלי חשבון.</p>
@@ -26,6 +25,20 @@
     </div>
 
     <div class="card">
+      <h2>התראות</h2>
+      <p class="subtitle" style="margin:0 0 8px">ההתראות זמינות רק למי שנרשם ומחובר לחשבון.</p>
+      <label class="switch-row"><span><b>עדכוני מכרזים</b><small>הודעה כשמכרז חדש נפתח באזור שבחרתם</small></span><input type="checkbox" class="switch" checked></label>
+      <label class="switch-row"><span><b>שינוי בריבית</b><small>התראה כשהריבית הממוצעת משתנה</small></span><input type="checkbox" class="switch" checked></label>
+      <label class="switch-row"><span><b>עדכון חודשי</b><small>סיכום קצר בתחילת כל חודש</small></span><input type="checkbox" class="switch"></label>
+    </div>
+
+    <div class="card">
+      <h2>תצוגה</h2>
+      <label class="switch-row"><span><b>מצב כהה</b><small>מתאים לשימוש בערב</small></span><input type="checkbox" class="switch" id="prefDark"></label>
+      <label class="switch-row"><span><b>הגדלת טקסט</b><small>טקסט גדול יותר בכל המסכים</small></span><input type="checkbox" class="switch" id="prefLargeText"></label>
+    </div>
+
+    <div class="card">
       <h2>פרטיות ונתונים</h2>
       <p class="subtitle" style="margin-bottom:10px">מוחק מהדפדפן הזה את פרטי ההתחברות השמורים (אם יש). לא משפיע על נתונים ששמורים בחשבון שלך בשרת.</p>
       <button class="secondary" onclick="clearLocalData()">ניקוי נתונים שמורים במכשיר זה</button>
@@ -34,8 +47,6 @@
 
     <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
-
-  <nav th:replace="~{fragments/nav :: floating(active='settings')}"></nav>
 
 <script src="/app.js"></script>
 <script>
@@ -55,23 +66,29 @@ async function handleLogout() {
 async function sendPasswordReset() {
   const email = document.getElementById('settingsEmail').textContent;
   const msgEl = document.getElementById('settingsMessage');
-  msgEl.style.color = '#8b93a6';
+  msgEl.style.color = '#6B8193';
   msgEl.textContent = 'רגע...';
   const res = await fetch('/api/auth/forgot-password', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
   });
   const data = await res.json();
-  msgEl.style.color = '#1a7a34';
+  msgEl.style.color = '#12805A';
   msgEl.textContent = data.message;
 }
 
 function clearLocalData() {
   clearAuthToken();
   const msgEl = document.getElementById('clearMessage');
-  msgEl.style.color = '#1a7a34';
+  msgEl.style.color = '#12805A';
   msgEl.textContent = 'נוקה. מרעננים...';
   setTimeout(() => location.reload(), 600);
 }
+
+const savedPrefs = displayPrefs.get();
+document.getElementById('prefDark').checked = !!savedPrefs.dark;
+document.getElementById('prefLargeText').checked = !!savedPrefs.largeText;
+document.getElementById('prefDark').addEventListener('change', e => displayPrefs.set('dark', e.target.checked));
+document.getElementById('prefLargeText').addEventListener('change', e => displayPrefs.set('largeText', e.target.checked));
 
 refreshSettingsUI();
 initPageIntro('settings', 'הגדרות',

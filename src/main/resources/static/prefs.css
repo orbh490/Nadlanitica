@@ -1,0 +1,48 @@
+/* מצב כהה: פעיל רק כש-<html data-theme="dark"> (נקבע לפי ההגדרה ב-prefs.js). בלי ההגדרה - אין שום השפעה */
+:root[data-theme="dark"] {
+  --page-bg: #0C1B2A;
+  --white: #15293D;
+  --ink: #E6EEF4;
+  --ink-secondary: #B8C9D6;
+  --ink-muted: #9DB2C2;
+  --border: #2B4359;
+  --teal-soft: #173D4B;
+  --primary-50: #173D4B;
+  --primary-100: #1F4F5E;
+  --good-bg: #123B2B;
+  --bad-bg: #431F1F;
+  --good-text: #7FE3B3;
+  --bad-text: #FF9E9E;
+  color-scheme: dark;
+}
+[data-theme="dark"] h1, [data-theme="dark"] h2 { color: var(--ink); }
+[data-theme="dark"] .topbar, [data-theme="dark"] nav.m-tabs { background: #0F2134; }
+[data-theme="dark"] .topbar .brand, [data-theme="dark"] .topbar .links a.active { color: var(--ink); }
+[data-theme="dark"] button.secondary, [data-theme="dark"] .btn.secondary { color: var(--ink); }
+[data-theme="dark"] a.policy-btn { background: var(--white); color: var(--ink); }
+[data-theme="dark"] .tile, [data-theme="dark"] .home-card { background: var(--white); }
+[data-theme="dark"] .tile .t, [data-theme="dark"] .home-card .amount { color: var(--ink); }
+
+/* מצב כהה - כפתורים בטורקיז (חוץ מלשוניות תוצאות, שצריכות להישאר נפרדות מהלשונית הפעילה) */
+[data-theme="dark"] button:not(.tab-btn), [data-theme="dark"] .btn, [data-theme="dark"] .login-btn { background: var(--teal); color: #0B2238; border-color: var(--teal); }
+[data-theme="dark"] button:not(.tab-btn):hover, [data-theme="dark"] .btn:hover, [data-theme="dark"] .login-btn:hover { background: #3CC4CC; color: #0B2238; }
+[data-theme="dark"] button:disabled { background: #3A5163; color: #9DB2C2; }
+
+/* בועות וכרטיסים לבנים -> משטח כהה עם טקסט בהיר */
+[data-theme="dark"] .step, [data-theme="dark"] .results-tabs button.tab-btn, [data-theme="dark"] .viz-root.chart-wrap { background: var(--white); color: var(--ink); border-color: var(--border); }
+[data-theme="dark"] .art-chat span:not(.me) { background: #1B3A50; color: var(--ink); }
+[data-theme="dark"] .art-chat span.me { background: var(--teal); color: #0B2238; }
+
+/* צבעי הנתונים בגרפים: הכחול הכהה לא נראה על רקע כהה, אז הוא מוחלף בטורקיז בהיר */
+[data-theme="dark"] .viz-root {
+  --surface-1: #15293D;
+  --text-primary: #E6EEF4;
+  --text-secondary: #B8C9D6;
+  --text-muted: #9DB2C2;
+  --gridline: #2B4359;
+  --baseline: #3A5470;
+  --series-principal: #BFEFF3;
+  --series-single: #7FDDE3;
+}
+[data-theme="dark"] .step h1, [data-theme="dark"] .step h2, [data-theme="dark"] .step h3, [data-theme="dark"] .step h4 { color: var(--ink); }
+

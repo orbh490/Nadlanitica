@@ -4,12 +4,17 @@
 <th:block th:replace="~{fragments/head :: common(title='האזור האישי שלי')}"></th:block>
 <style>
   #historyList { margin-top: 10px; }
+  .interest-add { display: flex; gap: 8px; }
+  .interest-add input { flex: 1; min-width: 0; }
+  .interest-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .interest-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 4px 4px 14px; border-radius: 999px; background: var(--teal-soft); color: var(--navy); font-size: 14px; }
+  .interest-chip button { margin: 0; min-height: 0; width: 28px; height: 28px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; line-height: 1; font-size: 14px; flex-shrink: 0; }
+  .history-more summary { cursor: pointer; font-size: 13px; color: var(--ink-secondary); margin-top: 10px; }
   .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 </style>
 </head>
 <body>
-  <div th:replace="~{fragments/nav :: help}"></div>
-  <div th:replace="~{fragments/nav :: account(active='account')}"></div>
+  <div th:replace="~{fragments/nav :: topbar(active='account')}"></div>
   <div class="page">
     <h1>האזור האישי שלי</h1>
     <p class="subtitle">היסטוריית החישובים שלך והשוואת מסלולים - זמין רק כשמחוברים, כדי שהמידע שלך יישמר.</p>
@@ -69,16 +74,28 @@
         <div id="pathComparisonResult" style="margin-top:14px"></div>
       </div>
 
+      <div class="card interest-bubble">
+        <h2>אזורי עניין</h2>
+        <p class="subtitle" style="margin-bottom:12px">בחרו מקומות בארץ שמעניינים אתכם, לקבלת התראות (ניתן לבטל התראות בהגדרות).</p>
+        <div class="interest-add">
+          <input type="text" id="interestInput" maxlength="60" placeholder="למשל: גבע בנימין, באר שבע" aria-label="שם האזור">
+          <button onclick="addInterestArea()">הוספה</button>
+        </div>
+        <div id="interestMsg" style="font-size:13px;margin-top:6px"></div>
+        <div id="interestList" class="interest-list"></div>
+      </div>
+
       <div class="card">
-        <h2>ההיסטוריה שלי</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <h2 style="margin:0">ההיסטוריה שלי</h2>
+          <button class="secondary" id="clearHistoryBtn" onclick="clearHistory()" style="display:none">נקה היסטוריה</button>
+        </div>
         <div id="historyList"></div>
       </div>
     </div>
 
     <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
-
-  <nav th:replace="~{fragments/nav :: floating(active='account')}"></nav>
 
 <script src="/app.js"></script>
 <script>
@@ -95,14 +112,14 @@ async function handleLogin() {
 async function handleRegister() {
   if (!document.getElementById('consentCheckbox').checked) {
     const msgEl = document.getElementById('authMessage');
-    msgEl.style.color = '#b02a2a';
+    msgEl.style.color = '#B3261E';
     msgEl.textContent = 'יש לאשר את מדיניות הפרטיות כדי להירשם';
     return;
   }
   const result = await submit('/api/auth/register', true);
   if (result) {
     const msgEl = document.getElementById('authMessage');
-    msgEl.style.color = '#1a7a34';
+    msgEl.style.color = '#12805A';
     msgEl.textContent = result.data.message;
   }
 }
@@ -112,12 +129,12 @@ async function submit(url, consent) {
   const password = document.getElementById('authPassword').value;
   const msgEl = document.getElementById('authMessage');
   const resendLink = document.getElementById('resendVerificationLink');
-  msgEl.style.color = '#8b93a6';
+  msgEl.style.color = '#6B8193';
   msgEl.textContent = 'רגע...';
   resendLink.style.display = 'none';
   const result = await authRequest(url, email, password, consent);
   if (!result.ok) {
-    msgEl.style.color = '#b02a2a';
+    msgEl.style.color = '#B3261E';
     msgEl.textContent = result.error;
     resendLink.style.display = result.status === 403 ? 'inline' : 'none';
     return null;
@@ -135,13 +152,13 @@ function toggleForgotPassword() {
 async function submitForgotPassword() {
   const email = document.getElementById('forgotEmail').value.trim();
   const msgEl = document.getElementById('authMessage');
-  msgEl.style.color = '#8b93a6';
+  msgEl.style.color = '#6B8193';
   msgEl.textContent = 'רגע...';
   const res = await fetch('/api/auth/forgot-password', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
   });
   const data = await res.json();
-  msgEl.style.color = '#1a7a34';
+  msgEl.style.color = '#12805A';
   msgEl.textContent = data.message;
   document.getElementById('forgotPasswordBox').style.display = 'none';
 }
@@ -152,7 +169,7 @@ async function resendVerification() {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
   });
   const msgEl = document.getElementById('authMessage');
-  msgEl.style.color = '#1a7a34';
+  msgEl.style.color = '#12805A';
   msgEl.textContent = 'אם הכתובת רשומה ועדיין לא אומתה, נשלח אליה מייל אימות חדש';
   document.getElementById('resendVerificationLink').style.display = 'none';
 }
@@ -169,20 +186,79 @@ async function refreshAccountUI() {
   if (!me.loggedIn) return;
   document.getElementById('authEmailDisplay').textContent = me.email;
   await renderHistory();
+  await loadInterestAreas();
 }
 
 async function renderHistory() {
   const el = document.getElementById('historyList');
   const history = await (await fetch('/api/dashboard/mine', { headers: authHeaders() })).json();
+  document.getElementById('clearHistoryBtn').style.display = history.length ? 'inline-flex' : 'none';
   if (history.length === 0) {
-    el.innerHTML = '<p style="color:#8b93a6;font-size:13px">עדיין לא שמרת חישובים. חשבו משכנתא בעמוד "משכנתאות" כדי שהיא תישמר כאן.</p>';
+    el.innerHTML = '<p style="color:#6B8193;font-size:13px">עדיין לא שמרת חישובים. חשבו משכנתא בעמוד "משכנתאות" כדי שהיא תישמר כאן.</p>';
     return;
   }
-  el.innerHTML = history.map(h => `
+  const row = h => `
     <div class="history-item">
-      <span>${h.category} · ${Math.round(h.purchasePrice).toLocaleString()} ש"ח <small style="color:#8b93a6">(${new Date(h.createdAt).toLocaleString('he-IL')})</small></span>
+      <span>${h.category} · ${Math.round(h.purchasePrice).toLocaleString()} ש"ח <small style="color:#6B8193">(${new Date(h.createdAt).toLocaleString('he-IL')})</small></span>
       <span><button class="secondary" onclick="loadFromHistory('${h.id}')">צפייה</button></span>
-    </div>`).join('');
+    </div>`;
+  el.innerHTML = history.slice(0, 3).map(row).join('')
+    + (history.length > 3
+      ? `<details class="history-more"><summary>הצג את כל ההיסטוריה (${history.length})</summary>${history.slice(3).map(row).join('')}</details>`
+      : '');
+}
+
+async function clearHistory() {
+  if (!confirm('למחוק את כל ההיסטוריה השמורה? אי אפשר לבטל את זה.')) return;
+  const res = await fetch('/api/dashboard/mine', { method: 'DELETE', headers: authHeaders() });
+  if (!res.ok) { alert('לא הצלחנו לנקות את ההיסטוריה, נסו שוב'); return; }
+  await renderHistory();
+}
+
+async function loadInterestAreas() {
+  const el = document.getElementById('interestList');
+  const areas = await (await fetch('/api/interest-areas', { headers: authHeaders() })).json();
+  el.replaceChildren();
+  if (areas.length === 0) {
+    el.innerHTML = '<p style="color:#6B8193;font-size:13px">עדיין לא הוספתם אזורי עניין.</p>';
+    return;
+  }
+  areas.forEach(a => {
+    const chip = document.createElement('span');
+    chip.className = 'interest-chip';
+    chip.textContent = a.name;
+    const btn = document.createElement('button');
+    btn.className = 'secondary';
+    btn.textContent = '✕';
+    btn.setAttribute('aria-label', 'הסרת ' + a.name);
+    btn.onclick = () => removeInterestArea(a.id);
+    chip.appendChild(btn);
+    el.appendChild(chip);
+  });
+}
+
+async function addInterestArea() {
+  const input = document.getElementById('interestInput');
+  const msg = document.getElementById('interestMsg');
+  const name = input.value.trim();
+  if (!name) { msg.style.color = '#B3261E'; msg.textContent = 'יש להזין שם אזור'; return; }
+  const res = await fetch('/api/interest-areas', {
+    method: 'POST', headers: { ...authHeaders(), 'Content-Type': 'application/json' }, body: JSON.stringify({ name })
+  });
+  if (!res.ok) {
+    msg.style.color = '#B3261E';
+    msg.textContent = res.status === 409 ? 'האזור הזה כבר ברשימה' : 'לא הצלחנו להוסיף את האזור, נסו שוב';
+    return;
+  }
+  input.value = '';
+  msg.textContent = '';
+  await loadInterestAreas();
+}
+
+async function removeInterestArea(id) {
+  const res = await fetch(`/api/interest-areas/${id}`, { method: 'DELETE', headers: authHeaders() });
+  if (!res.ok) { alert('לא הצלחנו להסיר את האזור, נסו שוב'); return; }
+  await loadInterestAreas();
 }
 
 async function loadFromHistory(id) {
@@ -235,7 +311,7 @@ async function comparePaths() {
           <td>${r.payment.dtiPercent.toFixed(1)}%</td>
         </tr>`).join('')}
     </table>
-    <p style="font-size:11px;color:#8b93a6;margin-top:6px">"מחיר למשתכן" ו"שוק חופשי" מבוססים על שווי השוק/מחיר הרכישה שמילאתם למעלה. "בנייה עצמית" הוא אומדן מפושט על סמך תקציב כולל אחד - למספרים מדויקים למכרז ספציפי היכנסו למחשבון הבנייה העצמית בעמוד "מכרזי קרקעות".</p>`;
+    <p style="font-size:11px;color:#6B8193;margin-top:6px">"מחיר למשתכן" ו"שוק חופשי" מבוססים על שווי השוק/מחיר הרכישה שמילאתם למעלה. "בנייה עצמית" הוא אומדן מפושט על סמך תקציב כולל אחד - למספרים מדויקים למכרז ספציפי היכנסו למחשבון הבנייה העצמית בעמוד "מכרזי קרקעות".</p>`;
 }
 
 refreshAccountUI();

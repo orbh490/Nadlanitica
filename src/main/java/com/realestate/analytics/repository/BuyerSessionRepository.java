@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface BuyerSessionRepository extends JpaRepository<BuyerSession, String> {
     List<BuyerSession> findByUserIdOrderByCreatedAtDesc(String userId);
+    void deleteAllByUserId(String userId);
 }
