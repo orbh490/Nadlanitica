@@ -211,6 +211,7 @@ button:disabled { background: var(--ink-muted); box-shadow: none; cursor: not-al
 .badge { display: inline-block; padding: 4px 14px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 700; }
 .badge.ok { background: var(--good-bg); color: var(--good-text); }
 .badge.bad { background: var(--bad-bg); color: var(--bad-text); }
+.form-error { color: var(--bad-text); font-size: 13px; margin-top: 8px; }
 
 table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
 th, td { text-align: right; padding: 9px 10px; border-bottom: 1px solid var(--border); }

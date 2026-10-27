@@ -90,7 +90,13 @@ async function refreshAccountUI() {
 
 async function renderHistory() {
   const el = document.getElementById('historyList');
-  const history = await (await fetch('/api/dashboard/mine', { headers: authHeaders() })).json();
+  let history;
+  try {
+    history = await apiFetch('/api/dashboard/mine', { headers: authHeaders() });
+  } catch (err) {
+    el.innerHTML = errorHtml(err);
+    return;
+  }
   document.getElementById('clearHistoryBtn').style.display = history.length ? 'inline-flex' : 'none';
   if (history.length === 0) {
     el.innerHTML = '<p style="color:#6B8193;font-size:13px">עדיין לא שמרת חישובים. חשבו משכנתא בעמוד "משכנתאות" כדי שהיא תישמר כאן.</p>';
@@ -99,7 +105,7 @@ async function renderHistory() {
   const row = h => `
     <div class="history-item">
       <span>${h.category} · ${Math.round(h.purchasePrice).toLocaleString()} ש"ח <small style="color:#6B8193">(${new Date(h.createdAt).toLocaleString('he-IL')})</small></span>
-      <span><button class="secondary" onclick="loadFromHistory('${h.id}')">צפייה</button></span>
+      <span><button class="secondary" onclick="loadFromHistory('${escapeHtml(h.id)}')">צפייה</button></span>
     </div>`;
   el.innerHTML = history.slice(0, 3).map(row).join('')
     + (history.length > 3
@@ -116,7 +122,13 @@ async function clearHistory() {
 
 async function loadInterestAreas() {
   const el = document.getElementById('interestList');
-  const areas = await (await fetch('/api/interest-areas', { headers: authHeaders() })).json();
+  let areas;
+  try {
+    areas = await apiFetch('/api/interest-areas', { headers: authHeaders() });
+  } catch (err) {
+    el.innerHTML = errorHtml(err);
+    return;
+  }
   el.replaceChildren();
   if (areas.length === 0) {
     el.innerHTML = '<p style="color:#6B8193;font-size:13px">עדיין לא הוספתם אזורי עניין.</p>';
@@ -141,12 +153,11 @@ async function addInterestArea() {
   const msg = document.getElementById('interestMsg');
   const name = input.value.trim();
   if (!name) { msg.style.color = '#B3261E'; msg.textContent = 'יש להזין שם אזור'; return; }
-  const res = await fetch('/api/interest-areas', {
-    method: 'POST', headers: { ...authHeaders(), 'Content-Type': 'application/json' }, body: JSON.stringify({ name })
-  });
-  if (!res.ok) {
-    msg.style.color = '#B3261E';
-    msg.textContent = res.status === 409 ? 'האזור הזה כבר ברשימה' : 'לא הצלחנו להוסיף את האזור, נסו שוב';
+  try {
+    await postJson('/api/interest-areas', { name }, authHeaders());
+  } catch (err) {
+    msg.style.color = 'var(--bad-text)';
+    msg.textContent = err.message;
     return;
   }
   input.value = '';
@@ -182,32 +193,39 @@ async function comparePaths() {
     { name: 'מחיר למשתכן', marketValue, purchasePrice, subsidized: true },
     { name: 'שוק חופשי (יד שנייה/קבלן)', marketValue, purchasePrice: marketValue, subsidized: false },
     { name: 'בנייה עצמית (מכרזי קרקעות)', marketValue: selfBuildBudget, purchasePrice: selfBuildBudget, subsidized: false }
-  ];
+  ].filter(sc => sc.purchasePrice > 0); // מסלול שלא מולא לו מחיר (למשל תקציב בנייה ריק) פשוט לא מוצג
+  if (scenarios.length === 0) {
+    document.getElementById('pathComparisonResult').innerHTML = '<p class="form-error">יש למלא מחיר לפחות למסלול אחד</p>';
+    return;
+  }
 
-  const results = await Promise.all(scenarios.map(async sc => {
-    const equity = await (await fetch('/api/equity/calculate', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ availableEquity, monthlyIncome, category, marketValue: sc.marketValue, purchasePrice: sc.purchasePrice, subsidized: sc.subsidized, usedBroker: false })
-    })).json();
-    const loanAmount = Math.max(0, sc.purchasePrice - availableEquity);
-    const payment = await (await fetch('/api/mortgage/monthly-payment', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ loanAmount, termYears, monthlyIncome })
-    })).json();
-    return { name: sc.name, equity, payment };
-  }));
+  // אותו חישוב כמו בדשבורד (כולל תקרת המימון) - בלי כותרת ההתחברות בכוונה, כדי שההשוואה לא תישמר בהיסטוריה
+  const resultEl = document.getElementById('pathComparisonResult');
+  let results;
+  try {
+    results = await Promise.all(scenarios.map(async sc => {
+      const { summary } = await postJson('/api/dashboard', {
+        availableEquity, monthlyIncome, category, marketValue: sc.marketValue, purchasePrice: sc.purchasePrice,
+        subsidized: sc.subsidized, usedBroker: false, termYears
+      });
+      return { name: sc.name, s: summary };
+    }));
+  } catch (err) {
+    resultEl.innerHTML = errorHtml(err);
+    return;
+  }
 
   const fmt = n => Math.round(n).toLocaleString();
-  document.getElementById('pathComparisonResult').innerHTML = `
+  resultEl.innerHTML = `
     <table>
       <tr><th>מסלול</th><th>הון עצמי נדרש</th><th>סה"כ מזומן נדרש</th><th>תשלום חודשי משוער</th><th>שיעור החזר מהכנסה</th></tr>
       ${results.map(r => `
         <tr>
           <td>${r.name}</td>
-          <td>${fmt(r.equity.requiredEquity)} ש"ח</td>
-          <td>${fmt(r.equity.totalCashNeeded)} ש"ח ${r.equity.canAfford ? '✅' : '⚠️'}</td>
-          <td>${fmt(r.payment.monthlyPayment)} ש"ח</td>
-          <td>${r.payment.dtiPercent.toFixed(1)}%</td>
+          <td>${fmt(r.s.requiredEquity)} ש"ח</td>
+          <td>${fmt(r.s.totalCashNeeded)} ש"ח ${r.s.canAffordEquity ? '✅' : '⚠️'}</td>
+          <td>${fmt(r.s.monthlyPayment)} ש"ח${r.s.loanCappedByLtv ? ' <small>(הלוואה מוגבלת בתקרת המימון)</small>' : ''}</td>
+          <td>${r.s.dtiPercent.toFixed(1)}%</td>
         </tr>`).join('')}
     </table>
     <p style="font-size:11px;color:#6B8193;margin-top:6px">"מחיר למשתכן" ו"שוק חופשי" מבוססים על שווי השוק/מחיר הרכישה שמילאתם למעלה. "בנייה עצמית" הוא אומדן מפושט על סמך תקציב כולל אחד - למספרים מדויקים למכרז ספציפי היכנסו למחשבון הבנייה העצמית בעמוד "מכרזי קרקעות".</p>`;

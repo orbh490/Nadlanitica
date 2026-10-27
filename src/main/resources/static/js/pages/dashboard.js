@@ -13,12 +13,13 @@ async function submitProfile() {
     usedBroker: document.getElementById('usedBroker').checked,
     termYears: Number(document.getElementById('termYears').value)
   };
-  const res = await fetch('/api/dashboard', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify(body)
-  });
-  const data = await res.json();
+  let data;
+  try {
+    data = await postJson('/api/dashboard', body, authHeaders());
+  } catch (err) {
+    document.getElementById('saveNote').innerHTML = errorHtml(err);
+    return;
+  }
   renderResults(data.summary);
   document.getElementById('saveNote').innerHTML = data.id
     ? '✅ החישוב נשמר <a href="/account.html">באזור האישי שלך</a>.'
@@ -75,10 +76,13 @@ async function loadRateStressTest(loanAmount, termYears) {
   if (!loanAmount || !termYears) { card.style.display = 'none'; return; }
   card.style.display = 'block';
   const fmt = n => Math.round(n).toLocaleString();
-  const data = await (await fetch('/api/mortgage/rate-stress-test', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ loanAmount, termYears, monthlyIncome })
-  })).json();
+  let data;
+  try {
+    data = await postJson('/api/mortgage/rate-stress-test', { loanAmount, termYears, monthlyIncome });
+  } catch (err) {
+    document.getElementById('rateStressResult').innerHTML = errorHtml(err);
+    return;
+  }
   document.getElementById('rateStressResult').innerHTML = `
     <table>
       <tr><th>תרחיש</th><th>ריבית שנתית</th><th>תשלום חודשי</th><th>שיעור החזר מהכנסה</th></tr>
@@ -123,7 +127,13 @@ function niceMax(value) {
 async function renderAmortizationChart(loanAmount, termYears) {
   const container = document.getElementById('amortizationChart');
   if (!loanAmount || !termYears) { container.innerHTML = ''; return; }
-  const schedule = await (await fetch(`/api/mortgage/amortization-schedule?loanAmount=${loanAmount}&termYears=${termYears}`)).json();
+  let schedule;
+  try {
+    schedule = await apiFetch(`/api/mortgage/amortization-schedule?loanAmount=${loanAmount}&termYears=${termYears}`);
+  } catch (err) {
+    container.innerHTML = errorHtml(err);
+    return;
+  }
 
   // רוחב ה-viewBox נמדד מהקונטיינר בפועל (לא קבוע) כדי שגודל הטקסט יישאר קריא במסך צר - ראו הערה דומה
   // ב-results-board.html שבה אותה בעיה בדיוק גרמה לתוויות בלתי קריאות בנייד.
@@ -206,7 +216,7 @@ async function calculateTrackMix() {
   const resultEl = document.getElementById('trackMixResult');
   const sum = fixedPercent + cpiPercent + primePercent;
   if (Math.round(sum) !== 100) {
-    resultEl.innerHTML = `<p style="color:#B3261E;font-size:13px">האחוזים חייבים להסתכם ל-100% (כרגע: ${sum}%)</p>`;
+    resultEl.innerHTML = `<p class="form-error">האחוזים חייבים להסתכם ל-100% (כרגע: ${sum}%)</p>`;
     return;
   }
   const body = {
@@ -216,9 +226,13 @@ async function calculateTrackMix() {
     cpiLinkedPercent: cpiPercent,
     primePercent: primePercent
   };
-  const data = await (await fetch('/api/mortgage/track-mix', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-  })).json();
+  let data;
+  try {
+    data = await postJson('/api/mortgage/track-mix', body);
+  } catch (err) {
+    resultEl.innerHTML = errorHtml(err);
+    return;
+  }
   const fmt = n => n.toLocaleString(undefined, {maximumFractionDigits: 0});
   const capWarning = data.exceedsVariableRateCap
     ? '<p style="font-size:12px;color:#B3261E;margin-top:8px">⚠ מסלול הפריים חורג מ-66.66% מההלוואה - הוראה 329 של בנק ישראל אוסרת על הבנק לאשר תמהיל כזה.</p>'

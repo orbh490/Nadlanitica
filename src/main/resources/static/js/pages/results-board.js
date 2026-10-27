@@ -84,20 +84,26 @@ function renderHorizontalBarChart(containerId, items, opts) {
   details.innerHTML = `<summary>הצג טבלה מלאה</summary>
     <div style="overflow-x:auto"><table>
       <tr>${opts.tableHeaders.map(h => `<th>${h}</th>`).join('')}</tr>
-      ${items.map(item => `<tr>${opts.tableRow(item).map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}
+      ${items.map(item => `<tr>${opts.tableRow(item).map(c => `<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}
     </table></div>`;
   container.appendChild(details);
 }
 
 async function loadCityComparison() {
   const localResident = document.getElementById('cityCompareLocal').checked;
-  const cities = await (await fetch(`/api/lottery/city-comparison?localResident=${localResident}&minProjects=3&limit=15`)).json();
+  let cities;
+  try {
+    cities = await apiFetch(`/api/lottery/city-comparison?localResident=${localResident}&minProjects=3&limit=15`);
+  } catch (err) {
+    document.getElementById('cityComparisonChart').innerHTML = errorHtml(err);
+    return;
+  }
   renderHorizontalBarChart('cityComparisonChart', cities, {
     ariaLabel: 'השוואת סיכויי זכייה ממוצעים לפי עיר',
     value: c => c.avgOddsPercent,
     city: c => c.city,
     valueLabel: c => c.avgOddsPercent.toFixed(1) + '%',
-    tooltip: c => `<b>${c.city}</b><br>סיכוי ממוצע: <b>${c.avgOddsPercent.toFixed(1)}%</b><br>מחיר ממוצע למ"ר: <b>${c.avgPricePerSqm > 0 ? Math.round(c.avgPricePerSqm).toLocaleString() : '—'}</b><br>מס' פרויקטים: <b>${c.projectCount}</b>`,
+    tooltip: c => `<b>${escapeHtml(c.city)}</b><br>סיכוי ממוצע: <b>${c.avgOddsPercent.toFixed(1)}%</b><br>מחיר ממוצע למ"ר: <b>${c.avgPricePerSqm > 0 ? Math.round(c.avgPricePerSqm).toLocaleString() : '—'}</b><br>מס' פרויקטים: <b>${c.projectCount}</b>`,
     tableHeaders: ['עיר', 'סיכוי ממוצע', 'מחיר ממוצע למ"ר', "מס' פרויקטים"],
     tableRow: c => [c.city, c.avgOddsPercent.toFixed(1) + '%', c.avgPricePerSqm > 0 ? Math.round(c.avgPricePerSqm).toLocaleString() : '—', c.projectCount]
   });
@@ -107,7 +113,7 @@ async function loadLandCityResults() {
   const statusEl = document.getElementById('landResultsStatus');
   statusEl.textContent = 'טוען תוצאות אמיתיות ממכרזי רמ"י (יכול לקחת כמה שניות בפעם הראשונה)...';
   try {
-    const cities = await (await fetch('/api/land-tenders/city-results')).json();
+    const cities = await apiFetch('/api/land-tenders/city-results');
     statusEl.textContent = cities.length > 0
       ? `מבוסס על ${cities.reduce((a, c) => a + c.decidedPlots, 0)} מגרשים שהוכרעו בפועל, ב-${cities.length} ערים.`
       : 'עדיין אין מספיק תוצאות מוכרעות זמינות.';
@@ -116,7 +122,7 @@ async function loadLandCityResults() {
       value: c => c.avgPricePerSqm,
       city: c => c.city,
       valueLabel: c => Math.round(c.avgPricePerSqm).toLocaleString(),
-      tooltip: c => `<b>${c.city}</b><br>מחיר ממוצע למ"ר: <b>${Math.round(c.avgPricePerSqm).toLocaleString()} ש"ח</b><br>מחיר סופי ממוצע למגרש: <b>${Math.round(c.avgFinalPrice).toLocaleString()} ש"ח</b><br>מגרשים שהוכרעו: <b>${c.decidedPlots}</b>`,
+      tooltip: c => `<b>${escapeHtml(c.city)}</b><br>מחיר ממוצע למ"ר: <b>${Math.round(c.avgPricePerSqm).toLocaleString()} ש"ח</b><br>מחיר סופי ממוצע למגרש: <b>${Math.round(c.avgFinalPrice).toLocaleString()} ש"ח</b><br>מגרשים שהוכרעו: <b>${c.decidedPlots}</b>`,
       tableHeaders: ['עיר', 'מחיר ממוצע למ"ר', 'מחיר סופי ממוצע למגרש', 'מגרשים שהוכרעו'],
       tableRow: c => [c.city, Math.round(c.avgPricePerSqm).toLocaleString(), Math.round(c.avgFinalPrice).toLocaleString(), c.decidedPlots]
     });

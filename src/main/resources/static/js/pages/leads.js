@@ -7,12 +7,6 @@ function currentKey() {
   return key;
 }
 
-function escapeHtml(value) {
-  const div = document.createElement('div');
-  div.textContent = value || '';
-  return div.innerHTML;
-}
-
 async function loadLeads() {
   const statusEl = document.getElementById('status');
   statusEl.textContent = '';

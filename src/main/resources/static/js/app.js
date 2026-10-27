@@ -83,6 +83,35 @@ function animateNumber(el, target, opts = {}) {
   requestAnimationFrame(frame);
 }
 
+// ---- הגנה מ-XSS: כל ערך שמגיע מבחוץ (משתמשים, API ממשלתי, טקסט מחוברות PDF) עובר כאן לפני שנכנס ל-innerHTML ----
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ---- קריאות API משותפות: זורקות Error עם הודעת השגיאה בעברית מהשרת (או הודעה כללית כשאין חיבור),
+// כדי שכל עמוד יציג למשתמש מה השתבש במקום להיתקע בשקט ----
+async function apiFetch(url, options = {}) {
+  let res;
+  try {
+    res = await fetch(url, options);
+  } catch {
+    throw new Error('לא הצלחנו להתחבר לשרת - בדקו את החיבור לאינטרנט ונסו שוב');
+  }
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.message) || 'אירעה שגיאה - נסו שוב');
+  return data;
+}
+function postJson(url, body, headers = {}) {
+  return apiFetch(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body)
+  });
+}
+function errorHtml(err) {
+  return `<p class="form-error">${escapeHtml(err.message)}</p>`;
+}
+
 // ---- אזהרה כשההלוואה נחתכה בתקרת המימון (הוראה 329) - משותף לדשבורד המשכנתא ולמחשבון הבנייה העצמית ----
 function ltvCapNote(s) {
   if (!s.loanCappedByLtv) return '';

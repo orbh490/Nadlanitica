@@ -9,10 +9,10 @@ async function load() {
     return;
   }
   try {
-    const detail = await (await fetch(`/api/land-tenders/${id}`)).json();
+    const detail = await apiFetch(`/api/land-tenders/${encodeURIComponent(id)}`);
     document.getElementById('tenderHeader').textContent = `${detail.tenderNumber} - ${detail.city}${detail.neighborhood ? ' (' + detail.neighborhood + ')' : ''}`;
     document.getElementById('bookletLinkWrap').innerHTML = detail.bookletAvailable
-      ? `<a href="/api/land-tenders/${id}/booklet" target="_blank" class="secondary" style="display:inline-block;text-decoration:none">📄 צפייה בחוברת המכרז המלאה (PDF מקורי מרשות מקרקעי ישראל)</a>`
+      ? `<a href="/api/land-tenders/${encodeURIComponent(id)}/booklet" target="_blank" class="secondary" style="display:inline-block;text-decoration:none">📄 צפייה בחוברת המכרז המלאה (PDF מקורי מרשות מקרקעי ישראל)</a>`
       : '';
   } catch (e) {
     document.getElementById('tenderHeader').textContent = '';
@@ -21,7 +21,7 @@ async function load() {
   const statusEl = document.getElementById('status');
   const snippetsEl = document.getElementById('snippets');
   try {
-    const info = await (await fetch(`/api/land-tenders/${id}/discounts`)).json();
+    const info = await apiFetch(`/api/land-tenders/${encodeURIComponent(id)}/discounts`);
     if (!info.bookletAvailable) {
       statusEl.textContent = 'חוברת המכרז טרם פורסמה במערכת רמ"י.';
       return;
@@ -31,9 +31,9 @@ async function load() {
       return;
     }
     statusEl.textContent = `נמצאו ${info.discountSnippets.length} קטעים בחוברת שמזכירים הנחה ליד אוכלוסיית עדיפות:`;
-    snippetsEl.innerHTML = info.discountSnippets.map(s => `<p style="font-size:13px;background:#f7f8fb;border-radius:8px;padding:10px 12px;margin-top:8px">${s}</p>`).join('');
-  } catch (e) {
-    statusEl.textContent = 'לא הצלחנו לחפש הנחות בחוברת כרגע.';
+    snippetsEl.innerHTML = info.discountSnippets.map(s => `<p style="font-size:13px;background:#f7f8fb;border-radius:8px;padding:10px 12px;margin-top:8px">${escapeHtml(s)}</p>`).join('');
+  } catch (err) {
+    statusEl.textContent = err.message;
   }
 }
 

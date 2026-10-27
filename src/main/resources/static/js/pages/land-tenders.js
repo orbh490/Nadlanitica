@@ -10,7 +10,7 @@ function labelFor(t) { return `${t.tenderNumber} - ${t.city}${t.neighborhood ? '
 async function loadTenders() {
   const statusEl = document.getElementById('tenderListStatus');
   try {
-    const tenders = await (await fetch('/api/land-tenders/self-build')).json();
+    const tenders = await apiFetch('/api/land-tenders/self-build');
     const datalist = document.getElementById('tenderOptions');
     datalist.innerHTML = '';
     tendersByLabel = {};
@@ -34,31 +34,38 @@ async function loadTenderDetail() {
     alert('בחרו מכרז מהרשימה (הקלידו כדי לסנן)');
     return;
   }
-  const detail = await (await fetch(`/api/land-tenders/${t.id}`)).json();
-  selectedTenderId = t.id;
   const card = document.getElementById('tenderDetailCard');
+  let detail;
+  try {
+    detail = await apiFetch(`/api/land-tenders/${t.id}`);
+  } catch (err) {
+    card.style.display = 'block';
+    document.getElementById('tenderDetailSummary').innerHTML = errorHtml(err);
+    return;
+  }
+  selectedTenderId = t.id;
   card.style.display = 'block';
   const fmt = n => n == null ? '—' : Math.round(n).toLocaleString();
 
   document.getElementById('tenderDetailSummary').innerHTML = `
-    <div class="badge ok">${detail.tenderNumber} - ${detail.city}${detail.neighborhood ? ' (' + detail.neighborhood + ')' : ''}</div>
+    <div class="badge ok">${escapeHtml(detail.tenderNumber)} - ${escapeHtml(detail.city)}${detail.neighborhood ? ' (' + escapeHtml(detail.neighborhood) + ')' : ''}</div>
     <table>
-      <tr><td>מועד פתיחת המכרז</td><td>${detail.openingDate ?? 'לא פורסם'}</td></tr>
-      <tr><td>מועד סגירת הגשות</td><td>${detail.closingDate ?? 'לא פורסם'}</td></tr>
+      <tr><td>מועד פתיחת המכרז</td><td>${escapeHtml(detail.openingDate ?? 'לא פורסם')}</td></tr>
+      <tr><td>מועד סגירת הגשות</td><td>${escapeHtml(detail.closingDate ?? 'לא פורסם')}</td></tr>
     </table>
     <p style="margin-top:8px">
       <a href="https://apps.land.gov.il/MichrazimSite/#/michraz/${t.id}" target="_blank" class="secondary" style="display:inline-block;text-decoration:none">🔗 המכרז באתר רמ"י</a>
     </p>`;
 
   document.getElementById('populationsNote').innerHTML = detail.priorityPopulations.length > 0
-    ? `<p style="font-size:13px;color:#12805A">🎯 במכרז זה יש עדיפות/מכסה נפרדת לאוכלוסיות: ${detail.priorityPopulations.map(p => p.label).join(', ')}. אפשר לבחור את הקטגוריה שלכם במחשבון למטה ולקבל הצעה לאחוז ההנחה.</p>`
+    ? `<p style="font-size:13px;color:#12805A">🎯 במכרז זה יש עדיפות/מכסה נפרדת לאוכלוסיות: ${detail.priorityPopulations.map(p => escapeHtml(p.label)).join(', ')}. אפשר לבחור את הקטגוריה שלכם במחשבון למטה ולקבל הצעה לאחוז ההנחה.</p>`
     : `<p style="font-size:13px;color:#6B8193">לא צוינה במכרז זה עדיפות לאוכלוסייה מסוימת.</p>`;
 
   const categoryWrap = document.getElementById('discountCategoryWrap');
   const categorySelect = document.getElementById('discountCategory');
   if (detail.priorityPopulations.length > 0) {
     categorySelect.innerHTML = '<option value="">בחרו קטגוריה...</option>' +
-      detail.priorityPopulations.map(p => `<option value="${p.code}">${p.label}</option>`).join('') +
+      detail.priorityPopulations.map(p => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.label)}</option>`).join('') +
       '<option value="none">אף אחת מהאוכלוסיות הרשומות לא חלה עליי</option>';
     categoryWrap.style.display = 'block';
   } else {
@@ -73,7 +80,7 @@ async function loadTenderDetail() {
     discountsSection.style.display = 'block';
     document.getElementById('discountsStatus').textContent = 'מחפש הנחות בחוברת המכרז...';
     document.getElementById('discountsPageLink').style.display = 'none';
-    fetch(`/api/land-tenders/${t.id}/discounts`).then(r => r.json()).then(info => {
+    apiFetch(`/api/land-tenders/${t.id}/discounts`).then(info => {
       const statusEl = document.getElementById('discountsStatus');
       const linkEl = document.getElementById('discountsPageLink');
       if (info.discountSnippets.length === 0) {
@@ -92,15 +99,15 @@ async function loadTenderDetail() {
   }
 
   const plotsEl = document.getElementById('plotsTable');
-  const fmtMoney = n => n == null ? '<span style="color:#B3261E">טרם פורסם ע"י רמ"י</span>' : fmt(n) + ' ש"ח';
+  const fmtMoney = n => n == null ? '<span style="color:var(--bad-text)">טרם פורסם ע"י רמ"י</span>' : fmt(n) + ' ש"ח';
   if (detail.plots.length === 0) {
     plotsEl.innerHTML = '<p style="color:#6B8193;font-size:13px">אין עדיין נתוני מגרשים מפורטים למכרז זה</p>';
   } else {
     const anyMissingPrice = detail.plots.some(p => p.appraisedPrice == null);
     const rowHtml = (p, i) => `
         <tr>
-          <td>${p.areaName ?? p.plotId}</td>
-          <td>${p.areaSqm ?? '—'}</td>
+          <td>${escapeHtml(p.areaName ?? p.plotId)}</td>
+          <td>${escapeHtml(p.areaSqm ?? '—')}</td>
           <td>${fmtMoney(p.appraisedPrice)}</td>
           <td>${fmtMoney(p.developmentCost)}</td>
           <td>${fmtMoney(p.guaranteeDeposit)}</td>
@@ -136,7 +143,7 @@ async function loadDiscountSuggestion() {
   noteEl.style.color = '#6B8193';
   noteEl.textContent = 'מחפש הצעה בחוברת המכרז...';
   try {
-    const suggestion = await (await fetch(`/api/land-tenders/${selectedTenderId}/discount-suggestion?populationCode=${code}`)).json();
+    const suggestion = await apiFetch(`/api/land-tenders/${selectedTenderId}/discount-suggestion?populationCode=${encodeURIComponent(code)}`);
     if (suggestion.suggestedPercent == null) {
       noteEl.style.color = '#6B8193';
       noteEl.innerHTML = 'לא נמצאה אוטומטית הצעה לקטגוריה זו - בדקו את חוברת המכרז והזינו את האחוז ידנית למטה.';
@@ -144,8 +151,8 @@ async function loadDiscountSuggestion() {
     }
     document.getElementById('discountPercent').value = suggestion.suggestedPercent;
     noteEl.style.color = '#12805A';
-    noteEl.innerHTML = `הצעה למילוי אוטומטי: <b>${suggestion.suggestedPercent}%</b> (ניתן לערוך למטה). מבוסס על הקטע הבא בחוברת - יש לאשר:<br>
-      <span style="display:block;background:#F4F8FA;border-radius:8px;padding:8px 10px;margin-top:4px;color:#333">${suggestion.sourceSnippet}</span>`;
+    noteEl.innerHTML = `הצעה למילוי אוטומטי: <b>${escapeHtml(suggestion.suggestedPercent)}%</b> (ניתן לערוך למטה). מבוסס על הקטע הבא בחוברת - יש לאשר:<br>
+      <span style="display:block;background:#F4F8FA;border-radius:8px;padding:8px 10px;margin-top:4px;color:#333">${escapeHtml(suggestion.sourceSnippet)}</span>`;
   } catch (e) {
     noteEl.style.color = '#6B8193';
     noteEl.textContent = 'לא הצלחנו לחפש הצעה כרגע - הזינו את האחוז ידנית לפי החוברת.';
@@ -172,11 +179,15 @@ async function calculateSelfBuild() {
     category: document.getElementById('category').value,
     termYears: Number(document.getElementById('termYears').value)
   };
-  const data = await (await fetch('/api/self-build/calculate', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-  })).json();
-  const fmt = n => n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   const el = document.getElementById('selfBuildResult');
+  let data;
+  try {
+    data = await postJson('/api/self-build/calculate', body);
+  } catch (err) {
+    el.innerHTML = errorHtml(err);
+    return;
+  }
+  const fmt = n => n.toLocaleString(undefined, { maximumFractionDigits: 0 });
   el.innerHTML = `
     <span class="badge ${data.canAffordEquity ? 'ok' : 'bad'}">${data.canAffordEquity ? 'יש לך מספיק הון עצמי' : 'חסר לך הון עצמי'}</span>
     <table>

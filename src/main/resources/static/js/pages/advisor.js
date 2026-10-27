@@ -3,7 +3,7 @@ async function submitLead() {
   const phone = document.getElementById('phone').value.trim();
   const resultEl = document.getElementById('leadResult');
   if (!fullName || !phone) {
-    resultEl.innerHTML = '<p style="color:#B3261E;font-size:13px">נא למלא שם וטלפון</p>';
+    resultEl.innerHTML = '<p class="form-error">נא למלא שם וטלפון</p>';
     return;
   }
   const body = {
@@ -12,11 +12,13 @@ async function submitLead() {
     email: document.getElementById('email').value.trim(),
     message: document.getElementById('message').value.trim()
   };
-  await fetch('/api/leads', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
+  // קודם ה"תודה" הוצג גם כשהשליחה נכשלה (למשל אחרי חסימת ספאם) - והליד פשוט אבד בלי שהמשתמש ידע
+  try {
+    await postJson('/api/leads', body);
+  } catch (err) {
+    resultEl.innerHTML = errorHtml(err);
+    return;
+  }
   resultEl.innerHTML = '<div class="badge ok">תודה! ניצור איתך קשר בקרוב</div>';
   document.getElementById('fullName').value = '';
   document.getElementById('phone').value = '';
