@@ -32,8 +32,9 @@ function renderProjectOptions() {
   document.getElementById('projectSearch').value = '';
   const openCount = allProjects.filter(p => p.liveStatus === 'OPEN').length;
   const upcomingCount = allProjects.filter(p => p.liveStatus === 'NOT_YET_OPEN').length;
-  document.getElementById('openCountStatus').textContent =
-    `${openCount} פרויקטים עם הרשמה פתוחה כרגע, ${upcomingCount} עומדים להיפתח בקרוב (מתוך ${allProjects.length} ברשימה)`;
+  document.getElementById('openCountStatus').textContent = openCount + upcomingCount === 0
+    ? `כרגע אין הגרלה עם הרשמה פתוחה או קרובה במשרד הבינוי והשיכון. אפשר לבדוק סיכויים על ${allProjects.length} הגרלות קודמות.`
+    : `${openCount} פרויקטים עם הרשמה פתוחה כרגע, ${upcomingCount} עומדים להיפתח בקרוב (מתוך ${allProjects.length} ברשימה)`;
 }
 
 async function calculateScore() {
