@@ -80,7 +80,7 @@
 - [x] הגרסה העדכנית היא `analytics-redesign` (שם חדש: **Nadlanitic**). הגרסה הישנה (`analytics`) שמורה ב-git כ-tag `v0.1.0`
 - [x] `analytics.zip` הועבר לסל המיחזור
 - [x] שם הפרויקט בקוד הוחלף ל-`nadlanitic` (pom, Dockerfile, spring.application.name). שינוי שם ה-package ב-Java ייעשה ב-Refactor
-- [ ] למחוק את התיקייה הישנה `analytics` (נעולה כרגע על ידי תהליך שרץ)
+- [x] התיקייה הישנה `analytics` הועברה לסל המיחזור
 - [ ] לשנות את שם התיקייה `analytics-redesign` ל-`Nadlanitic`, ואת שם ה-repo ב-GitHub
 - תיקיית `נדלניטיקה` (לוגו + סיסמת לידים) נשארת מחוץ ל-git. `lids.txt` לא עלה ל-git אף פעם
 
