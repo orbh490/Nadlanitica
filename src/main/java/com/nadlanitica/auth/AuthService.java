@@ -110,6 +110,22 @@ public class AuthService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "יש להתחבר כדי להשתמש בפיצ'ר הזה"));
     }
 
+    /**
+     * מחיקת חשבון לפי בקשת המשתמש (זכות המחיקה בחוק הגנת הפרטיות, ומובטחת במדיניות הפרטיות).
+     * דורש את הסיסמה שוב, כדי שמי שמצא מכשיר פתוח לא יוכל למחוק חשבון של מישהו אחר; ניסיונות שגויים
+     * נספרים יחד עם ניסיונות התחברות כושלים. כל המידע של המשתמש (sessions, טוקנים, חישובים שמורים, אזורי עניין)
+     * נמחק יחד איתו ע"י ON DELETE CASCADE במסד הנתונים - ראו V1__init.sql.
+     */
+    public void deleteAccount(String token, String password) {
+        AppUser user = requireUser(token);
+        rateLimiter.checkNotBlocked(user.getEmail());
+        if (password == null || !passwordEncoder.matches(password, user.getPasswordHash())) {
+            rateLimiter.recordFailure(user.getEmail());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "הסיסמה שגויה - החשבון לא נמחק");
+        }
+        userRepository.delete(user);
+    }
+
     /** לא חושף אם הכתובת קיימת/מאומתת כבר - תמיד "מצליח" מנקודת מבטו של הקורא. */
     public void resendVerification(String email) {
         userRepository.findByEmailIgnoreCase(normalize(email))

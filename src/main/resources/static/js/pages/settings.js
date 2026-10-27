@@ -2,6 +2,7 @@ async function refreshSettingsUI() {
   const me = await fetchCurrentUser();
   document.getElementById('loggedOutView').style.display = me.loggedIn ? 'none' : 'block';
   document.getElementById('loggedInView').style.display = me.loggedIn ? 'block' : 'none';
+  document.getElementById('deleteAccountSection').style.display = me.loggedIn ? 'block' : 'none';
   if (!me.loggedIn) return;
   document.getElementById('settingsEmail').textContent = me.email;
 }
@@ -22,6 +23,25 @@ async function sendPasswordReset() {
   const data = await res.json();
   msgEl.style.color = '#12805A';
   msgEl.textContent = data.message;
+}
+
+async function deleteAccount() {
+  const password = document.getElementById('deleteAccountPassword').value;
+  const msgEl = document.getElementById('deleteAccountMessage');
+  if (!password) {
+    msgEl.innerHTML = '<p class="form-error">יש להזין את הסיסמה כדי למחוק את החשבון</p>';
+    return;
+  }
+  if (!confirm('למחוק לצמיתות את החשבון וכל המידע השמור בו? אי אפשר לבטל את זה.')) return;
+  try {
+    const data = await postJson('/api/auth/delete-account', { password }, authHeaders());
+    clearAuthToken();
+    msgEl.style.color = '#12805A';
+    msgEl.textContent = data.message;
+    setTimeout(() => location.reload(), 1500);
+  } catch (err) {
+    msgEl.innerHTML = errorHtml(err);
+  }
 }
 
 function clearLocalData() {

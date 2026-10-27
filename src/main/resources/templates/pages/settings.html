@@ -43,6 +43,14 @@
       <p class="subtitle" style="margin-bottom:10px">מוחק מהדפדפן הזה את פרטי ההתחברות השמורים (אם יש). לא משפיע על נתונים ששמורים בחשבון שלך בשרת.</p>
       <button class="secondary" onclick="clearLocalData()">ניקוי נתונים שמורים במכשיר זה</button>
       <div id="clearMessage" style="margin-top:8px;font-size:13px"></div>
+
+      <div id="deleteAccountSection" style="display:none;margin-top:18px">
+        <h3>מחיקת החשבון</h3>
+        <p class="subtitle" style="margin-bottom:10px">מוחק לצמיתות את החשבון וכל מה שנשמר בו: חישובים שמורים, אזורי עניין והתחברויות. אי אפשר לבטל את זה.</p>
+        <label>הסיסמה שלך (לאישור) <input type="password" id="deleteAccountPassword" autocomplete="current-password"></label>
+        <button class="secondary" onclick="deleteAccount()">מחיקת החשבון לצמיתות</button>
+        <div id="deleteAccountMessage" style="margin-top:8px;font-size:13px"></div>
+      </div>
     </div>
 
     <div th:replace="~{fragments/nav :: policy}"></div>

@@ -38,6 +38,11 @@ record ResetPasswordRequest(
         @Size(max = 72, message = "הסיסמה ארוכה מדי (עד 72 תווים)") String newPassword) {
 }
 
+record DeleteAccountRequest(
+        @NotBlank(message = "יש להזין את הסיסמה כדי למחוק את החשבון")
+        @Size(max = 72, message = "הסיסמה ארוכה מדי (עד 72 תווים)") String password) {
+}
+
 record TokenRequest(@NotBlank(message = "הקישור אינו תקין - יש לבקש קישור אימות חדש") String token) {
 }
 
@@ -105,5 +110,12 @@ class AuthController {
     @PostMapping("/reset-password")
     AuthService.AuthResult resetPassword(@Valid @RequestBody ResetPasswordRequest req) {
         return authService.resetPassword(req.token(), req.newPassword());
+    }
+
+    @PostMapping("/delete-account")
+    Map<String, String> deleteAccount(@Valid @RequestBody DeleteAccountRequest req,
+            @RequestHeader(value = "Authorization", required = false) String authorization) {
+        authService.deleteAccount(BearerToken.from(authorization), req.password());
+        return Map.of("message", "החשבון וכל המידע השמור בו נמחקו");
     }
 }
