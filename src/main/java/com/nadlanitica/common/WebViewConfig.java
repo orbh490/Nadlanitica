@@ -15,7 +15,8 @@ class WebViewConfig implements WebMvcConfigurer {
 
     private static final List<String> PAGES = List.of(
             "index", "home", "dashboard", "lottery", "land-tenders", "land-tender-discounts", "results-board",
-            "account", "advisor", "settings", "privacy", "disclaimer", "email-verified", "reset-password", "leads");
+            "account", "advisor", "settings", "privacy", "disclaimer", "accessibility", "email-verified", "reset-password",
+            "leads");
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {

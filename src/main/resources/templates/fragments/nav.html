@@ -3,6 +3,8 @@
 <body>
 <!-- סרגל עליון משותף: לוגו, קישורים, עזרה, הגדרות ואזור אישי -->
 <header class="topbar" th:fragment="topbar(active)">
+  <!-- למשתמשי מקלדת: מופיע רק בפוקוס (Tab ראשון), קופץ ישר לתוכן ומדלג על הניווט -->
+  <a class="skip-link" href="#main">דילוג לתוכן הראשי</a>
   <a class="brand" href="/home.html"><img src="/img/logo.png" alt="לוגו נדלניטיקה"><span>נדלניטיקה</span></a>
   <nav class="links">
     <a href="/home.html" th:classappend="${active == 'home'} ? ' active'">בית</a>
@@ -13,25 +15,26 @@
     <a href="/advisor.html" th:classappend="${active == 'advisor'} ? ' active'">ייעוץ</a>
   </nav>
   <div class="actions">
-    <a href="#" class="icon-btn" id="helpBtn" aria-label="הסבר על הדף"><span class="material-symbols-outlined">help</span></a>
-    <a href="/settings.html" class="icon-btn" th:classappend="${active == 'settings'} ? ' active'" aria-label="הגדרות"><span class="material-symbols-outlined">settings</span></a>
-    <a href="/account.html" class="login-btn" th:classappend="${active == 'account'} ? ' active'"><span class="material-symbols-outlined">person</span>אזור אישי</a>
+    <a href="#" class="icon-btn" id="helpBtn" aria-label="הסבר על הדף"><span aria-hidden="true" class="material-symbols-outlined">help</span></a>
+    <a href="/settings.html" class="icon-btn" th:classappend="${active == 'settings'} ? ' active'" aria-label="הגדרות"><span aria-hidden="true" class="material-symbols-outlined">settings</span></a>
+    <a href="/account.html" class="login-btn" th:classappend="${active == 'account'} ? ' active'"><span aria-hidden="true" class="material-symbols-outlined">person</span>אזור אישי</a>
   </div>
 <!-- ניווט תחתון לנייד בלבד (מוסתר במחשב) -->
 <style>.m-tabs{display:none}</style>
 <nav class="m-tabs" aria-label="ניווט ראשי">
-  <a href="/dashboard.html" th:classappend="${active == 'dashboard'} ? ' active'"><span class="material-symbols-outlined">account_balance</span>משכנתא</a>
-  <a href="/lottery.html" th:classappend="${active == 'lottery'} ? ' active'"><span class="material-symbols-outlined">confirmation_number</span>מחיר למשתכן</a>
-  <a href="/land-tenders.html" th:classappend="${active == 'land-tenders'} ? ' active'"><span class="material-symbols-outlined">landscape</span>מכרזים</a>
-  <a href="/results-board.html" th:classappend="${active == 'results-board'} ? ' active'"><span class="material-symbols-outlined">bar_chart</span>לוח תוצאות</a>
-  <a href="/advisor.html" th:classappend="${active == 'advisor'} ? ' active'"><span class="material-symbols-outlined">support_agent</span>ייעוץ</a>
+  <a href="/dashboard.html" th:classappend="${active == 'dashboard'} ? ' active'"><span aria-hidden="true" class="material-symbols-outlined">account_balance</span>משכנתא</a>
+  <a href="/lottery.html" th:classappend="${active == 'lottery'} ? ' active'"><span aria-hidden="true" class="material-symbols-outlined">confirmation_number</span>מחיר למשתכן</a>
+  <a href="/land-tenders.html" th:classappend="${active == 'land-tenders'} ? ' active'"><span aria-hidden="true" class="material-symbols-outlined">landscape</span>מכרזים</a>
+  <a href="/results-board.html" th:classappend="${active == 'results-board'} ? ' active'"><span aria-hidden="true" class="material-symbols-outlined">bar_chart</span>לוח תוצאות</a>
+  <a href="/advisor.html" th:classappend="${active == 'advisor'} ? ' active'"><span aria-hidden="true" class="material-symbols-outlined">support_agent</span>ייעוץ</a>
 </nav>
 </header>
 
 <!-- קישורי מדיניות קבועים בתחתית הדף -->
 <div class="policy-links" th:fragment="policy">
-  <a href="/disclaimer.html" class="policy-btn"><span class="material-symbols-outlined icon">gavel</span>גילוי נאות מלא</a>
-  <a href="/privacy.html" class="policy-btn"><span class="material-symbols-outlined icon">privacy_tip</span>מדיניות פרטיות</a>
+  <a href="/disclaimer.html" class="policy-btn"><span aria-hidden="true" class="material-symbols-outlined icon">gavel</span>גילוי נאות מלא</a>
+  <a href="/privacy.html" class="policy-btn"><span aria-hidden="true" class="material-symbols-outlined icon">privacy_tip</span>מדיניות פרטיות</a>
+  <a href="/accessibility.html" class="policy-btn"><span aria-hidden="true" class="material-symbols-outlined icon">accessibility_new</span>הצהרת נגישות</a>
 </div>
 </body>
 </html>

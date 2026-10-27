@@ -1061,3 +1061,18 @@ button, .btn, .login-btn, .primary, .secondary { min-height: 44px; }
 .why-text { font-size: 16px; line-height: 1.9; color: var(--ink-secondary); margin: 16px 0 0; }
 .home-section .card:has(> .why-text) { max-width: 760px; margin-inline: auto; }
 
+
+/* קישור "דילוג לתוכן": מוסתר עד שמגיעים אליו ב-Tab, ואז מופיע בראש העמוד */
+.skip-link {
+  position: absolute;
+  inset-inline-start: 12px;
+  top: -60px;
+  z-index: 1000;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-900);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip-link:focus { top: 12px; }

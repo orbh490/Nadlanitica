@@ -50,3 +50,7 @@
 
 /* אייקון ה-"?" ליד שדות: בצבע --navy, שלא מוגדר מחדש במצב כהה - כמעט בלתי נראה על הרקע הכהה */
 [data-theme="dark"] .info-tip { color: var(--ink); }
+
+/* מסגרת הפוקוס (#0E7C84) כמעט לא נראית על הרקע הכהה */
+[data-theme="dark"] a:focus-visible, [data-theme="dark"] button:focus-visible, [data-theme="dark"] summary:focus-visible,
+[data-theme="dark"] .icon-btn:focus-visible, [data-theme="dark"] .login-btn:focus-visible { outline-color: var(--teal); }
