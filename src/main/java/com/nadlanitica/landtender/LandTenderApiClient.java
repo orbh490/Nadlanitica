@@ -1,25 +1,32 @@
 package com.nadlanitica.landtender;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
 /**
  * לקוח ל-API הציבורי (לא רשמי, אך פתוח וללא אימות) של רשות מקרקעי ישראל למכרזי קרקע.
  * מקור: https://apps.land.gov.il/MichrazimSite/ - נבדק ואומת ידנית מול הנתונים החיים.
- * התעבורה עוברת דרך curl.exe (ראו CurlClientHttpRequestFactory) - java.net.http נחסם ע"י השרת.
+ * הגוף נשלח מחוצץ (עם Content-Length) ולא ב-chunked - שרת ה-IIS של רמ"י מחזיר "ארעה תקלה" לגוף chunked.
+ * זמן קריאה ארוך כי חוברות מכרז הן PDF של ~9MB שלוקחות מעל 20 שניות להורדה.
  */
 @Component
 class LandTenderApiClient {
 
     private static final String BASE_URL = "https://apps.land.gov.il/MichrazimSite/api";
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(90);
 
     private final RestClient restClient = RestClient.builder()
             .baseUrl(BASE_URL)
-            .requestFactory(new CurlClientHttpRequestFactory())
+            .requestFactory(requestFactory())
             .defaultHeader("User-Agent", "datagov-external-client")
             .defaultHeader("Origin", "https://apps.land.gov.il")
             .defaultHeader("Referer", "https://apps.land.gov.il/MichrazimSite/")
@@ -107,5 +114,12 @@ class LandTenderApiClient {
                 .body(document)
                 .retrieve()
                 .body(byte[].class);
+    }
+
+    private static BufferingClientHttpRequestFactory requestFactory() {
+        HttpClient httpClient = HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT).build();
+        JdkClientHttpRequestFactory jdk = new JdkClientHttpRequestFactory(httpClient);
+        jdk.setReadTimeout(READ_TIMEOUT);
+        return new BufferingClientHttpRequestFactory(jdk);
     }
 }
