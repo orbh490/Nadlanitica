@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,11 +23,16 @@ public class NotificationEmailService {
     }
 
     /** התראות תפעוליות למפתח בלבד (כתובת קבועה מ-app.notifications.to). */
+    @Async
     public void sendAlert(String subject, String body) {
         send(toAddress, subject, body);
     }
 
-    /** מיילים ללקוחות עצמם (אימות אימייל, איפוס סיסמה וכו') - לכתובת שהמשתמש הזין בהרשמה. */
+    /**
+     * מיילים ללקוחות עצמם (אימות אימייל, איפוס סיסמה וכו') - לכתובת שהמשתמש הזין בהרשמה.
+     * רץ ברקע (@Async): הרשמה ואיפוס סיסמה לא מחכים לשרת ה-SMTP, שיכול לקחת כמה שניות.
+     */
+    @Async
     public void send(String to, String subject, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
