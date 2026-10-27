@@ -82,7 +82,7 @@
 - [x] שם הפרויקט בקוד הוחלף ל-`nadlanitic` (pom, Dockerfile, spring.application.name). שינוי שם ה-package ב-Java ייעשה ב-Refactor
 - [x] התיקייה הישנה `analytics` הועברה לסל המיחזור
 - [x] שם התיקייה שונה ל-`Nadlanitica`
-- [ ] לשנות את שם ה-repo ב-GitHub
+- [x] שם ה-repo ב-GitHub שונה ל-`Nadlanitica`
 - תיקיית `נדלניטיקה` (לוגו + סיסמת לידים) נשארת מחוץ ל-git. `lids.txt` לא עלה ל-git אף פעם
 
 ### שלב א – Refactor (2–4 ימים)
