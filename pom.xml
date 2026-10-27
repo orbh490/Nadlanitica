@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.realestate</groupId>
-	<artifactId>analytics</artifactId>
+	<artifactId>nadlanitic</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>analytics</name>
+	<name>nadlanitic</name>
 	<description/>
 	<url/>
 	<licenses>

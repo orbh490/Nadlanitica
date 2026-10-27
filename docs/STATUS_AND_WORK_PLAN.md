@@ -76,9 +76,13 @@
 > הסדר שונה קצת מהרשימה המקורית: **Git עובר להתחלה ונשאר לאורך כל הדרך** (לא שלב בסוף), ו**הדומיין והמייל מתחילים מוקדם** כי DNS ואימות לוקחים זמן.
 
 ### שלב 0 – שמירת המצב הנוכחי (חצי שעה)
-- [ ] commit לכל העבודה הפתוחה (29 קבצים) על branch חדש, push ל-GitHub
-- [ ] לקבוע עותק אחד אמיתי של הפרויקט, ולמחוק/לארכב את השאר (`analytics`, `analytics.zip`, `נדלניטיקה`)
-- [ ] tag `v0.1-before-refactor` כנקודת חזרה
+- [x] commit לכל העבודה הפתוחה על branch `redesign-snapshot`, push ל-GitHub
+- [x] הגרסה העדכנית היא `analytics-redesign` (שם חדש: **Nadlanitic**). הגרסה הישנה (`analytics`) שמורה ב-git כ-tag `v0.1.0`
+- [x] `analytics.zip` הועבר לסל המיחזור
+- [x] שם הפרויקט בקוד הוחלף ל-`nadlanitic` (pom, Dockerfile, spring.application.name). שינוי שם ה-package ב-Java ייעשה ב-Refactor
+- [ ] למחוק את התיקייה הישנה `analytics` (נעולה כרגע על ידי תהליך שרץ)
+- [ ] לשנות את שם התיקייה `analytics-redesign` ל-`Nadlanitic`, ואת שם ה-repo ב-GitHub
+- תיקיית `נדלניטיקה` (לוגו + סיסמת לידים) נשארת מחוץ ל-git. `lids.txt` לא עלה ל-git אף פעם
 
 ### שלב א – Refactor (2–4 ימים)
 
