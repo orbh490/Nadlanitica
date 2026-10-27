@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:replace="~{fragments/head :: common(title='הדף לא נמצא | נדלניטיקה', description=null)}"></th:block>
+<meta name="robots" content="noindex">
+</head>
+<body>
+  <div th:replace="~{fragments/nav :: topbar(active='none')}"></div>
+  <div class="page" id="main" style="max-width:520px;text-align:center">
+    <div class="card">
+      <p style="font-size:44px;font-weight:700;color:var(--primary-500);margin:0">404</p>
+      <h1 style="font-size:24px">הדף שחיפשתם לא נמצא</h1>
+      <p class="subtitle">ייתכן שהקישור ישן או שהוקלד לא נכון. אפשר להמשיך מאחד המקומות האלה:</p>
+      <p style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+        <a class="btn" href="/home.html">לעמוד הבית</a>
+        <a class="btn secondary" href="/dashboard.html">מחשבון משכנתא</a>
+        <a class="btn secondary" href="/lottery.html">מחיר למשתכן</a>
+      </p>
+    </div>
+    <div th:replace="~{fragments/nav :: policy}"></div>
+  </div>
+</body>
+</html>

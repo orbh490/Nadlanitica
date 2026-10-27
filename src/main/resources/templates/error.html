@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:replace="~{fragments/head :: common(title='אירעה שגיאה | נדלניטיקה', description=null)}"></th:block>
+<meta name="robots" content="noindex">
+</head>
+<body>
+  <!-- דף שגיאה כללי (500 וכו') לבקשות מדפדפן. לא מציג פרטים טכניים - רק את קוד השגיאה. -->
+  <div th:replace="~{fragments/nav :: topbar(active='none')}"></div>
+  <div class="page" id="main" style="max-width:520px;text-align:center">
+    <div class="card">
+      <p style="font-size:44px;font-weight:700;color:var(--primary-500);margin:0" th:text="${status}">500</p>
+      <h1 style="font-size:24px">משהו השתבש אצלנו</h1>
+      <p class="subtitle">התקלה נרשמה ונבדוק אותה. נסו לרענן את הדף בעוד רגע, או לחזור לעמוד הבית.</p>
+      <p style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+        <a class="btn" href="/home.html">לעמוד הבית</a>
+        <button class="secondary" type="button" onclick="location.reload()">רענון הדף</button>
+      </p>
+    </div>
+    <div th:replace="~{fragments/nav :: policy}"></div>
+  </div>
+</body>
+</html>
