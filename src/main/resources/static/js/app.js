@@ -111,6 +111,10 @@ function postJson(url, body, headers = {}) {
 function errorHtml(err) {
   return `<p class="form-error">${escapeHtml(err.message)}</p>`;
 }
+// role="status" כדי שקוראי מסך יודיעו על ההמתנה; הטקסט תמיד קבוע בקוד (לא מגיע מבחוץ)
+function loadingHtml(text) {
+  return `<p class="loading-note" role="status"><span class="spinner" aria-hidden="true"></span>${text}</p>`;
+}
 
 // ---- אזהרה כשההלוואה נחתכה בתקרת המימון (הוראה 329) - משותף לדשבורד המשכנתא ולמחשבון הבנייה העצמית ----
 function ltvCapNote(s) {

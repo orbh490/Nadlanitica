@@ -19,6 +19,7 @@ async function load() {
   }
 
   const statusEl = document.getElementById('status');
+  statusEl.innerHTML = loadingHtml('מחפש בחוברת המכרז... בפעם הראשונה זה יכול לקחת עד חצי דקה (החוברת היא קובץ גדול)');
   const snippetsEl = document.getElementById('snippets');
   try {
     const info = await apiFetch(`/api/land-tenders/${encodeURIComponent(id)}/discounts`);
@@ -31,7 +32,7 @@ async function load() {
       return;
     }
     statusEl.textContent = `נמצאו ${info.discountSnippets.length} קטעים בחוברת שמזכירים הנחה ליד אוכלוסיית עדיפות:`;
-    snippetsEl.innerHTML = info.discountSnippets.map(s => `<p style="font-size:13px;background:#f7f8fb;border-radius:8px;padding:10px 12px;margin-top:8px">${escapeHtml(s)}</p>`).join('');
+    snippetsEl.innerHTML = info.discountSnippets.map(s => `<p style="font-size:13px;background:var(--page-bg);border-radius:8px;padding:10px 12px;margin-top:8px">${escapeHtml(s)}</p>`).join('');
   } catch (err) {
     statusEl.textContent = err.message;
   }

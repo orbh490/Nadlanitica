@@ -19,7 +19,8 @@
   --ink-muted: #5a6f80;
   --border: #dee9ed;
   --good-bg: #e6f8ee;
-  --good-text: #12805a;
+  --good-text: #0e7350;
+  --warn-text: #8a5300;
   --bad-bg: #fdecec;
   --bad-text: #c22b2b;
 
@@ -75,6 +76,20 @@
     100% { background-position: 200% 0; }
   }
   .skeleton { animation: shimmer 1.4s ease-in-out infinite; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { animation: spin .8s linear infinite; }
+}
+
+/* חיווי טעינה לנתונים ממקורות ממשלתיים (יכולים לקחת כמה שניות, חוברת מכרז עד חצי דקה) - ראו loadingHtml ב-app.js */
+.loading-note { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-muted); margin-top: 6px; }
+.spinner {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary-500);
 }
 
 /* שורת טעינה "שלד" - למצבי המתנה לנתונים חיים, במקום טקסט "טוען..." יבש */

@@ -11,14 +11,14 @@ async function handleLogin() {
 async function handleRegister() {
   if (!document.getElementById('consentCheckbox').checked) {
     const msgEl = document.getElementById('authMessage');
-    msgEl.style.color = '#B3261E';
+    msgEl.style.color = 'var(--bad-text)';
     msgEl.textContent = 'יש לאשר את מדיניות הפרטיות כדי להירשם';
     return;
   }
   const result = await submit('/api/auth/register', true);
   if (result) {
     const msgEl = document.getElementById('authMessage');
-    msgEl.style.color = '#12805A';
+    msgEl.style.color = 'var(--good-text)';
     msgEl.textContent = result.data.message;
   }
 }
@@ -28,12 +28,12 @@ async function submit(url, consent) {
   const password = document.getElementById('authPassword').value;
   const msgEl = document.getElementById('authMessage');
   const resendLink = document.getElementById('resendVerificationLink');
-  msgEl.style.color = '#6B8193';
+  msgEl.style.color = 'var(--ink-muted)';
   msgEl.textContent = 'רגע...';
   resendLink.style.display = 'none';
   const result = await authRequest(url, email, password, consent);
   if (!result.ok) {
-    msgEl.style.color = '#B3261E';
+    msgEl.style.color = 'var(--bad-text)';
     msgEl.textContent = result.error;
     resendLink.style.display = result.status === 403 ? 'inline' : 'none';
     return null;
@@ -51,13 +51,13 @@ function toggleForgotPassword() {
 async function submitForgotPassword() {
   const email = document.getElementById('forgotEmail').value.trim();
   const msgEl = document.getElementById('authMessage');
-  msgEl.style.color = '#6B8193';
+  msgEl.style.color = 'var(--ink-muted)';
   msgEl.textContent = 'רגע...';
   const res = await fetch('/api/auth/forgot-password', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
   });
   const data = await res.json();
-  msgEl.style.color = '#12805A';
+  msgEl.style.color = 'var(--good-text)';
   msgEl.textContent = data.message;
   document.getElementById('forgotPasswordBox').style.display = 'none';
 }
@@ -68,7 +68,7 @@ async function resendVerification() {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
   });
   const msgEl = document.getElementById('authMessage');
-  msgEl.style.color = '#12805A';
+  msgEl.style.color = 'var(--good-text)';
   msgEl.textContent = 'אם הכתובת רשומה ועדיין לא אומתה, נשלח אליה מייל אימות חדש';
   document.getElementById('resendVerificationLink').style.display = 'none';
 }
@@ -99,12 +99,12 @@ async function renderHistory() {
   }
   document.getElementById('clearHistoryBtn').style.display = history.length ? 'inline-flex' : 'none';
   if (history.length === 0) {
-    el.innerHTML = '<p style="color:#6B8193;font-size:13px">עדיין לא שמרת חישובים. חשבו משכנתא בעמוד "משכנתאות" כדי שהיא תישמר כאן.</p>';
+    el.innerHTML = '<p style="color:var(--ink-muted);font-size:13px">עדיין לא שמרת חישובים. חשבו משכנתא בעמוד "משכנתאות" כדי שהיא תישמר כאן.</p>';
     return;
   }
   const row = h => `
     <div class="history-item">
-      <span>${h.category} · ${Math.round(h.purchasePrice).toLocaleString()} ש"ח <small style="color:#6B8193">(${new Date(h.createdAt).toLocaleString('he-IL')})</small></span>
+      <span>${h.category} · ${Math.round(h.purchasePrice).toLocaleString()} ש"ח <small style="color:var(--ink-muted)">(${new Date(h.createdAt).toLocaleString('he-IL')})</small></span>
       <span><button class="secondary" onclick="loadFromHistory('${escapeHtml(h.id)}')">צפייה</button></span>
     </div>`;
   el.innerHTML = history.slice(0, 3).map(row).join('')
@@ -131,7 +131,7 @@ async function loadInterestAreas() {
   }
   el.replaceChildren();
   if (areas.length === 0) {
-    el.innerHTML = '<p style="color:#6B8193;font-size:13px">עדיין לא הוספתם אזורי עניין.</p>';
+    el.innerHTML = '<p style="color:var(--ink-muted);font-size:13px">עדיין לא הוספתם אזורי עניין.</p>';
     return;
   }
   areas.forEach(a => {
@@ -152,7 +152,7 @@ async function addInterestArea() {
   const input = document.getElementById('interestInput');
   const msg = document.getElementById('interestMsg');
   const name = input.value.trim();
-  if (!name) { msg.style.color = '#B3261E'; msg.textContent = 'יש להזין שם אזור'; return; }
+  if (!name) { msg.style.color = 'var(--bad-text)'; msg.textContent = 'יש להזין שם אזור'; return; }
   try {
     await postJson('/api/interest-areas', { name }, authHeaders());
   } catch (err) {
@@ -228,7 +228,7 @@ async function comparePaths() {
           <td>${r.s.dtiPercent.toFixed(1)}%</td>
         </tr>`).join('')}
     </table>
-    <p style="font-size:11px;color:#6B8193;margin-top:6px">"מחיר למשתכן" ו"שוק חופשי" מבוססים על שווי השוק/מחיר הרכישה שמילאתם למעלה. "בנייה עצמית" הוא אומדן מפושט על סמך תקציב כולל אחד - למספרים מדויקים למכרז ספציפי היכנסו למחשבון הבנייה העצמית בעמוד "מכרזי קרקעות".</p>`;
+    <p style="font-size:11px;color:var(--ink-muted);margin-top:6px">"מחיר למשתכן" ו"שוק חופשי" מבוססים על שווי השוק/מחיר הרכישה שמילאתם למעלה. "בנייה עצמית" הוא אומדן מפושט על סמך תקציב כולל אחד - למספרים מדויקים למכרז ספציפי היכנסו למחשבון הבנייה העצמית בעמוד "מכרזי קרקעות".</p>`;
 }
 
 refreshAccountUI();

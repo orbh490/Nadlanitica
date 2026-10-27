@@ -36,7 +36,7 @@ function switchTab(tab) {
 function renderHorizontalBarChart(containerId, items, opts) {
   const container = document.getElementById(containerId);
   if (items.length === 0) {
-    container.innerHTML = '<p style="color:#6B8193;font-size:13px">אין מספיק נתונים</p>';
+    container.innerHTML = '<p style="color:var(--ink-muted);font-size:13px">אין מספיק נתונים</p>';
     return;
   }
   // רוחב ה-viewBox נמדד מהקונטיינר בפועל (לא קבוע) כדי שגודל הטקסט יישאר קריא במסך צר - אחרת ה-SVG
@@ -91,6 +91,7 @@ function renderHorizontalBarChart(containerId, items, opts) {
 
 async function loadCityComparison() {
   const localResident = document.getElementById('cityCompareLocal').checked;
+  document.getElementById('cityComparisonChart').innerHTML = loadingHtml('מחשב השוואה בין ערים...');
   let cities;
   try {
     cities = await apiFetch(`/api/lottery/city-comparison?localResident=${localResident}&minProjects=3&limit=15`);
@@ -111,7 +112,7 @@ async function loadCityComparison() {
 
 async function loadLandCityResults() {
   const statusEl = document.getElementById('landResultsStatus');
-  statusEl.textContent = 'טוען תוצאות אמיתיות ממכרזי רמ"י (יכול לקחת כמה שניות בפעם הראשונה)...';
+  statusEl.innerHTML = loadingHtml('טוען תוצאות אמיתיות ממכרזי רמ"י (יכול לקחת כמה שניות בפעם הראשונה)...');
   try {
     const cities = await apiFetch('/api/land-tenders/city-results');
     statusEl.textContent = cities.length > 0
@@ -126,8 +127,8 @@ async function loadLandCityResults() {
       tableHeaders: ['עיר', 'מחיר ממוצע למ"ר', 'מחיר סופי ממוצע למגרש', 'מגרשים שהוכרעו'],
       tableRow: c => [c.city, Math.round(c.avgPricePerSqm).toLocaleString(), Math.round(c.avgFinalPrice).toLocaleString(), c.decidedPlots]
     });
-  } catch (e) {
-    statusEl.textContent = 'לא הצלחנו לטעון תוצאות מכרזי קרקע כרגע.';
+  } catch (err) {
+    statusEl.innerHTML = errorHtml(err);
   }
 }
 

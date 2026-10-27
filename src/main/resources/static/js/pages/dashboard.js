@@ -51,7 +51,7 @@ function renderResults(s) {
       <tr><td><b>סה"כ עלות חודשית משוערת</b></td><td><b id="totalMonthlyValue">0 ש"ח</b></td></tr>
     </table>
     ${ltvCapNote(s)}
-    <p style="font-size:11px;color:#6B8193;margin-top:4px">ביטוח המשכנתא הוא אומדן שוק בלבד (תלוי גיל ובריאות) - ניתן לרכוש פוליסה חיצונית לבנק.</p>
+    <p style="font-size:11px;color:var(--ink-muted);margin-top:4px">ביטוח המשכנתא הוא אומדן שוק בלבד (תלוי גיל ובריאות) - ניתן לרכוש פוליסה חיצונית לבנק.</p>
 `;
   animateNumber(document.getElementById('totalMonthlyValue'), s.totalMonthlyWithInsurance, { suffix: ' ש"ח' });
 
@@ -95,7 +95,7 @@ async function loadRateStressTest(loanAmount, termYears) {
           <td>${sc.dtiPercent.toFixed(1)}% ${sc.withinLegalDtiLimit ? '✅' : '⚠️ חורג מ-50%'}</td>
         </tr>`).join('')}
     </table>
-    <p style="font-size:11px;color:#6B8193;margin-top:6px">התרחישים כאן להמחשה בלבד - כדי לבדוק אם תוכלו לעמוד בתשלום גם אם הריבית תעלה, לפני שבוחרים כמה מהמשכנתא לשים במסלול צמוד-ריבית (פריים) בתמהיל למטה.</p>`;
+    <p style="font-size:11px;color:var(--ink-muted);margin-top:6px">התרחישים כאן להמחשה בלבד - כדי לבדוק אם תוכלו לעמוד בתשלום גם אם הריבית תעלה, לפני שבוחרים כמה מהמשכנתא לשים במסלול צמוד-ריבית (פריים) בתמהיל למטה.</p>`;
 }
 
 // ---- SVG helpers ----
@@ -235,7 +235,7 @@ async function calculateTrackMix() {
   }
   const fmt = n => n.toLocaleString(undefined, {maximumFractionDigits: 0});
   const capWarning = data.exceedsVariableRateCap
-    ? '<p style="font-size:12px;color:#B3261E;margin-top:8px">⚠ מסלול הפריים חורג מ-66.66% מההלוואה - הוראה 329 של בנק ישראל אוסרת על הבנק לאשר תמהיל כזה.</p>'
+    ? '<p style="font-size:12px;color:var(--bad-text);margin-top:8px">⚠ מסלול הפריים חורג מ-66.66% מההלוואה - הוראה 329 של בנק ישראל אוסרת על הבנק לאשר תמהיל כזה.</p>'
     : '';
   resultEl.innerHTML = `
     <div class="badge ok">ריבית ממוצעת משוקללת: ${data.blendedAnnualRatePercent.toFixed(2)}%</div>

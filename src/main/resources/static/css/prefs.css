@@ -13,6 +13,7 @@
   --bad-bg: #431F1F;
   --good-text: #7FE3B3;
   --bad-text: #FF9E9E;
+  --warn-text: #F5C27A;
   color-scheme: dark;
 }
 [data-theme="dark"] h1, [data-theme="dark"] h2 { color: var(--ink); }
@@ -46,3 +47,6 @@
 }
 [data-theme="dark"] .step h1, [data-theme="dark"] .step h2, [data-theme="dark"] .step h3, [data-theme="dark"] .step h4 { color: var(--ink); }
 
+
+/* אייקון ה-"?" ליד שדות: בצבע --navy, שלא מוגדר מחדש במצב כהה - כמעט בלתי נראה על הרקע הכהה */
+[data-theme="dark"] .info-tip { color: var(--ink); }

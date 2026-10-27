@@ -9,14 +9,14 @@ async function handleLogin() {
 async function handleRegister() {
   if (!document.getElementById('consentCheckbox').checked) {
     const msgEl = document.getElementById('authMessage');
-    msgEl.style.color = '#b02a2a';
+    msgEl.style.color = 'var(--bad-text)';
     msgEl.textContent = 'יש לאשר את מדיניות הפרטיות כדי להירשם';
     return;
   }
   const result = await submit('/api/auth/register', true);
   if (result) {
     const msgEl = document.getElementById('authMessage');
-    msgEl.style.color = '#1a7a34';
+    msgEl.style.color = 'var(--good-text)';
     msgEl.textContent = result.data.message;
   }
 }
@@ -26,12 +26,12 @@ async function submit(url, consent) {
   const password = document.getElementById('authPassword').value;
   const msgEl = document.getElementById('authMessage');
   const resendLink = document.getElementById('resendVerificationLink');
-  msgEl.style.color = '#8b93a6';
+  msgEl.style.color = 'var(--ink-muted)';
   msgEl.textContent = 'רגע...';
   resendLink.style.display = 'none';
   const result = await authRequest(url, email, password, consent);
   if (!result.ok) {
-    msgEl.style.color = '#b02a2a';
+    msgEl.style.color = 'var(--bad-text)';
     msgEl.textContent = result.error;
     resendLink.style.display = result.status === 403 ? 'inline' : 'none';
     return null;
@@ -49,13 +49,13 @@ function toggleForgotPassword() {
 async function submitForgotPassword() {
   const email = document.getElementById('forgotEmail').value.trim();
   const msgEl = document.getElementById('authMessage');
-  msgEl.style.color = '#8b93a6';
+  msgEl.style.color = 'var(--ink-muted)';
   msgEl.textContent = 'רגע...';
   const res = await fetch('/api/auth/forgot-password', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
   });
   const data = await res.json();
-  msgEl.style.color = '#1a7a34';
+  msgEl.style.color = 'var(--good-text)';
   msgEl.textContent = data.message;
   document.getElementById('forgotPasswordBox').style.display = 'none';
 }
@@ -66,7 +66,7 @@ async function resendVerification() {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
   });
   const msgEl = document.getElementById('authMessage');
-  msgEl.style.color = '#1a7a34';
+  msgEl.style.color = 'var(--good-text)';
   msgEl.textContent = 'אם הכתובת רשומה ועדיין לא אומתה, נשלח אליה מייל אימות חדש';
   document.getElementById('resendVerificationLink').style.display = 'none';
 }

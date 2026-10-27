@@ -22,7 +22,7 @@
           onblur="if (!this.value) this.value = this.dataset.prev || '';">
         <datalist id="tenderOptions"></datalist>
       </label>
-      <div id="tenderListStatus" style="font-size:13px;color:#6B8193;margin-top:6px"><span class="skeleton"></span></div>
+      <div id="tenderListStatus" style="font-size:13px;color:var(--ink-muted);margin-top:6px" aria-live="polite"></div>
       <button onclick="loadTenderDetail()">הצג פרטי מכרז</button>
     </div>
 
@@ -35,7 +35,7 @@
         <h3>הנחות לאוכלוסיות עדיפות במכרז זה
           <span class="info-tip" tabindex="0" data-tip="חיפשנו אוטומטית בחוברת המכרז המקורית קטעים שמזכירים הנחה ליד מילת מפתח (מילואים/חסרי דיור/נכות וכו'). זה חיפוש טקסט, לא חישוב - יכול להיות לא מדויק או לא שלם, ולפעמים כמה הנחות חלות יחד. תמיד אמתו מול החוברת המלאה (קישור למטה) לפני שמסתמכים על המספר.">?</span>
         </h3>
-        <div id="discountsStatus" style="font-size:13px;color:#6B8193">מחפש הנחות בחוברת המכרז...</div>
+        <div id="discountsStatus" style="font-size:13px;color:var(--ink-muted)">מחפש הנחות בחוברת המכרז...</div>
         <a id="discountsPageLink" class="secondary" style="display:none;margin-top:8px;text-decoration:none">📄 צפייה בכל הקטעים שנמצאו</a>
       </div>
       <div id="bookletLinkWrap" style="margin-top:10px"></div>

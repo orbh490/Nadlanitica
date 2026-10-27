@@ -4,7 +4,7 @@
 
   async function confirmVerify() {
     const msgEl = document.getElementById('resultMessage');
-    msgEl.style.color = '#8b93a6';
+    msgEl.style.color = 'var(--ink-muted)';
     msgEl.textContent = 'רגע...';
     const res = await fetch('/api/auth/verify-confirm', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token })

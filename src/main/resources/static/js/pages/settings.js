@@ -15,13 +15,13 @@ async function handleLogout() {
 async function sendPasswordReset() {
   const email = document.getElementById('settingsEmail').textContent;
   const msgEl = document.getElementById('settingsMessage');
-  msgEl.style.color = '#6B8193';
+  msgEl.style.color = 'var(--ink-muted)';
   msgEl.textContent = 'רגע...';
   const res = await fetch('/api/auth/forgot-password', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
   });
   const data = await res.json();
-  msgEl.style.color = '#12805A';
+  msgEl.style.color = 'var(--good-text)';
   msgEl.textContent = data.message;
 }
 
@@ -36,7 +36,7 @@ async function deleteAccount() {
   try {
     const data = await postJson('/api/auth/delete-account', { password }, authHeaders());
     clearAuthToken();
-    msgEl.style.color = '#12805A';
+    msgEl.style.color = 'var(--good-text)';
     msgEl.textContent = data.message;
     setTimeout(() => location.reload(), 1500);
   } catch (err) {
@@ -47,7 +47,7 @@ async function deleteAccount() {
 function clearLocalData() {
   clearAuthToken();
   const msgEl = document.getElementById('clearMessage');
-  msgEl.style.color = '#12805A';
+  msgEl.style.color = 'var(--good-text)';
   msgEl.textContent = 'נוקה. מרעננים...';
   setTimeout(() => location.reload(), 600);
 }
