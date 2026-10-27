@@ -1,18 +1,7 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>נדלניטיקה</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#16324a">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
-<link rel="stylesheet" href="/css/app.css">
+<th:block th:replace="~{fragments/head :: common(title='נדלניטיקה')}"></th:block>
 </head>
 <body>
   <div class="page" style="max-width:420px">
@@ -45,10 +34,7 @@
       <p style="font-size:12px;color:#8b93a6;margin-top:8px">בלי חשבון אפשר להשתמש בכל המחשבונים, אבל שום דבר לא נשמר אחרי שסוגרים את הדפדפן.</p>
     </div>
 
-    <div class="policy-links">
-      <a href="/disclaimer.html" class="policy-btn"><span class="material-symbols-outlined icon">gavel</span>גילוי נאות מלא</a>
-      <a href="/privacy.html" class="policy-btn"><span class="material-symbols-outlined icon">privacy_tip</span>מדיניות פרטיות</a>
-    </div>
+    <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
 
 <script src="/js/app.js"></script>

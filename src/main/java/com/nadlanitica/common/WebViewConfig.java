@@ -4,23 +4,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
 /**
- * מפה כתובות .html קבועות (נשארות זהות לאלה שהיו קבצים סטטיים) לתבניות Thymeleaf תחת templates/ -
- * כדי שהדפים שעברו ל-fragments משותפים (head/corner-actions/floating-nav/policy-links) ימשיכו
- * להיות נגישים באותו URL בדיוק כמו קודם, בלי לשבור אף קישור קיים באפליקציה.
+ * מפה כתובות .html קבועות לתבניות Thymeleaf תחת templates/pages/ - כל עמוד נשאר באותו URL בדיוק כמו
+ * כשהיה קובץ סטטי, כדי לא לשבור קישורים קיימים (כולל קישורים שכבר נשלחו במיילי אימות ואיפוס סיסמה).
  */
 @Configuration
 class WebViewConfig implements WebMvcConfigurer {
 
+    private static final List<String> PAGES = List.of(
+            "index", "home", "dashboard", "lottery", "land-tenders", "land-tender-discounts", "results-board",
+            "account", "advisor", "settings", "privacy", "disclaimer", "email-verified", "reset-password", "leads");
+
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/lottery.html").setViewName("lottery");
-        registry.addViewController("/land-tenders.html").setViewName("land-tenders");
-        registry.addViewController("/dashboard.html").setViewName("dashboard");
-        registry.addViewController("/results-board.html").setViewName("results-board");
-        registry.addViewController("/account.html").setViewName("account");
-        registry.addViewController("/advisor.html").setViewName("advisor");
-        registry.addViewController("/settings.html").setViewName("settings");
-        registry.addViewController("/home.html").setViewName("home");
+        registry.addViewController("/").setViewName("pages/index");
+        for (String page : PAGES) {
+            registry.addViewController("/" + page + ".html").setViewName("pages/" + page);
+        }
     }
 }

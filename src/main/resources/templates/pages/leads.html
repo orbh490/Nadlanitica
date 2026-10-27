@@ -1,12 +1,7 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>לידים - ניהול (פנימי)</title>
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#16324a">
+<th:block th:replace="~{fragments/head :: common(title='לידים - ניהול (פנימי)')}"></th:block>
 <style>
   body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f7f7f9; color: #222; }
   table { width: 100%; border-collapse: collapse; margin-top: 16px; background: #fff; }
