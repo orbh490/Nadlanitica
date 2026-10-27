@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<th:block th:replace="~{fragments/head :: common(title='נדלניטיקה')}"></th:block>
+<th:block th:replace="~{fragments/head :: common(title='נדלניטיקה', description='הון עצמי, מס רכישה, סיכויי הגרלה ותשלום חודשי - כל התמונה האמיתית לפני שקונים דירה בישראל.')}"></th:block>
 </head>
 <body>
   <div th:replace="~{fragments/nav :: topbar(active='home')}"></div>
 
-  <section class="home-hero">
+  <section class="home-hero" id="main">
     <div class="home-hero-grid">
       <div>
         <div class="home-eyebrow">לרוכשי דירה בישראל</div>
@@ -31,32 +31,32 @@
   <section class="home-tiles" id="tiles">
     <div class="tile-grid">
       <a class="tile" href="/lottery.html">
-        <span class="material-symbols-outlined">apartment</span>
+        <span aria-hidden="true" class="material-symbols-outlined">apartment</span>
         <div class="t">מחיר למשתכן</div>
         <div class="d">בדקו את סיכויי הזכייה שלכם בפרויקט ספציפי</div>
       </a>
       <a class="tile" href="/results-board.html">
-        <span class="material-symbols-outlined">leaderboard</span>
+        <span aria-hidden="true" class="material-symbols-outlined">leaderboard</span>
         <div class="t">לוח תוצאות</div>
         <div class="d">השוואת ערים לפי סיכויי זכייה ומחירים</div>
       </a>
       <a class="tile" href="/land-tenders.html">
-        <span class="material-symbols-outlined">landscape</span>
+        <span aria-hidden="true" class="material-symbols-outlined">landscape</span>
         <div class="t">מכרזי קרקעות</div>
         <div class="d">מכרזי בנייה עצמית חיים ממשרד רשות מקרקעי ישראל, כולל מחשבון</div>
       </a>
       <a class="tile" href="/dashboard.html">
-        <span class="material-symbols-outlined">account_balance</span>
+        <span aria-hidden="true" class="material-symbols-outlined">account_balance</span>
         <div class="t">משכנתאות</div>
         <div class="d">חשבו הון עצמי, תשלום חודשי, ובדקו רגישות לריבית</div>
       </a>
       <a class="tile" href="/advisor.html">
-        <span class="material-symbols-outlined">support_agent</span>
+        <span aria-hidden="true" class="material-symbols-outlined">support_agent</span>
         <div class="t">ייעוץ משכנתאות</div>
         <div class="d">קבלו תמהיל מדויק מיועץ מומחה</div>
       </a>
       <a class="tile soft" href="/account.html">
-        <span class="material-symbols-outlined">person</span>
+        <span aria-hidden="true" class="material-symbols-outlined">person</span>
         <div class="t">אזור אישי</div>
         <div class="d">היסטוריית החישובים שלכם והשוואת מסלולים (רשומים בלבד)</div>
       </a>

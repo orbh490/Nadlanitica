@@ -5,10 +5,20 @@
   בלוק ה-head המשותף לכל דפי האפליקציה - פאבויקון, מניפסט, גופנים, app.css.
   לפני המעבר ל-fragments, כל שינוי כאן (כמו הוספת manifest.json) דרש עריכה זהה ב-8 קבצים בנפרד.
 -->
-<th:block th:fragment="common(title)">
+<th:block th:fragment="common(title, description)"
+    th:with="desc=${description} ?: 'הון עצמי, מס רכישה, סיכויי הגרלה ותשלום חודשי - כל התמונה האמיתית לפני שקונים דירה בישראל.',
+             baseUrl=${@environment.getProperty('app.base-url')}">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title th:text="${title}">נדלניטיקה</title>
+<meta name="description" th:content="${desc}">
+<!-- תצוגה מקדימה כשמשתפים קישור (וואטסאפ, פייסבוק וכו') -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+<meta property="og:site_name" content="נדלניטיקה">
+<meta property="og:title" th:content="${title}">
+<meta property="og:description" th:content="${desc}">
+<meta property="og:image" th:content="${baseUrl} + '/img/icon-512.png'">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<th:block th:replace="~{fragments/head :: common(title='האזור האישי שלי')}"></th:block>
+<th:block th:replace="~{fragments/head :: common(title='האזור האישי שלי | נדלניטיקה', description=null)}"></th:block>
 <style>
   #historyList { margin-top: 10px; }
   .interest-add { display: flex; gap: 8px; }
@@ -15,7 +15,7 @@
 </head>
 <body>
   <div th:replace="~{fragments/nav :: topbar(active='account')}"></div>
-  <div class="page">
+  <div class="page" id="main">
     <h1>האזור האישי שלי</h1>
     <p class="subtitle">היסטוריית החישובים שלך והשוואת מסלולים - זמין רק כשמחוברים, כדי שהמידע שלך יישמר.</p>
 

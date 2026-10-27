@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<th:block th:replace="~{fragments/head :: common(title='ייעוץ משכנתאות')}"></th:block>
+<th:block th:replace="~{fragments/head :: common(title='ייעוץ משכנתאות | נדלניטיקה', description='השאירו פרטים ויועץ משכנתאות יחזור אליכם לבניית תמהיל משכנתא מותאם אישית.')}"></th:block>
 </head>
 <body>
   <div th:replace="~{fragments/nav :: topbar(active='advisor')}"></div>
-  <div class="page">
+  <div class="page" id="main">
     <div class="hero-art" aria-hidden="true"><div class="art-chat"><span class="me" style="--d:.2s">כמה אפשר לחסוך במשכנתא?</span><span style="--d:.9s">בואו נבדוק את התמהיל שלכם</span><div class="dots"><i></i><i></i><i></i></div></div></div>
     <h1>ייעוץ משכנתאות מקצועי</h1>
     <p class="subtitle">תמהיל משכנתא נכון (קבועה / משתנה / פריים / צמודת מדד) יכול לחסוך לכם עשרות אלפי שקלים. השאירו פרטים ויועץ מומחה יחזור אליכם.</p>

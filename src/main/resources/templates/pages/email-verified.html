@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<th:block th:replace="~{fragments/head :: common(title='אימות אימייל')}"></th:block>
+<th:block th:replace="~{fragments/head :: common(title='אימות אימייל | נדלניטיקה', description=null)}"></th:block>
 </head>
 <body>
-  <div class="page" style="max-width:420px;text-align:center">
+  <div class="page" id="main" style="max-width:420px;text-align:center">
     <div class="card" id="confirmCard" style="display:none">
       <h2>אימות כתובת אימייל</h2>
       <p style="font-size:14px;color:var(--ink-secondary)">לחצו לאישור סופי של כתובת האימייל שלכם.</p>

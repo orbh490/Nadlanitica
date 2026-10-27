@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<th:block th:replace="~{fragments/head :: common(title='הגדרות')}"></th:block>
+<th:block th:replace="~{fragments/head :: common(title='הגדרות | נדלניטיקה', description=null)}"></th:block>
 </head>
 <body>
   <div th:replace="~{fragments/nav :: topbar(active='settings')}"></div>
-  <div class="page">
+  <div class="page" id="main">
     <h1>הגדרות</h1>
     <p class="subtitle">ההגדרות הכלליות זמינות לכולם - עם או בלי חשבון.</p>
 
@@ -26,10 +26,11 @@
 
     <div class="card">
       <h2>התראות</h2>
-      <p class="subtitle" style="margin:0 0 8px">ההתראות זמינות רק למי שנרשם ומחובר לחשבון.</p>
-      <label class="switch-row"><span><b>עדכוני מכרזים</b><small>הודעה כשמכרז חדש נפתח באזור שבחרתם</small></span><input type="checkbox" class="switch" checked></label>
-      <label class="switch-row"><span><b>שינוי בריבית</b><small>התראה כשהריבית הממוצעת משתנה</small></span><input type="checkbox" class="switch" checked></label>
-      <label class="switch-row"><span><b>עדכון חודשי</b><small>סיכום קצר בתחילת כל חודש</small></span><input type="checkbox" class="switch"></label>
+      <!-- המתגים עדיין לא מחוברים לשום דבר - מושבתים עד שההתראות ייבנו, כדי לא להטעות -->
+      <p class="subtitle" style="margin:0 0 8px">בקרוב: התראות במייל למשתמשים רשומים. אפשר כבר עכשיו לבחור אזורי עניין <a href="/account.html">באזור האישי</a>.</p>
+      <label class="switch-row"><span><b>עדכוני מכרזים</b><small>הודעה כשמכרז חדש נפתח באזור שבחרתם</small></span><input type="checkbox" class="switch" disabled></label>
+      <label class="switch-row"><span><b>שינוי בריבית</b><small>התראה כשהריבית הממוצעת משתנה</small></span><input type="checkbox" class="switch" disabled></label>
+      <label class="switch-row"><span><b>עדכון חודשי</b><small>סיכום קצר בתחילת כל חודש</small></span><input type="checkbox" class="switch" disabled></label>
     </div>
 
     <div class="card">

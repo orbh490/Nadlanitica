@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<th:block th:replace="~{fragments/head :: common(title='המשכנתא שלי')}"></th:block>
+<th:block th:replace="~{fragments/head :: common(title='המשכנתא שלי | נדלניטיקה', description='מחשבון משכנתא לפי כללי בנק ישראל: הון עצמי נדרש, מס רכישה, עלויות סגירה, החזר חודשי ותרחישי עליית ריבית.')}"></th:block>
 <style>
   .viz-root {
     --surface-1: #FFFFFF;
@@ -27,7 +27,7 @@
 </head>
 <body>
   <div th:replace="~{fragments/nav :: topbar(active='dashboard')}"></div>
-  <div class="page">
+  <div class="page" id="main">
     <div class="hero-art" aria-hidden="true"><svg class="art-house" viewBox="0 0 150 150"><path class="d1" pathLength="100" d="M18 74 L75 26 L132 74"/><path class="d2" pathLength="100" d="M36 66 V128 H114 V66"/><path class="d3 teal" pathLength="100" d="M64 128 V98 H86 V128"/></svg></div>
     <h1>המשכנתא שלי</h1>
     <p class="subtitle">הון עצמי, מס רכישה, החזר חודשי ועוד - כל התמונה של המשכנתא שלך במקום אחד. <a href="/account.html">ההיסטוריה שלך והשוואת מסלולים נמצאות באזור האישי</a>.</p>

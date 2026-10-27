@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <head>
-<th:block th:replace="~{fragments/head :: common(title='מחיר למשתכן - סיכויי זכייה')}"></th:block>
+<th:block th:replace="~{fragments/head :: common(title='מחיר למשתכן - סיכויי זכייה | נדלניטיקה', description='בדקו את סיכויי הזכייה שלכם בהגרלות מחיר למשתכן, לפי נתוני 2,320 הגרלות אמיתיות של משרד הבינוי והשיכון.')}"></th:block>
 </head>
 <body>
   <div th:replace="~{fragments/nav :: topbar(active='lottery')}"></div>
-  <div class="page">
+  <div class="page" id="main">
     <div class="hero-art" aria-hidden="true"><div class="art-donut"><svg viewBox="0 0 180 180"><circle class="track" cx="90" cy="90" r="72"/><circle class="arc" cx="90" cy="90" r="72" pathLength="100"/></svg><b>סיכוי זכייה<span>38%</span></b></div></div>
     <h1>מחיר למשתכן</h1>
     <p class="subtitle">חפשו פרויקט ובדקו את הסיכוי הריאלי שלכם לזכות - כולל ניקוד הזכאות האישי שלכם, לא רק ממוצע כללי.</p>
