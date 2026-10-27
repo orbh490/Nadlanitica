@@ -37,6 +37,7 @@ public class LandTenderService {
     private static final Duration LIST_CACHE_TTL = Duration.ofMinutes(10);
     private static final Duration DETAIL_CACHE_TTL = Duration.ofMinutes(5);
     private static final Duration BOOKLET_CACHE_TTL = Duration.ofHours(1);
+    private static final int MAX_CACHED_BOOKLETS = 5;
     private static final Duration CLOSED_LIST_CACHE_TTL = Duration.ofHours(1);
     private static final Duration CITY_RESULTS_CACHE_TTL = Duration.ofHours(6);
     private static final int MAX_RESULTS_SAMPLE = 60;
@@ -283,6 +284,12 @@ public class LandTenderService {
         String text = bookletExtractor.extractText(bytes);
         List<String> snippets = bookletExtractor.findDiscountSnippets(text);
         CachedBooklet fresh = new CachedBooklet(bytes, text, snippets, Instant.now());
+        // כל חוברת היא PDF של כ-9MB - בלי תקרה המטמון גדל עם כל מכרז שמישהו פתח, על שרת של 512MB
+        while (bookletCache.size() >= MAX_CACHED_BOOKLETS) {
+            bookletCache.entrySet().stream()
+                    .min(Comparator.comparing(e -> e.getValue().fetchedAt()))
+                    .ifPresent(oldest -> bookletCache.remove(oldest.getKey()));
+        }
         bookletCache.put(id, fresh);
         return fresh;
     }
@@ -309,6 +316,7 @@ public class LandTenderService {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
                     "לא הצלחנו לקבל את פרטי המכרז מרשות מקרקעי ישראל כרגע. נסו שוב בעוד רגע.");
         }
+        rawDetailCache.values().removeIf(c -> Duration.between(c.fetchedAt(), Instant.now()).compareTo(DETAIL_CACHE_TTL) >= 0);
         rawDetailCache.put(id, new CachedRawDetail(raw, Instant.now()));
         return raw;
     }
