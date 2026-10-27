@@ -1,5 +1,7 @@
 package com.nadlanitica.lottery;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,10 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.OptionalDouble;
 
-record ProjectSummary(String city, String projectName, String projectId, String liveStatus) {
+record ProjectSummary(String lotteryId, String city, String projectName, String projectId, LocalDate lotteryDate,
+        String liveStatus) {
 }
 
 record LotteryOddsResponse(String city, String projectName, boolean localResident, double winProbabilityPercent,
@@ -45,7 +49,8 @@ class LotteryController {
     @GetMapping("/projects")
     List<ProjectSummary> projects() {
         return engine.allProjects().stream()
-                .map(p -> new ProjectSummary(p.getCity(), p.getProjectName(), p.getProjectId(), liveStatusFor(p.getProjectId())))
+                .map(p -> new ProjectSummary(p.getLotteryId(), p.getCity(), p.getProjectName(), p.getProjectId(),
+                        p.getLotteryDate(), liveStatusFor(p.getProjectId())))
                 .toList();
     }
 
@@ -57,9 +62,9 @@ class LotteryController {
     }
 
     @GetMapping("/odds")
-    LotteryOddsResponse odds(@RequestParam String city, @RequestParam String project, @RequestParam boolean localResident) {
-        LotteryProject p = engine.findProject(city, project)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "פרויקט לא נמצא: " + city + " / " + project));
+    LotteryOddsResponse odds(@RequestParam String lotteryId, @RequestParam boolean localResident) {
+        LotteryProject p = engine.findByLotteryId(lotteryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ההגרלה לא נמצאה"));
         OptionalDouble historical = engine.actualHistoricalOddsPercent(p, localResident);
         LotteryOddsEngine.OddsPool pool = engine.poolFor(p, localResident);
         return new LotteryOddsResponse(p.getCity(), p.getProjectName(), localResident,
@@ -70,7 +75,10 @@ class LotteryController {
 
     @GetMapping("/city-comparison")
     List<LotteryOddsEngine.CityStats> cityComparison(@RequestParam boolean localResident,
-            @RequestParam(defaultValue = "3") int minProjects, @RequestParam(defaultValue = "15") int limit) {
+            @RequestParam(defaultValue = "3") @Min(value = 1, message = "מספר הפרויקטים המינימלי חייב להיות בין 1 ל-100")
+            @Max(value = 100, message = "מספר הפרויקטים המינימלי חייב להיות בין 1 ל-100") int minProjects,
+            @RequestParam(defaultValue = "15") @Min(value = 1, message = "מספר הערים להצגה חייב להיות בין 1 ל-100")
+            @Max(value = 100, message = "מספר הערים להצגה חייב להיות בין 1 ל-100") int limit) {
         return engine.compareCities(localResident, minProjects, limit);
     }
 }

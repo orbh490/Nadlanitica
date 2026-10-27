@@ -1,9 +1,14 @@
 package com.nadlanitica.lottery;
 
+import java.time.LocalDate;
+
+/** הגרלה אחת (סבב אחד) של פרויקט - לאותו פרויקט יכולים להיות כמה סבבים ("ראשונה", "המשך"), כל אחד עם lotteryId משלו. */
 public class LotteryProject {
+    private final String lotteryId;      // מזהה ההגרלה (LotteryId) - המפתח הייחודי היחיד בקובץ; עיר+שם ואפילו projectId חוזרים בין סבבים
     private final String city;
     private final String projectName;
     private final String projectId;      // מזהה הפרויקט של משרד השיכון - אותו מזהה בדיוק מופיע ב-API החי (ProjectNumber), ומאפשר התאמה מדויקת בלי להסתמך על שם הפרויקט
+    private final LocalDate lotteryDate; // תאריך ביצוע ההגרלה; null אם לא ידוע
     private final int totalUnits;
     private final int localQuotaUnits;   // יחידות שמורות לבני מקום
     private final int totalApplicants;
@@ -12,11 +17,14 @@ public class LotteryProject {
     private final int localWinners;      // מתוך הזוכים, כמה הם בני מקום; -1 אם לא ידוע
     private final double pricePerSqm;    // מחיר למ"ר; 0 אם לא ידוע
 
-    public LotteryProject(String city, String projectName, String projectId, int totalUnits, int localQuotaUnits,
-            int totalApplicants, int localApplicants, int totalWinners, int localWinners, double pricePerSqm) {
+    public LotteryProject(String lotteryId, String city, String projectName, String projectId, LocalDate lotteryDate,
+            int totalUnits, int localQuotaUnits, int totalApplicants, int localApplicants, int totalWinners,
+            int localWinners, double pricePerSqm) {
+        this.lotteryId = lotteryId;
         this.city = city;
         this.projectName = projectName;
         this.projectId = projectId;
+        this.lotteryDate = lotteryDate;
         this.totalUnits = totalUnits;
         this.localQuotaUnits = localQuotaUnits;
         this.totalApplicants = totalApplicants;
@@ -26,9 +34,11 @@ public class LotteryProject {
         this.pricePerSqm = pricePerSqm;
     }
 
+    public String getLotteryId() { return lotteryId; }
     public String getCity() { return city; }
     public String getProjectName() { return projectName; }
     public String getProjectId() { return projectId; }
+    public LocalDate getLotteryDate() { return lotteryDate; }
     public int getTotalUnits() { return totalUnits; }
     public int getLocalQuotaUnits() { return localQuotaUnits; }
     public int getTotalApplicants() { return totalApplicants; }

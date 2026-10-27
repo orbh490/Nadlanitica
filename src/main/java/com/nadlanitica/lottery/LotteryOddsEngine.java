@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -35,8 +38,11 @@ public class LotteryOddsEngine {
     private static final int COL_PROJECT_NAME = 22;
     private static final int COL_PROJECT_ID = 23;
     private static final int COL_CITY = 25;
+    private static final int COL_LOTTERY_DATE = 27;
     private static final int COL_STATUS = 29;
+    private static final int COL_LOTTERY_ID = 38;
     private static final String STATUS_RESULTS_PUBLISHED = "פורסמו תוצאות";
+    private static final DateTimeFormatter LOTTERY_DATE_FORMAT = DateTimeFormatter.ofPattern("M/d/yyyy");
 
     private final List<LotteryProject> projects = loadProjects();
 
@@ -44,10 +50,8 @@ public class LotteryOddsEngine {
         return projects;
     }
 
-    public Optional<LotteryProject> findProject(String city, String projectName) {
-        return projects.stream()
-                .filter(p -> p.getCity().equalsIgnoreCase(city) && p.getProjectName().equalsIgnoreCase(projectName))
-                .findFirst();
+    public Optional<LotteryProject> findByLotteryId(String lotteryId) {
+        return projects.stream().filter(p -> p.getLotteryId().equals(lotteryId)).findFirst();
     }
 
     public OddsPool poolFor(LotteryProject project, boolean isLocalResident) {
@@ -132,8 +136,22 @@ public class LotteryOddsEngine {
         int localWinners = parseNullableCount(f[COL_WINNERS_BNEY_MAKOM]);
         double pricePerSqm = parsePrice(f[COL_PRICE_PER_METER]);
         String projectId = f.length > COL_PROJECT_ID ? f[COL_PROJECT_ID].trim() : "";
-        return new LotteryProject(city, projectName, projectId, totalUnits, localQuotaUnits, totalApplicants,
-                localApplicants, totalWinners, localWinners, pricePerSqm);
+        String lotteryId = f.length > COL_LOTTERY_ID ? f[COL_LOTTERY_ID].trim() : "";
+        if (lotteryId.isEmpty()) {
+            return null;
+        }
+        return new LotteryProject(lotteryId, city, projectName, projectId, parseLotteryDate(f[COL_LOTTERY_DATE]),
+                totalUnits, localQuotaUnits, totalApplicants, localApplicants, totalWinners, localWinners, pricePerSqm);
+    }
+
+    // "12/6/2017 12:29:26 PM" - חודש/יום/שנה; null אם חסר או בפורמט אחר
+    private static LocalDate parseLotteryDate(String raw) {
+        String datePart = raw.trim().split(" ")[0];
+        try {
+            return LocalDate.parse(datePart, LOTTERY_DATE_FORMAT);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     private static double parsePrice(String raw) {

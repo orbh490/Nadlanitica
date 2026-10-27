@@ -6,10 +6,19 @@ let projectsByLabel = {};
 let lastScoreInfo = null;
 let allProjects = [];
 
-function labelFor(p) { return `${p.city} - ${p.projectName}`; }
+// לאותו פרויקט יש לפעמים כמה סבבי הגרלה (אפילו באותו יום) - מספר ההגרלה הוא מה שמבדיל ביניהם ברשימה
+function labelFor(p) {
+  const when = p.lotteryDate ? ` (${p.lotteryDate.slice(5, 7)}/${p.lotteryDate.slice(0, 4)})` : '';
+  return `${p.city} - ${p.projectName} · הגרלה ${p.lotteryId}${when}`;
+}
 
 async function loadProjects() {
-  allProjects = await (await fetch('/api/lottery/projects')).json();
+  try {
+    allProjects = await apiFetch('/api/lottery/projects');
+  } catch (err) {
+    document.getElementById('openCountStatus').textContent = err.message;
+    return;
+  }
   allProjects.sort((a, b) => labelFor(a).localeCompare(labelFor(b), 'he'));
   renderProjectOptions();
 }
@@ -48,11 +57,15 @@ async function calculateScore() {
     lowIncomeHousehold: document.getElementById('lowIncomeHousehold').checked,
     failedPriorApplications: Number(document.getElementById('failedPriorApplications').value)
   };
-  const data = await (await fetch('/api/lottery/eligibility-score', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-  })).json();
-  lastScoreInfo = data;
   const resultEl = document.getElementById('scoreResult');
+  let data;
+  try {
+    data = await postJson('/api/lottery/eligibility-score', body);
+  } catch (err) {
+    resultEl.innerHTML = errorHtml(err);
+    return;
+  }
+  lastScoreInfo = data;
   if (!data.meetsMinimumThreshold) {
     resultEl.innerHTML = `<div class="badge bad">ניקוד: <span id="scoreValue">0</span></div><p style="font-size:13px;margin-top:8px">ניקוד זה נמוך מסף הרישום המינימלי (11 נקודות) במסלול הכללי.</p>`;
     revealResult(resultEl);
@@ -137,11 +150,11 @@ function liveStatusHtml(live) {
     <div class="badge ok" style="margin-top:8px">✅ פתוח להרשמה כרגע</div>
     <table style="margin-top:8px">
       <tr><td>סגירת הרשמה</td><td>${fmtDate(p.applicationEndDate)}</td></tr>
-      <tr><td>מסלול</td><td>${p.processName ?? '—'}</td></tr>
-      <tr><td>זכאות</td><td>${p.entitlement ?? '—'}</td></tr>
+      <tr><td>מסלול</td><td>${escapeHtml(p.processName ?? '—')}</td></tr>
+      <tr><td>זכאות</td><td>${escapeHtml(p.entitlement ?? '—')}</td></tr>
       <tr><td>יח"ד</td><td>${p.housingUnits ?? '—'}</td></tr>
       <tr><td>מחיר בסיס למ"ר</td><td>${p.pricePerSqm ? Math.round(p.pricePerSqm).toLocaleString() + ' ש"ח (לפני הנחה)' : '—'}</td></tr>
-      <tr><td>יזם</td><td>${p.contractorName ?? '—'}</td></tr>
+      <tr><td>יזם</td><td>${escapeHtml(p.contractorName ?? '—')}</td></tr>
       <tr><td>נרשמים עד כה</td><td>${p.totalSubscribers ?? '—'}${p.totalLocalSubscribers ? ' (מתוכם ' + p.totalLocalSubscribers + ' בני מקום)' : ''}</td></tr>
     </table>
     <p style="font-size:11px;color:#6B8193;margin-top:6px">מחיר הבסיס למ"ר הוא לפני הנחה - שיעור ההנחה בפועל ותנאיו משתנים בין מכרזים, יש לבדוק את תנאי המכרז הספציפי.</p>`;
@@ -152,16 +165,22 @@ async function calculateOdds() {
   const p = projectsByLabel[label];
   const resultEl = document.getElementById('oddsResult');
   if (!p) {
-    resultEl.innerHTML = '<p style="color:#B3261E;font-size:13px">בחרו פרויקט מהרשימה (הקלידו כדי לסנן)</p>';
+    resultEl.innerHTML = '<p class="form-error">בחרו פרויקט מהרשימה (הקלידו כדי לסנן)</p>';
     return;
   }
   const localResident = document.getElementById('localResident').checked;
-  const url = `/api/lottery/odds?city=${encodeURIComponent(p.city)}&project=${encodeURIComponent(p.projectName)}&localResident=${localResident}`;
-  const oddsPromise = fetch(url).then(r => r.json());
+  const url = `/api/lottery/odds?lotteryId=${encodeURIComponent(p.lotteryId)}&localResident=${localResident}`;
+  // אם הלוח החי של משרד השיכון לא זמין - עדיין מציגים את הסיכוי ההיסטורי, רק בלי סטטוס הרשמה
   const livePromise = p.projectId
-    ? fetch(`/api/lottery/live-status?projectId=${encodeURIComponent(p.projectId)}`).then(r => r.json())
+    ? apiFetch(`/api/lottery/live-status?projectId=${encodeURIComponent(p.projectId)}`).catch(() => ({ hasLiveData: false }))
     : Promise.resolve({ hasLiveData: false });
-  const [data, live] = await Promise.all([oddsPromise, livePromise]);
+  let data, live;
+  try {
+    [data, live] = await Promise.all([apiFetch(url), livePromise]);
+  } catch (err) {
+    resultEl.innerHTML = errorHtml(err);
+    return;
+  }
   const historicalLine = data.actualHistoricalWinRatePercent == null
     ? '<p style="font-size:13px;margin-top:10px;text-align:center"><small style="color:#6B8193">אין נתון זכייה בפועל זמין להגרלה זו</small></p>'
     : '';
@@ -175,7 +194,7 @@ async function calculateOdds() {
     ? '<p style="font-size:12px;color:#12805A;margin-top:6px">🎁 עיר זו מוכרת כישוב עדיפות לאומית - ייתכן שתהיו זכאים למענק מותנה של כ-50,000-60,000 ש"ח, שבנק ישראל מכיר בו כחלק מההון העצמי (בכפוף למגורים בדירה 5-7 שנים). בדקו זכאות מדויקת מול משרד השיכון.</p>'
     : '';
   resultEl.innerHTML = `
-    <div class="badge ok">${data.city} - ${data.projectName}</div>
+    <div class="badge ok">${escapeHtml(data.city)} - ${escapeHtml(data.projectName)} · הגרלה ${escapeHtml(p.lotteryId)}</div>
     ${oddsDonutHtml(data.winProbabilityPercent, data.actualHistoricalWinRatePercent, data.poolUnits, data.poolApplicants)}
     ${historicalLine}
     ${liveStatusHtml(live)}
