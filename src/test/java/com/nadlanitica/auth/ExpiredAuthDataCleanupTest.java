@@ -18,15 +18,18 @@ class ExpiredAuthDataCleanupTest {
     UserSessionRepository sessions;
     @Autowired
     AccountTokenRepository tokens;
+    @Autowired
+    AppUserRepository users;
 
     @Test
     void deletesOnlyExpiredSessionsAndTokens() {
         Instant past = Instant.now().minus(Duration.ofHours(1));
         Instant future = Instant.now().plus(Duration.ofHours(1));
-        sessions.save(new UserSession("cleanup-expired-session", "u1", past));
-        sessions.save(new UserSession("cleanup-valid-session", "u1", future));
-        tokens.save(new AccountToken("cleanup-expired-token", "u1", "VERIFY_EMAIL", past));
-        tokens.save(new AccountToken("cleanup-valid-token", "u1", "VERIFY_EMAIL", future));
+        users.save(new AppUser("cleanup-user", "cleanup@example.test", "hash"));
+        sessions.save(new UserSession("cleanup-expired-session", "cleanup-user", past));
+        sessions.save(new UserSession("cleanup-valid-session", "cleanup-user", future));
+        tokens.save(new AccountToken("cleanup-expired-token", "cleanup-user", "VERIFY_EMAIL", past));
+        tokens.save(new AccountToken("cleanup-valid-token", "cleanup-user", "VERIFY_EMAIL", future));
 
         cleanup.deleteExpired();
 

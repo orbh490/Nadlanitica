@@ -10,7 +10,7 @@
     {
       "name": "nadlanitica-test",
       "runtimeExecutable": "C:/Users/Or_Ben_Hamo/Desktop/projects/Nadlanitica/mvnw.cmd",
-      "runtimeArgs": ["spring-boot:run", "-Dspring-boot.run.arguments=--server.port=8090 --spring.datasource.url=jdbc:h2:mem:test --spring.mail.host=localhost --spring.mail.port=1"],
+      "runtimeArgs": ["spring-boot:run", "-Dspring-boot.run.arguments=--server.port=8090 --spring.datasource.url=jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH --spring.mail.host=localhost --spring.mail.port=1"],
       "port": 8090
     }
   ]
