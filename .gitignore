@@ -1,8 +1,7 @@
-HELP.md
 target/
 /data/
 *.log
-/deta/
+/raw-data/
 /lid.txt
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

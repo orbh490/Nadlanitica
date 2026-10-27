@@ -1,0 +1,11 @@
+# רק קוד המקור נדרש ל-build - בלי DB מקומי, נתוני מקור גולמיים או תוצרי build
+.git
+.github
+.claude
+.vscode
+.idea
+target
+data
+raw-data
+docs
+*.log
