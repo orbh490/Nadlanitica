@@ -81,43 +81,45 @@
 - [x] `analytics.zip` הועבר לסל המיחזור
 - [x] שם הפרויקט בקוד הוחלף ל-`nadlanitic` (pom, Dockerfile, spring.application.name). שינוי שם ה-package ב-Java ייעשה ב-Refactor
 - [x] התיקייה הישנה `analytics` הועברה לסל המיחזור
-- [ ] לשנות את שם התיקייה `analytics-redesign` ל-`Nadlanitic`, ואת שם ה-repo ב-GitHub
+- [x] שם התיקייה שונה ל-`Nadlanitica`
+- [ ] לשנות את שם ה-repo ב-GitHub
 - תיקיית `נדלניטיקה` (לוגו + סיסמת לידים) נשארת מחוץ ל-git. `lids.txt` לא עלה ל-git אף פעם
 
 ### שלב א – Refactor (2–4 ימים)
 
-**החלטה נדרשת – מבנה front/back:**
-- **אפשרות 1 (מומלצת):** נשארים עם אפליקציה אחת (Spring Boot + Thymeleaf), אבל מפרידים בצורה ברורה בתוכה. פריסה אחת, בלי CORS, הכי פשוט לתחזוקה לבד.
-- **אפשרות 2:** פיצול מלא ל-`frontend/` (Vite) + `backend/` (API בלבד). יותר גמיש בעתיד (אפליקציית מובייל), אבל שתי פריסות ועבודה כפולה עכשיו.
+**הוחלט (27/10/2026): אפליקציה אחת מסודרת** (Spring Boot + Thymeleaf), עם הפרדה ברורה בתוכה. פריסה אחת, בלי CORS.
 
-**מבנה יעד (אפשרות 1):**
+**המבנה בפועל (branch `refactor/structure`):**
 ```
-src/main/java/com/realestate/analytics/
-  auth/          AuthController, AuthService, AppUser, UserSession, AccountToken, rate limiters
-  mortgage/      Dashboard, Equity, Payment, TrackMix, RuleEngine, PurchaseTax, Insurance, Costs
-  lottery/       Lottery + Eligibility controllers, OddsEngine, LiveService, MochApiClient
-  landtender/    LandTender controller/service, RMI client, booklet extractor, SelfBuild
-  leads/         Lead + AdminLeads controllers
-  account/       InterestArea, saved calculations
-  notifications/ NotificationEmailService, RegulatoryFreshnessWatchdog
-  common/        AdminGuard, ApiExceptionHandler, config, external rates (BoiRateService)
+src/main/java/com/nadlanitica/
+  NadlaniticaApplication
+  auth/          AuthController, AuthService, BearerToken, LoginRateLimiter, AppUser, UserSession, AccountToken
+  mortgage/      Dashboard, Equity, Payment, TrackMix, WaitingPeriod, RuleEngine, PurchaseTax, Insurance, BoiRateService
+  lottery/       Lottery + Eligibility controllers, OddsEngine, LiveService, MochLotteryApiClient
+  landtender/    LandTender + SelfBuild, RMI client, curl factory, booklet extractor, SettlementNames
+  leads/         MortgageLead + AdminLeads controllers, LeadRateLimiter
+  account/       InterestArea (אזורי עניין)
+  notifications/ NotificationEmailService, RegulatoryFreshnessWatchdog, NotificationTestController
+  common/        AdminGuard, ApiExceptionHandler, WebViewConfig
 src/main/resources/
-  templates/pages/      כל העמודים, כולל אלה שהיום סטטיים
-  templates/fragments/  head, nav, footer, auth-modal
+  templates/pages/      כל 15 העמודים (אותן כתובות .html כמו קודם)
+  templates/fragments/  head, nav (topbar + policy)
   static/css/           app.css, mobile.css, prefs.css
-  static/js/            common.js (app.js) + קובץ JS לכל עמוד (במקום inline)
-  static/img/
+  static/js/            app.js, mobile.js, prefs.js
+  static/js/pages/      קובץ JS לכל עמוד
+  static/img/, favicon.png, manifest.json
   data/                 lottery_results.csv, settlement_codes.csv
-raw-data/ (מחוץ ל-git)   הקבצים הגולמיים מ-deta/
+raw-data/ (מחוץ ל-git)   הקבצים הגולמיים (לשעבר deta/)
 ```
 
 **משימות:**
-- [ ] למחוק: `mobile.css.bak`, `HELP.md`, `tools.html` (או להעביר מאחורי מפתח אדמין), לנקות `target/`
-- [ ] לשנות שם `deta/` ← `raw-data/`, להוסיף `.dockerignore`
-- [ ] להעביר את 8 העמודים הסטטיים ל-Thymeleaf עם fragments משותפים
-- [ ] להוציא JS inline לקבצים, inline styles ל-classes
+- [x] למחוק: `mobile.css.bak`, `HELP.md`, `tools.html`, `img/chart-band.svg` (לא בשימוש), לנקות `target/`
+- [x] לשנות שם `deta/` ← `raw-data/`, להוסיף `.dockerignore`
+- [x] להעביר את 7 העמודים הסטטיים ל-Thymeleaf עם fragments משותפים (קיבלו גם מצב כהה ותצוגת נייד)
+- [x] להוציא JS inline לקבצים (13 קבצים ב-`static/js/pages/`)
+- [ ] inline styles ל-classes (נדחה לשלב ד – ליטושי UI)
 - [ ] פונקציית `escapeHtml` משותפת ושימוש בה בכל `innerHTML` (באג #11)
-- [ ] לארגן packages לפי פיצ'ר
+- [x] לארגן packages לפי פיצ'ר (`com.nadlanitica.*`)
 - [ ] DTO/records בקבצים מסודרים + Bean Validation (`@Valid`, `@NotNull`, `@Min/@Max`) – באג #9
 - [ ] טיפול מרכזי בשגיאות: 400/500 תמיד עם הודעה בעברית
 
@@ -165,7 +167,7 @@ raw-data/ (מחוץ ל-git)   הקבצים הגולמיים מ-deta/
 
 ### שלב ד – ליטושי UI (2–3 ימים)
 - [ ] עיצוב אחיד לכל העמודים שהיו סטטיים (login, reset-password, email-verified, privacy, disclaimer)
-- [ ] מצבי טעינה (skeleton/spinner) לכל קריאה ל-API ממשלתי (יכולות לקחת כמה שניות)
+- [ ] מצבי טעינה (skeleton/spinner) לכל קריאה ל-API ממשלתי (יכולות לקחת כמה שניות). דוגמה: בכניסה הראשונה אחרי הפעלת השרת, רשימת הפרויקטים במחיר למשתכן ריקה כמה שניות בלי שום חיווי
 - [ ] הודעות שגיאה ידידותיות כשאתר ממשלתי לא זמין
 - [ ] ולידציה בטפסים בצד הלקוח (הודעות בעברית ליד השדה)
 - [ ] אזהרת LTV בדשבורד (המשך לבאג #8)
