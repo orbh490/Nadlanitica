@@ -4,9 +4,9 @@
 <th:block th:replace="~{fragments/head :: common(title='מחיר למשתכן - סיכויי זכייה')}"></th:block>
 </head>
 <body>
-  <div th:replace="~{fragments/nav :: help}"></div>
-  <div th:replace="~{fragments/nav :: account(active='lottery')}"></div>
+  <div th:replace="~{fragments/nav :: topbar(active='lottery')}"></div>
   <div class="page">
+    <div class="hero-art" aria-hidden="true"><div class="art-donut"><svg viewBox="0 0 180 180"><circle class="track" cx="90" cy="90" r="72"/><circle class="arc" cx="90" cy="90" r="72" pathLength="100"/></svg><b>סיכוי זכייה<span>38%</span></b></div></div>
     <h1>מחיר למשתכן</h1>
     <p class="subtitle">חפשו פרויקט ובדקו את הסיכוי הריאלי שלכם לזכות - כולל ניקוד הזכאות האישי שלכם, לא רק ממוצע כללי.</p>
 
@@ -69,7 +69,7 @@
           <option value="open_or_upcoming">פרויקטים פתוחים או שעומדים להיפתח בקרוב</option>
         </select>
       </label>
-      <div id="openCountStatus" style="font-size:12px;color:#8b93a6;margin-top:4px"></div>
+      <div id="openCountStatus" style="font-size:12px;color:#6B8193;margin-top:4px"></div>
       <div class="checkbox-row">
         <input type="checkbox" id="localResident">
         <label for="localResident" style="margin:0">בן מקום</label>
@@ -92,8 +92,6 @@
 
     <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
-
-  <nav th:replace="~{fragments/nav :: floating(active='lottery')}"></nav>
 
 <script src="/app.js"></script>
 <script>
@@ -225,7 +223,7 @@ function oddsDonutHtml(predictedPercent, historicalPercent, poolUnits, poolAppli
 
 function liveStatusHtml(live) {
   if (!live || !live.hasLiveData) {
-    return '<p style="font-size:13px;color:#8b93a6;margin-top:8px">אין כרגע הרשמה פתוחה או עתידית לפרויקט זה בלוח החי של משרד הבינוי והשיכון.</p>';
+    return '<p style="font-size:13px;color:#6B8193;margin-top:8px">אין כרגע הרשמה פתוחה או עתידית לפרויקט זה בלוח החי של משרד הבינוי והשיכון.</p>';
   }
   const p = live.liveProject;
   if (p.status === 'NOT_YET_OPEN') {
@@ -242,7 +240,7 @@ function liveStatusHtml(live) {
       <tr><td>יזם</td><td>${p.contractorName ?? '—'}</td></tr>
       <tr><td>נרשמים עד כה</td><td>${p.totalSubscribers ?? '—'}${p.totalLocalSubscribers ? ' (מתוכם ' + p.totalLocalSubscribers + ' בני מקום)' : ''}</td></tr>
     </table>
-    <p style="font-size:11px;color:#8b93a6;margin-top:6px">מחיר הבסיס למ"ר הוא לפני הנחה - שיעור ההנחה בפועל ותנאיו משתנים בין מכרזים, יש לבדוק את תנאי המכרז הספציפי.</p>`;
+    <p style="font-size:11px;color:#6B8193;margin-top:6px">מחיר הבסיס למ"ר הוא לפני הנחה - שיעור ההנחה בפועל ותנאיו משתנים בין מכרזים, יש לבדוק את תנאי המכרז הספציפי.</p>`;
 }
 
 async function calculateOdds() {
@@ -250,7 +248,7 @@ async function calculateOdds() {
   const p = projectsByLabel[label];
   const resultEl = document.getElementById('oddsResult');
   if (!p) {
-    resultEl.innerHTML = '<p style="color:#b02a2a;font-size:13px">בחרו פרויקט מהרשימה (הקלידו כדי לסנן)</p>';
+    resultEl.innerHTML = '<p style="color:#B3261E;font-size:13px">בחרו פרויקט מהרשימה (הקלידו כדי לסנן)</p>';
     return;
   }
   const localResident = document.getElementById('localResident').checked;
@@ -261,16 +259,16 @@ async function calculateOdds() {
     : Promise.resolve({ hasLiveData: false });
   const [data, live] = await Promise.all([oddsPromise, livePromise]);
   const historicalLine = data.actualHistoricalWinRatePercent == null
-    ? '<p style="font-size:13px;margin-top:10px;text-align:center"><small style="color:#8b93a6">אין נתון זכייה בפועל זמין להגרלה זו</small></p>'
+    ? '<p style="font-size:13px;margin-top:10px;text-align:center"><small style="color:#6B8193">אין נתון זכייה בפועל זמין להגרלה זו</small></p>'
     : '';
   // המספר למעלה הוא הממוצע האמיתי של כלל הנרשמים בקבוצה (בן מקום/כלל הארץ) - לא לפי קבוצת הניקוד.
   // אין נתון רשמי על כמה נרשמים נמצאים בכל קבוצת ניקוד בהגרלה הספציפית הזו, ולכן אי אפשר לחשב באופן אמין
   // סיכוי מדויק לקבוצת הניקוד שלך - רק להציג איזה חלק מהדירות (מתוך התקנון) שמור לה.
   const scoreNote = lastScoreInfo && lastScoreInfo.meetsMinimumThreshold
-    ? `<p style="font-size:12px;color:#8b93a6;margin-top:10px">המספר הזה הוא הממוצע האמיתי של כלל הנרשמים בקבוצה שלך - לא מותאם לניקוד, כי אין נתון רשמי על פילוג הנרשמים בין קבוצות הניקוד. מה שכן ידוע: הניקוד שלך (${lastScoreInfo.score}, קבוצת ${lastScoreInfo.bracketLabel}) מזכה אתכם ב-${lastScoreInfo.unitSharePercent}% מהדירות בהגרלה, וההגרלה בתוך הקבוצה אקראית לחלוטין.</p>`
-    : '<p style="font-size:12px;color:#8b93a6;margin-top:10px">חשבו קודם את הניקוד שלכם למעלה כדי לדעת איזה חלק מהדירות שמור לקבוצת הניקוד שלכם.</p>';
+    ? `<p style="font-size:12px;color:#6B8193;margin-top:10px">המספר הזה הוא הממוצע האמיתי של כלל הנרשמים בקבוצה שלך - לא מותאם לניקוד, כי אין נתון רשמי על פילוג הנרשמים בין קבוצות הניקוד. מה שכן ידוע: הניקוד שלך (${lastScoreInfo.score}, קבוצת ${lastScoreInfo.bracketLabel}) מזכה אתכם ב-${lastScoreInfo.unitSharePercent}% מהדירות בהגרלה, וההגרלה בתוך הקבוצה אקראית לחלוטין.</p>`
+    : '<p style="font-size:12px;color:#6B8193;margin-top:10px">חשבו קודם את הניקוד שלכם למעלה כדי לדעת איזה חלק מהדירות שמור לקבוצת הניקוד שלכם.</p>';
   const peripheryNote = data.peripheryGrantEligibleCity
-    ? '<p style="font-size:12px;color:#1a7a34;margin-top:6px">🎁 עיר זו מוכרת כישוב עדיפות לאומית - ייתכן שתהיו זכאים למענק מותנה של כ-50,000-60,000 ש"ח, שבנק ישראל מכיר בו כחלק מההון העצמי (בכפוף למגורים בדירה 5-7 שנים). בדקו זכאות מדויקת מול משרד השיכון.</p>'
+    ? '<p style="font-size:12px;color:#12805A;margin-top:6px">🎁 עיר זו מוכרת כישוב עדיפות לאומית - ייתכן שתהיו זכאים למענק מותנה של כ-50,000-60,000 ש"ח, שבנק ישראל מכיר בו כחלק מההון העצמי (בכפוף למגורים בדירה 5-7 שנים). בדקו זכאות מדויקת מול משרד השיכון.</p>'
     : '';
   resultEl.innerHTML = `
     <div class="badge ok">${data.city} - ${data.projectName}</div>

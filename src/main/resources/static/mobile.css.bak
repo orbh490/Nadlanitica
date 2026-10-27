@@ -1,0 +1,23 @@
+/* ===== גרסת נייד בלבד (מתחת ל-700px). הקובץ נטען רק בזכות media בתוך fragments/head.html, כך שגרסת המחשב לא מושפעת ===== */
+.topbar { height: 60px; padding: 0 16px; backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; transform: none; }
+.topbar .links { display: none; }
+.topbar .actions .icon-btn[href="/settings.html"] { display: none; }
+.topbar .brand span { font-size: 17px; }
+.topbar .brand img { width: 30px; height: 30px; }
+body { padding-bottom: 88px; }
+.policy-links { position: static; margin: 28px 16px 0; justify-content: center; flex-wrap: wrap; }
+nav.m-tabs { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; height: 72px; padding: 0 6px; align-items: center; justify-content: space-around; background: var(--navy-deep, #0F3150); box-shadow: 0 -8px 24px -12px rgba(11,34,56,.5); }
+.m-tabs a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; padding: 6px 2px; border-radius: 14px; color: #CFE3EE; font-size: 12px; font-weight: 600; text-decoration: none; text-align: center; line-height: 1.2; }
+.m-tabs a .material-symbols-outlined { font-size: 24px; }
+.m-tabs a.active { background: #1BB2BB; color: #0B2238; }
+table { display: block; overflow-x: auto; max-width: 100%; }
+.intro-bubble { max-width: none; margin: 0 16px; }
+/* דף הבית בנייד: עמודה אחת, כרטיסים דו-עמודתיים */
+.home-hero { padding: 130px 16px 100px; }
+.home-hero-grid { grid-template-columns: 1fr; gap: 28px; }
+.home-hero h1 { font-size: 36px; max-width: none; }
+.home-hero p { font-size: 16px; }
+.home-tiles { padding: 0 16px; margin-top: -40px; }
+.tile-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+.home-steps { padding: 0 16px; }
+.steps-grid { grid-template-columns: 1fr; gap: 14px; }

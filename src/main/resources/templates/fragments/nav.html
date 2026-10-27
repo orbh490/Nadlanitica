@@ -1,27 +1,34 @@
 <!DOCTYPE html>
 <html lang="he" xmlns:th="http://www.thymeleaf.org">
 <body>
-<!-- כפתור "?" בפינה שמאל-עליונה - פותח שוב את בועת ההסבר של הדף (ראו initPageIntro ב-app.js) -->
-<div class="corner-actions left" th:fragment="help">
-  <a href="#" class="corner-btn" id="helpBtn" aria-label="הסבר על הדף"><span class="material-symbols-outlined">help</span></a>
-</div>
-
-<!-- כפתורי אזור אישי/הגדרות בפינה ימין-עליונה - active מסמן איזה מהם (אם בכלל) מתאים לדף הנוכחי -->
-<div class="corner-actions" th:fragment="account(active)">
-  <a href="/account.html" class="corner-btn" th:classappend="${active == 'account'} ? ' active'" aria-label="אזור אישי"><span class="material-symbols-outlined">person</span></a>
-  <a href="/settings.html" class="corner-btn" th:classappend="${active == 'settings'} ? ' active'" aria-label="הגדרות"><span class="material-symbols-outlined">settings</span></a>
-</div>
-
-<!-- ניווט צף תחתון - active מסמן איזה קישור מתאים לדף הנוכחי -->
-<nav class="floating-nav" th:fragment="floating(active)">
-  <a href="/lottery.html" th:classappend="${active == 'lottery'} ? ' active'"><span class="material-symbols-outlined icon">apartment</span>מחיר למשתכן</a>
-  <a href="/land-tenders.html" th:classappend="${active == 'land-tenders'} ? ' active'"><span class="material-symbols-outlined icon">landscape</span>מכרזי קרקעות</a>
-  <a href="/results-board.html" th:classappend="${active == 'results-board'} ? ' active'"><span class="material-symbols-outlined icon">leaderboard</span>לוח תוצאות</a>
-  <a href="/dashboard.html" th:classappend="${active == 'dashboard'} ? ' active'"><span class="material-symbols-outlined icon">account_balance</span>משכנתאות</a>
-  <a href="/advisor.html" th:classappend="${active == 'advisor'} ? ' active'"><span class="material-symbols-outlined icon">support_agent</span>ייעוץ</a>
+<!-- סרגל עליון משותף: לוגו, קישורים, עזרה, הגדרות ואזור אישי -->
+<header class="topbar" th:fragment="topbar(active)">
+  <a class="brand" href="/home.html"><img src="/img/logo.png" alt="לוגו נדלניטיקה"><span>נדלניטיקה</span></a>
+  <nav class="links">
+    <a href="/home.html" th:classappend="${active == 'home'} ? ' active'">בית</a>
+    <a href="/dashboard.html" th:classappend="${active == 'dashboard'} ? ' active'">משכנתאות</a>
+    <a href="/lottery.html" th:classappend="${active == 'lottery'} ? ' active'">מחיר למשתכן</a>
+    <a href="/land-tenders.html" th:classappend="${active == 'land-tenders'} ? ' active'">מכרזי קרקעות</a>
+    <a href="/results-board.html" th:classappend="${active == 'results-board'} ? ' active'">לוח תוצאות</a>
+    <a href="/advisor.html" th:classappend="${active == 'advisor'} ? ' active'">ייעוץ</a>
+  </nav>
+  <div class="actions">
+    <a href="#" class="icon-btn" id="helpBtn" aria-label="הסבר על הדף"><span class="material-symbols-outlined">help</span></a>
+    <a href="/settings.html" class="icon-btn" th:classappend="${active == 'settings'} ? ' active'" aria-label="הגדרות"><span class="material-symbols-outlined">settings</span></a>
+    <a href="/account.html" class="login-btn" th:classappend="${active == 'account'} ? ' active'"><span class="material-symbols-outlined">person</span>אזור אישי</a>
+  </div>
+<!-- ניווט תחתון לנייד בלבד (מוסתר במחשב) -->
+<style>.m-tabs{display:none}</style>
+<nav class="m-tabs" aria-label="ניווט ראשי">
+  <a href="/dashboard.html" th:classappend="${active == 'dashboard'} ? ' active'"><span class="material-symbols-outlined">account_balance</span>משכנתא</a>
+  <a href="/lottery.html" th:classappend="${active == 'lottery'} ? ' active'"><span class="material-symbols-outlined">confirmation_number</span>מחיר למשתכן</a>
+  <a href="/land-tenders.html" th:classappend="${active == 'land-tenders'} ? ' active'"><span class="material-symbols-outlined">landscape</span>מכרזים</a>
+  <a href="/results-board.html" th:classappend="${active == 'results-board'} ? ' active'"><span class="material-symbols-outlined">bar_chart</span>לוח תוצאות</a>
+  <a href="/advisor.html" th:classappend="${active == 'advisor'} ? ' active'"><span class="material-symbols-outlined">support_agent</span>ייעוץ</a>
 </nav>
+</header>
 
-<!-- קישורי מדיניות קבועים בפינה ימין-תחתונה -->
+<!-- קישורי מדיניות קבועים בתחתית הדף -->
 <div class="policy-links" th:fragment="policy">
   <a href="/disclaimer.html" class="policy-btn"><span class="material-symbols-outlined icon">gavel</span>גילוי נאות מלא</a>
   <a href="/privacy.html" class="policy-btn"><span class="material-symbols-outlined icon">privacy_tip</span>מדיניות פרטיות</a>

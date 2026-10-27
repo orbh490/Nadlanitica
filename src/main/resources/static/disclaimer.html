@@ -13,16 +13,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
 <link rel="stylesheet" href="/app.css">
+<link rel="stylesheet" href="/prefs.css">
+<script src="/prefs.js"></script>
+<style>.card { border-top: 5px solid var(--teal, #1BB2BB); }</style>
+<script>try { if (JSON.parse(localStorage.getItem('displayPrefs') || '{}').dark) document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {}</script>
 </head>
 <body>
   <div class="page">
-    <p><a href="/home.html" class="btn secondary">← לעמוד הבית</a></p>
+    <a href="/home.html" class="back-home">לעמוד הבית</a>
     <h1>גילוי נאות ותנאי שימוש</h1>
     <p class="subtitle">עודכן לאחרונה: 2 בספטמבר 2026</p>
 
     <div class="card">
       <h2>1. הכלי הזה אינו ייעוץ מקצועי</h2>
-      <p style="font-size:14px;line-height:1.7">"המצפן הפיננסי לרוכש הישראלי" (להלן: "הכלי") הוא כלי מידע והדמיה בלבד, ואינו מהווה ייעוץ משכנתאות, ייעוץ פיננסי, ייעוץ מס, ייעוץ משפטי, שירותי תיווך או כל שירות מקצועי מוסמך אחר כהגדרתו בדין. השימוש בכלי אינו מהווה תחליף להתייעצות עם יועץ משכנתאות מוסמך, רואה חשבון, עורך דין, שמאי מקרקעין או כל בעל מקצוע רלוונטי אחר, ולפני קבלת החלטה כלכלית כלשהי - ובוודאי החלטה בהיקף של רכישת דירה או נטילת משכנתא - יש להיוועץ באנשי מקצוע מוסמכים.</p>
+      <p style="font-size:14px;line-height:1.7">"נדלניטיקה" (להלן: "הכלי") הוא כלי מידע והדמיה בלבד, ואינו מהווה ייעוץ משכנתאות, ייעוץ פיננסי, ייעוץ מס, ייעוץ משפטי, שירותי תיווך או כל שירות מקצועי מוסמך אחר כהגדרתו בדין. השימוש בכלי אינו מהווה תחליף להתייעצות עם יועץ משכנתאות מוסמך, רואה חשבון, עורך דין, שמאי מקרקעין או כל בעל מקצוע רלוונטי אחר, ולפני קבלת החלטה כלכלית כלשהי - ובוודאי החלטה בהיקף של רכישת דירה או נטילת משכנתא - יש להיוועץ באנשי מקצוע מוסמכים.</p>
     </div>
 
     <div class="card">

@@ -7,6 +7,8 @@ import com.realestate.analytics.repository.BuyerSessionRepository;
 import com.realestate.analytics.service.AuthService;
 import com.realestate.analytics.service.DashboardService;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -85,5 +87,13 @@ class DashboardController {
         return repository.findByUserIdOrderByCreatedAtDesc(user.getId()).stream()
                 .map(s -> new SavedSessionSummary(s.getId(), s.getCategory(), s.getPurchasePrice(), s.getCreatedAt()))
                 .toList();
+    }
+
+    /** מוחק את כל החישובים השמורים של המשתמש המחובר. */
+    @DeleteMapping("/mine")
+    @Transactional
+    void clearMine(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        AppUser user = authService.requireUser(AuthController.bearerToken(authorization));
+        repository.deleteAllByUserId(user.getId());
     }
 }
