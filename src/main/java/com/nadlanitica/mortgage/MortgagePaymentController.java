@@ -1,5 +1,7 @@
 package com.nadlanitica.mortgage;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,7 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-record MortgagePaymentRequest(double loanAmount, int termYears, double monthlyIncome) {
+record MortgagePaymentRequest(double loanAmount, int termYears,
+        @PositiveOrZero(message = "הכנסה חודשית לא יכולה להיות שלילית") double monthlyIncome) {
 }
 
 record MortgagePaymentResponse(double annualRatePercent, double monthlyPayment, double totalPayment,
@@ -19,7 +22,8 @@ record MortgagePaymentResponse(double annualRatePercent, double monthlyPayment, 
         double totalMonthlyWithInsurance) {
 }
 
-record RateStressTestRequest(double loanAmount, int termYears, double monthlyIncome) {
+record RateStressTestRequest(double loanAmount, int termYears,
+        @PositiveOrZero(message = "הכנסה חודשית לא יכולה להיות שלילית") double monthlyIncome) {
 }
 
 record RateScenario(double extraRatePercent, double annualRatePercent, double monthlyPayment, double dtiPercent,
@@ -42,7 +46,7 @@ class MortgagePaymentController {
     }
 
     @PostMapping("/monthly-payment")
-    MortgagePaymentResponse monthlyPayment(@RequestBody MortgagePaymentRequest req) {
+    MortgagePaymentResponse monthlyPayment(@Valid @RequestBody MortgagePaymentRequest req) {
         validateLoanInputs(req.loanAmount(), req.termYears());
         double monthly = calculator.monthlyPayment(req.loanAmount(), req.termYears());
         double rate = calculator.annualRatePercentForTerm(req.termYears());
@@ -58,7 +62,7 @@ class MortgagePaymentController {
     private static final double[] STRESS_SCENARIOS_PERCENT = {1.0, 2.0, 3.0};
 
     @PostMapping("/rate-stress-test")
-    RateStressTestResponse rateStressTest(@RequestBody RateStressTestRequest req) {
+    RateStressTestResponse rateStressTest(@Valid @RequestBody RateStressTestRequest req) {
         validateLoanInputs(req.loanAmount(), req.termYears());
         double baseRate = calculator.annualRatePercentForTerm(req.termYears());
         double basePayment = calculator.monthlyPaymentForRate(req.loanAmount(), req.termYears(), baseRate);

@@ -3,6 +3,12 @@ package com.nadlanitica.mortgage;
 import com.nadlanitica.auth.AppUser;
 import com.nadlanitica.auth.AuthService;
 import com.nadlanitica.auth.BearerToken;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,8 +26,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-record DashboardRequest(double availableEquity, double monthlyIncome, ApartmentCategory category,
-        double marketValue, double purchasePrice, boolean subsidized, boolean usedBroker, int termYears) {
+record DashboardRequest(
+        @PositiveOrZero(message = "הון עצמי לא יכול להיות שלילי") double availableEquity,
+        @PositiveOrZero(message = "הכנסה חודשית לא יכולה להיות שלילית") double monthlyIncome,
+        @NotNull(message = "יש לבחור סוג רכישה") ApartmentCategory category,
+        @PositiveOrZero(message = "שווי השוק לא יכול להיות שלילי") double marketValue,
+        @Positive(message = "יש להזין מחיר רכישה") double purchasePrice,
+        boolean subsidized, boolean usedBroker,
+        // 0 = ברירת המחדל (20 שנה) - ראו DashboardService
+        @Min(value = 0, message = "תקופת המשכנתא חייבת להיות בין 1 ל-40 שנה")
+        @Max(value = 40, message = "תקופת המשכנתא חייבת להיות בין 1 ל-40 שנה") int termYears) {
 }
 
 record DashboardResponse(String id, DashboardService.DashboardSummary summary) {
@@ -50,7 +64,7 @@ class DashboardController {
     }
 
     @PostMapping
-    DashboardResponse save(@RequestBody DashboardRequest req,
+    DashboardResponse save(@Valid @RequestBody DashboardRequest req,
             @RequestHeader(value = "Authorization", required = false) String authorization) {
         Optional<AppUser> user = authService.currentUser(BearerToken.from(authorization));
 

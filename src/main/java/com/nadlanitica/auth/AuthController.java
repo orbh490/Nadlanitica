@@ -1,5 +1,8 @@
 package com.nadlanitica.auth;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,19 +18,27 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
-record AuthRequest(String email, String password, Boolean consent) {
+// BCrypt מתעלם מכל מה שאחרי 72 בייטים (ובגרסאות החדשות זורק חריגה) - לכן התקרה על אורך הסיסמה.
+record AuthRequest(
+        @Size(max = 254, message = "כתובת האימייל ארוכה מדי") String email,
+        @Size(max = 72, message = "הסיסמה ארוכה מדי (עד 72 תווים)") String password,
+        Boolean consent) {
 }
 
 record MeResponse(boolean loggedIn, String email) {
 }
 
-record EmailRequest(String email) {
+record EmailRequest(
+        @NotBlank(message = "יש להזין כתובת אימייל")
+        @Size(max = 254, message = "כתובת האימייל ארוכה מדי") String email) {
 }
 
-record ResetPasswordRequest(String token, String newPassword) {
+record ResetPasswordRequest(
+        @NotBlank(message = "הקישור אינו תקין - יש לבקש קישור חדש") String token,
+        @Size(max = 72, message = "הסיסמה ארוכה מדי (עד 72 תווים)") String newPassword) {
 }
 
-record TokenRequest(String token) {
+record TokenRequest(@NotBlank(message = "הקישור אינו תקין - יש לבקש קישור אימות חדש") String token) {
 }
 
 @RestController
@@ -41,13 +52,13 @@ class AuthController {
     }
 
     @PostMapping("/register")
-    Map<String, String> register(@RequestBody AuthRequest req) {
+    Map<String, String> register(@Valid @RequestBody AuthRequest req) {
         authService.register(req.email(), req.password(), Boolean.TRUE.equals(req.consent()));
         return Map.of("message", "נשלח מייל אימות ל-" + req.email() + " - יש לאמת את הכתובת לפני ההתחברות");
     }
 
     @PostMapping("/login")
-    AuthService.AuthResult login(@RequestBody AuthRequest req) {
+    AuthService.AuthResult login(@Valid @RequestBody AuthRequest req) {
         return authService.login(req.email(), req.password());
     }
 
@@ -72,7 +83,7 @@ class AuthController {
     }
 
     @PostMapping("/verify-confirm")
-    Map<String, String> verifyConfirm(@RequestBody TokenRequest req) {
+    Map<String, String> verifyConfirm(@Valid @RequestBody TokenRequest req) {
         if (!authService.confirmEmailVerification(req.token())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "הקישור אינו תקין או שפג תוקפו - יש לבקש קישור אימות חדש");
         }
@@ -80,19 +91,19 @@ class AuthController {
     }
 
     @PostMapping("/resend-verification")
-    Map<String, String> resendVerification(@RequestBody EmailRequest req) {
+    Map<String, String> resendVerification(@Valid @RequestBody EmailRequest req) {
         authService.resendVerification(req.email());
         return Map.of("message", "אם הכתובת רשומה ועדיין לא אומתה, נשלח אליה מייל אימות חדש");
     }
 
     @PostMapping("/forgot-password")
-    Map<String, String> forgotPassword(@RequestBody EmailRequest req) {
+    Map<String, String> forgotPassword(@Valid @RequestBody EmailRequest req) {
         authService.requestPasswordReset(req.email());
         return Map.of("message", "אם הכתובת רשומה במערכת, נשלח אליה קישור לאיפוס סיסמה");
     }
 
     @PostMapping("/reset-password")
-    AuthService.AuthResult resetPassword(@RequestBody ResetPasswordRequest req) {
+    AuthService.AuthResult resetPassword(@Valid @RequestBody ResetPasswordRequest req) {
         return authService.resetPassword(req.token(), req.newPassword());
     }
 }
