@@ -83,6 +83,14 @@ function animateNumber(el, target, opts = {}) {
   requestAnimationFrame(frame);
 }
 
+// ---- אזהרה כשההלוואה נחתכה בתקרת המימון (הוראה 329) - משותף לדשבורד המשכנתא ולמחשבון הבנייה העצמית ----
+function ltvCapNote(s) {
+  if (!s.loanCappedByLtv) return '';
+  const fmt = n => n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  return `<p class="badge bad" style="display:block;margin-top:8px;line-height:1.6">⚠️ הבנק לא יכול לממן יותר מ-${fmt(s.maxLoanAmount)} ש"ח לפי מגבלת שיעור המימון של בנק ישראל.
+    כדי לסגור את העסקה חסרים לך עוד ${fmt(s.equityShortfall)} ש"ח הון עצמי.</p>`;
+}
+
 // ---- התחברות משותפת: טוקן ב-localStorage (נשאר בין ביקורים, כמו כל "זכור אותי"),
 // כל בקשה מאומתת שולחת אותו כ-Authorization: Bearer <token> ----
 const AUTH_TOKEN_KEY = 'financialCompassAuthToken';

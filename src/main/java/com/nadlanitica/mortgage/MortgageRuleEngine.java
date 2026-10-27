@@ -24,6 +24,22 @@ public class MortgageRuleEngine {
         return buyer.getAvailableEquity() >= calculateRequiredEquity(buyer, property);
     }
 
+    /**
+     * גודל ההלוואה בפועל: ההון העצמי מכסה קודם את העלויות שמשולמות במזומן (מס רכישה, עלויות סגירה, ערבות),
+     * ורק היתרה הולכת למקדמה. ההלוואה לעולם לא עולה על המחיר פחות ההון העצמי המינימלי לפי ההוראה -
+     * כשהלקוח לא מגיע לזה, ההלוואה נחתכת ב-maxLoanAmount ו-equityShortfall אומר כמה מזומן חסר.
+     */
+    public record LoanSizing(double loanAmount, double maxLoanAmount, boolean cappedByLtv, double equityShortfall) {
+    }
+
+    public LoanSizing sizeLoan(double price, double requiredEquity, double availableEquity, double upfrontCashCosts) {
+        double equityForDownPayment = Math.max(0, availableEquity - upfrontCashCosts);
+        double neededLoan = Math.max(0, price - equityForDownPayment);
+        double maxLoan = Math.max(0, price - requiredEquity);
+        double shortfall = Math.max(0, requiredEquity + upfrontCashCosts - availableEquity);
+        return new LoanSizing(Math.min(neededLoan, maxLoan), maxLoan, neededLoan > maxLoan, shortfall);
+    }
+
     // סעיף 2 להוראה: מגבלת שיעור מימון (LTV) לפי קטגוריית הדירה
     private static double maxLtvFor(ApartmentCategory category) {
         return switch (category) {

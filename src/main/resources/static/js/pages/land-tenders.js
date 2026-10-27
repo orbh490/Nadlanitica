@@ -192,6 +192,7 @@ async function calculateSelfBuild() {
       <tr><td>תשלום חודשי משוער</td><td>${fmt(data.monthlyPayment)} ש"ח</td></tr>
       <tr><td>שיעור החזר מהכנסה</td><td>${data.dtiPercent.toFixed(1)}% ${data.withinLegalDtiLimit ? '(בתוך המגבלה)' : '(חורג מהמגבלה הבנקאית של 50%!)'}</td></tr>
     </table>
+    ${ltvCapNote(data)}
     <p style="font-size:11px;color:#6B8193;margin-top:6px">הערכה בלבד: תקציב הבנייה הוא הזנה ידנית שלכם, ומדיניות הבנק המדויקת למשכנתא לבנייה עצמית (למשל פריסת ההלוואה לשלבים) משתנה בין בנקים.</p>`;
 }
 

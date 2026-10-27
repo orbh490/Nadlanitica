@@ -22,7 +22,8 @@ public class DashboardService {
     }
 
     public record DashboardSummary(double requiredEquity, double purchaseTax, double closingCosts,
-            double totalCashNeeded, boolean canAffordEquity, double loanAmount, int termYears, double monthlyPayment,
+            double totalCashNeeded, boolean canAffordEquity, double loanAmount, double maxLoanAmount,
+            boolean loanCappedByLtv, double equityShortfall, int termYears, double monthlyPayment,
             double annualRatePercent, double dtiPercent, boolean withinLegalDtiLimit,
             MortgageInsuranceEstimator.InsuranceEstimate insuranceEstimate, double totalMonthlyWithInsurance) {
     }
@@ -38,7 +39,9 @@ public class DashboardService {
         double totalCashNeeded = requiredEquity + purchaseTax + closingCosts.total();
         boolean canAffordEquity = buyer.getAvailableEquity() >= totalCashNeeded;
 
-        double loanAmount = Math.max(0, property.getPurchasePrice() - buyer.getAvailableEquity());
+        var loan = mortgageRuleEngine.sizeLoan(property.getPurchasePrice(), requiredEquity, buyer.getAvailableEquity(),
+                purchaseTax + closingCosts.total());
+        double loanAmount = loan.loanAmount();
         int termYears = session.getTermYears() > 0 ? session.getTermYears() : 20;
         double monthlyPayment = paymentCalculator.monthlyPayment(loanAmount, termYears);
         double annualRate = paymentCalculator.annualRatePercentForTerm(termYears);
@@ -47,7 +50,8 @@ public class DashboardService {
         var insurance = insuranceEstimator.estimateMonthlyCost(loanAmount);
 
         return new DashboardSummary(requiredEquity, purchaseTax, closingCosts.total(), totalCashNeeded,
-                canAffordEquity, loanAmount, termYears, monthlyPayment, annualRate, dtiPercent, withinDti,
+                canAffordEquity, loanAmount, loan.maxLoanAmount(), loan.cappedByLtv(), loan.equityShortfall(),
+                termYears, monthlyPayment, annualRate, dtiPercent, withinDti,
                 insurance, monthlyPayment + insurance.totalMonthly());
     }
 }

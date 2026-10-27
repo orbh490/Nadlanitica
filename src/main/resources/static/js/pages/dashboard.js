@@ -49,6 +49,7 @@ function renderResults(s) {
       <tr><td><small>ביטוח חיים + מבנה (אומדן שוק)</small></td><td><small>${fmt(s.insuranceEstimate.totalMonthly)} ש"ח לחודש</small></td></tr>
       <tr><td><b>סה"כ עלות חודשית משוערת</b></td><td><b id="totalMonthlyValue">0 ש"ח</b></td></tr>
     </table>
+    ${ltvCapNote(s)}
     <p style="font-size:11px;color:#6B8193;margin-top:4px">ביטוח המשכנתא הוא אומדן שוק בלבד (תלוי גיל ובריאות) - ניתן לרכוש פוליסה חיצונית לבנק.</p>
 `;
   animateNumber(document.getElementById('totalMonthlyValue'), s.totalMonthlyWithInsurance, { suffix: ' ש"ח' });

@@ -37,7 +37,8 @@ public class SelfBuildCalculatorService {
 
     public record SelfBuildSummary(double landCostAfterDiscount, double purchaseTax, double closingCosts,
             double guaranteeDeposit, double totalCashNeeded, boolean canAffordEquity, double totalPropertyValue,
-            double loanAmount, int termYears, double monthlyPayment, double annualRatePercent, double dtiPercent,
+            double loanAmount, double maxLoanAmount, boolean loanCappedByLtv, double equityShortfall, int termYears,
+            double monthlyPayment, double annualRatePercent, double dtiPercent,
             boolean withinLegalDtiLimit, MortgageInsuranceEstimator.InsuranceEstimate insuranceEstimate,
             double totalMonthlyWithInsurance) {
     }
@@ -59,7 +60,9 @@ public class SelfBuildCalculatorService {
         double totalCashNeeded = requiredEquity + purchaseTax + closingCosts.total() + Math.max(0, guaranteeDeposit);
         boolean canAffordEquity = availableEquity >= totalCashNeeded;
 
-        double loanAmount = Math.max(0, totalPropertyValue - availableEquity);
+        var loan = mortgageRuleEngine.sizeLoan(totalPropertyValue, requiredEquity, availableEquity,
+                purchaseTax + closingCosts.total() + Math.max(0, guaranteeDeposit));
+        double loanAmount = loan.loanAmount();
         int effectiveTermYears = termYears > 0 ? termYears : 20;
         double monthlyPayment = paymentCalculator.monthlyPayment(loanAmount, effectiveTermYears);
         double annualRate = paymentCalculator.annualRatePercentForTerm(effectiveTermYears);
@@ -69,6 +72,7 @@ public class SelfBuildCalculatorService {
 
         return new SelfBuildSummary(landCostAfterDiscount, purchaseTax, closingCosts.total(),
                 Math.max(0, guaranteeDeposit), totalCashNeeded, canAffordEquity, totalPropertyValue, loanAmount,
+                loan.maxLoanAmount(), loan.cappedByLtv(), loan.equityShortfall(),
                 effectiveTermYears, monthlyPayment, annualRate, dtiPercent, withinDti, insurance,
                 monthlyPayment + insurance.totalMonthly());
     }

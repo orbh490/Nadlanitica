@@ -62,6 +62,31 @@ class MortgageRuleEngineTest {
     }
 
     @Test
+    void loanIsCappedAtLtvWhenEquityIsShort() {
+        // המקרה מהבדיקה: 150K הון עצמי על דירה ב-1.4M - קודם הוצגה הלוואה של 1.25M (89% מימון)
+        var loan = engine.sizeLoan(1_400_000, 350_000, 150_000, 18_520);
+        assertThat(loan.maxLoanAmount()).isEqualTo(1_050_000.0);
+        assertThat(loan.loanAmount()).isEqualTo(1_050_000.0);
+        assertThat(loan.cappedByLtv()).isTrue();
+        assertThat(loan.equityShortfall()).isEqualTo(218_520.0); // 350K + 18,520 - 150K
+    }
+
+    @Test
+    void upfrontCostsComeOutOfEquityBeforeTheDownPayment() {
+        var loan = engine.sizeLoan(1_400_000, 350_000, 600_000, 18_520);
+        assertThat(loan.loanAmount()).isEqualTo(818_520.0); // 1.4M - (600K - 18,520)
+        assertThat(loan.cappedByLtv()).isFalse();
+        assertThat(loan.equityShortfall()).isZero();
+    }
+
+    @Test
+    void noLoanWhenEquityCoversEverything() {
+        var loan = engine.sizeLoan(1_000_000, 250_000, 2_000_000, 10_000);
+        assertThat(loan.loanAmount()).isZero();
+        assertThat(loan.cappedByLtv()).isFalse();
+    }
+
+    @Test
     void canAffordComparesAvailableEquityToRequirement() {
         BuyerProfile affordable = new BuyerProfile(400_000, 0, ApartmentCategory.SINGLE);
         BuyerProfile notAffordable = new BuyerProfile(300_000, 0, ApartmentCategory.SINGLE);
