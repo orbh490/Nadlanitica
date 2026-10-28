@@ -3,6 +3,7 @@ package com.nadlanitica.lottery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,7 +14,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * פרויקטי "דירה בהנחה" (מחיר למשתכן וכו') הפעילים על הלוח כרגע - נשלף חי מ-MochLotteryApiClient.
@@ -57,6 +60,35 @@ public class LotteryLiveService {
                 .filter(p -> p.status() != RegistrationStatus.CLOSED)
                 .filter(p -> normId.equals(normalize(p.projectId())))
                 .min(Comparator.comparingInt(p -> p.status() == RegistrationStatus.OPEN ? 0 : 1));
+    }
+
+    /**
+     * מרענן את הלוח החי ברקע - בעלייה ואחר כך כל 10 דקות - כדי שאף משתמש לא יחכה לאתר של משרד השיכון
+     * (שליפה אחת לוקחת בין כמה שניות לחצי דקה). כישלון כבר נרשם בלוג בתוך allProjects.
+     */
+    @Scheduled(initialDelay = 0, fixedDelay = 10 * 60 * 1000)
+    void refreshInBackground() {
+        try {
+            allProjects();
+        } catch (ResponseStatusException e) {
+            // הלוח לא זמין כרגע - ננסה שוב בריצה הבאה
+        }
+    }
+
+    /**
+     * סטטוס ההרשמה (פתוח/טרם נפתח) לכל פרויקט שעוד לא נסגר, לפי מזהה פרויקט - או ריק אם הלוח החי עוד לא נטען
+     * (או לא זמין). לא פונה לרשת: משתמש רק במה שהרענון ברקע כבר הביא, כך שרשימת ההגרלות חוזרת מיד.
+     * הרשימה ההיסטורית לא תלויה באתר של משרד השיכון, ולכן בלי הלוח החי מציגים אותה בלי הסטטוס ולא נכשלים.
+     */
+    public Optional<Map<String, RegistrationStatus>> openStatusesByProjectId() {
+        if (cachedAt.equals(Instant.EPOCH)) {
+            return Optional.empty();
+        }
+        List<LiveLotteryProject> live = cached;
+        return Optional.of(live.stream()
+                .filter(p -> p.status() != RegistrationStatus.CLOSED && p.projectId() != null)
+                .collect(Collectors.toMap(p -> normalize(p.projectId()), LiveLotteryProject::status,
+                        (a, b) -> a == RegistrationStatus.OPEN ? a : b)));
     }
 
     private static String normalize(String s) {

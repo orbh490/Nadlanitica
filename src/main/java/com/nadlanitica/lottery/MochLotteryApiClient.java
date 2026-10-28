@@ -1,9 +1,12 @@
 package com.nadlanitica.lottery;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -21,10 +24,23 @@ class MochLotteryApiClient {
 
     private static final String BASE_URL = "https://dira.moch.gov.il/api";
 
+    // בלי timeout, שרת שלא עונה תוקע את הבקשה (ואת המשתמש שמחכה לרשימת ההגרלות) בלי הגבלה.
+    // זמן הקריאה נדיב כי התשובה היא ~2.3MB.
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(30);
+
     private final RestClient restClient = RestClient.builder()
             .baseUrl(BASE_URL)
+            .requestFactory(requestFactory())
             .defaultHeader("User-Agent", "Mozilla/5.0")
             .build();
+
+    private static JdkClientHttpRequestFactory requestFactory() {
+        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(
+                HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT).build());
+        factory.setReadTimeout(READ_TIMEOUT);
+        return factory;
+    }
 
     record MochProjectItem(
             @JsonProperty("LotteryNumber") String lotteryNumber,

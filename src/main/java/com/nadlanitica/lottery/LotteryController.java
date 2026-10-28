@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalDouble;
 
 record ProjectSummary(String lotteryId, String city, String projectName, String projectId, LocalDate lotteryDate,
@@ -48,17 +49,20 @@ class LotteryController {
 
     @GetMapping("/projects")
     List<ProjectSummary> projects() {
+        var liveStatuses = liveService.openStatusesByProjectId();
         return engine.allProjects().stream()
                 .map(p -> new ProjectSummary(p.getLotteryId(), p.getCity(), p.getProjectName(), p.getProjectId(),
-                        p.getLotteryDate(), liveStatusFor(p.getProjectId())))
+                        p.getLotteryDate(), liveStatuses.map(m -> liveStatusFor(m, p.getProjectId())).orElse("UNKNOWN")))
                 .toList();
     }
 
-    /** "OPEN" / "NOT_YET_OPEN" / "NONE" (אין נתון חי תואם, כולל אם כבר נסגר) - לסינון ברשימת החיפוש. */
-    private String liveStatusFor(String projectId) {
-        return liveService.findForProjectId(projectId)
-                .map(p -> p.status().name())
-                .orElse("NONE");
+    /**
+     * "OPEN" / "NOT_YET_OPEN" / "NONE" (אין נתון חי תואם, כולל אם כבר נסגר) - לסינון ברשימת החיפוש.
+     * "UNKNOWN" (ב-projects) = הלוח החי של משרד השיכון לא זמין כרגע, אז אי אפשר לדעת.
+     */
+    private static String liveStatusFor(Map<String, LotteryLiveService.RegistrationStatus> statuses, String projectId) {
+        var status = projectId == null ? null : statuses.get(projectId.trim());
+        return status == null ? "NONE" : status.name();
     }
 
     @GetMapping("/odds")

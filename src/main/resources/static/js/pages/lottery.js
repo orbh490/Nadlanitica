@@ -15,7 +15,7 @@ function labelFor(p) {
 async function loadProjects() {
   const statusEl = document.getElementById('openCountStatus');
   const searchEl = document.getElementById('projectSearch');
-  statusEl.innerHTML = loadingHtml('טוען את רשימת ההגרלות ובודק מול משרד הבינוי והשיכון אם יש הרשמה פתוחה...');
+  statusEl.innerHTML = loadingHtml('טוען את רשימת ההגרלות...');
   searchEl.disabled = true;
   try {
     allProjects = await apiFetch('/api/lottery/projects');
@@ -47,12 +47,20 @@ function renderProjectOptions() {
   document.getElementById('projectSearch').value = '';
   const openCount = allProjects.filter(p => p.liveStatus === 'OPEN').length;
   const upcomingCount = allProjects.filter(p => p.liveStatus === 'NOT_YET_OPEN').length;
-  document.getElementById('openCountStatus').textContent = openCount + upcomingCount === 0
+  // UNKNOWN = הלוח של משרד השיכון עוד לא נטען בשרת (או לא זמין); הרשימה ההיסטורית מלאה, רק אי אפשר לדעת מה פתוח עכשיו
+  const liveUnavailable = allProjects.length > 0 && allProjects.every(p => p.liveStatus === 'UNKNOWN');
+  document.getElementById('openCountStatus').textContent = liveUnavailable
+    ? `המידע על הרשמה פתוחה ממשרד הבינוי והשיכון לא זמין כרגע - נסו לרענן בעוד כמה דקות. אפשר כבר לבדוק סיכויים על ${allProjects.length} הגרלות קודמות.`
+    : openCount + upcomingCount === 0
     ? `כרגע אין הגרלה עם הרשמה פתוחה או קרובה במשרד הבינוי והשיכון. אפשר לבדוק סיכויים על ${allProjects.length} הגרלות קודמות.`
     : `${openCount} פרויקטים עם הרשמה פתוחה כרגע, ${upcomingCount} עומדים להיפתח בקרוב (מתוך ${allProjects.length} ברשימה)`;
 }
 
 async function calculateScore() {
+  if (!validateFields([
+    ['numberOfChildren', check.intRange(0, 20, 'מספר הילדים חייב להיות בין 0 ל-20')],
+    ['failedPriorApplications', check.intRange(0, 50, 'מספר ההגרלות הקודמות חייב להיות בין 0 ל-50')]
+  ])) return;
   const body = {
     numberOfChildren: Number(document.getElementById('numberOfChildren').value),
     completedMilitaryOrNationalService: document.getElementById('completedMilitaryOrNationalService').checked,
