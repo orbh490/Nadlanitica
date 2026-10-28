@@ -6,7 +6,7 @@
 <body>
   <div class="page" id="main" style="max-width:420px">
     <div class="hero" style="text-align:center">
-      <div class="hero-logo-badge" style="margin-inline:auto"><img src="/img/logo.png" alt="לוגו נדלניטיקה"></div>
+      <div class="hero-logo-badge" style="margin-inline:auto"><img th:src="@{/img/logo.png}" alt="לוגו נדלניטיקה"></div>
       <h1>נדלניטיקה</h1>
       <p>הון עצמי, מס רכישה, סיכויי הגרלה ותשלום חודשי - כל התמונה האמיתית לפני שיוצאים לדרך.</p>
     </div>
@@ -37,7 +37,7 @@
     <div th:replace="~{fragments/nav :: policy}"></div>
   </div>
 
-<script src="/js/app.js"></script>
-<script src="/js/pages/index.js"></script>
+<script th:src="@{/js/app.js}"></script>
+<script th:src="@{/js/pages/index.js}"></script>
 </body>
 </html>

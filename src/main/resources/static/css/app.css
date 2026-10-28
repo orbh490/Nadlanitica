@@ -122,7 +122,7 @@ body::before, body::after {
   position: fixed;
   width: 85vmin;
   height: 85vmin;
-  background-image: url('/img/logo.png');
+  background-image: url('/img/logo-watermark.png');
   background-repeat: no-repeat;
   background-size: contain;
   filter: grayscale(100%);
@@ -227,6 +227,9 @@ button:disabled { background: var(--ink-muted); box-shadow: none; cursor: not-al
 .badge.ok { background: var(--good-bg); color: var(--good-text); }
 .badge.bad { background: var(--bad-bg); color: var(--bad-text); }
 .form-error { color: var(--bad-text); font-size: 13px; margin-top: 8px; }
+/* שגיאת ולידציה מתחת לשדה ספציפי (validateFields ב-app.js) */
+.field-error { display: block; color: var(--bad-text); font-size: 12px; margin-top: 4px; }
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--bad-text); }
 
 table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
 th, td { text-align: right; padding: 9px 10px; border-bottom: 1px solid var(--border); }
@@ -745,7 +748,7 @@ body::before, body::after {
   position: fixed;
   width: min(62vmin, 620px);
   height: min(62vmin, 620px);
-  background: url('/img/logo.png') no-repeat center / contain;
+  background: url('/img/logo-watermark.png') no-repeat center / contain;
   opacity: .075;
   filter: grayscale(1) contrast(.9);
   pointer-events: none;

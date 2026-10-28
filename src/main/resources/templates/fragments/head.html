@@ -20,18 +20,19 @@
 <meta property="og:description" th:content="${desc}">
 <meta property="og:image" th:content="${baseUrl} + '/img/icon-512.png'">
 <link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" th:href="@{/img/apple-touch-icon.png}">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0B2238">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
-<link rel="stylesheet" href="/css/app.css">
-<link rel="stylesheet" href="/css/mobile.css" media="(max-width: 700px)">
-<script src="/js/mobile.js" defer></script>
-<link rel="stylesheet" href="/css/prefs.css">
-<script src="/js/prefs.js"></script>
+<!-- רק האייקונים שבשימוש (3KB במקום 316KB של הגופן המלא). אייקון חדש באתר = להוסיף אותו כאן, ברשימה ממוינת לפי א"ב -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=accessibility_new,account_balance,apartment,bar_chart,confirmation_number,gavel,help,landscape,leaderboard,person,privacy_tip,settings,support_agent&display=block" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/app.css}">
+<link rel="stylesheet" th:href="@{/css/mobile.css}" media="(max-width: 700px)">
+<script th:src="@{/js/mobile.js}" defer></script>
+<link rel="stylesheet" th:href="@{/css/prefs.css}">
+<script th:src="@{/js/prefs.js}"></script>
 <script>try { if (JSON.parse(localStorage.getItem('displayPrefs') || '{}').dark) document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {}</script>
 </th:block>
 </head>

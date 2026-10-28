@@ -5,7 +5,7 @@
 <header class="topbar" th:fragment="topbar(active)">
   <!-- למשתמשי מקלדת: מופיע רק בפוקוס (Tab ראשון), קופץ ישר לתוכן ומדלג על הניווט -->
   <a class="skip-link" href="#main">דילוג לתוכן הראשי</a>
-  <a class="brand" href="/home.html"><img src="/img/logo.png" alt="לוגו נדלניטיקה"><span>נדלניטיקה</span></a>
+  <a class="brand" href="/home.html"><img th:src="@{/img/logo.png}" alt="לוגו נדלניטיקה"><span>נדלניטיקה</span></a>
   <nav class="links">
     <a href="/home.html" th:classappend="${active == 'home'} ? ' active'">בית</a>
     <a href="/dashboard.html" th:classappend="${active == 'dashboard'} ? ' active'">משכנתאות</a>

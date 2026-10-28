@@ -17,7 +17,7 @@ class SeoController {
 
     /** עמודי תוכן ציבוריים בלבד - בלי עמודי חשבון, איפוס סיסמה, אימות מייל או ניהול. */
     private static final List<String> PUBLIC_PAGES = List.of(
-            "/home.html", "/dashboard.html", "/lottery.html", "/land-tenders.html", "/results-board.html",
+            "/", "/dashboard.html", "/lottery.html", "/land-tenders.html", "/results-board.html",
             "/advisor.html", "/privacy.html", "/disclaimer.html", "/accessibility.html");
 
     private final String baseUrl;
