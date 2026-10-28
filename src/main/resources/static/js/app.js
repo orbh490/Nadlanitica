@@ -116,6 +116,82 @@ function loadingHtml(text) {
   return `<p class="loading-note" role="status"><span class="spinner" aria-hidden="true"></span>${text}</p>`;
 }
 
+// ---- ולידציה בצד הלקוח: הודעה מתחת לשדה עצמו לפני השליחה, באותם כללים כמו בשרת (השרת עדיין בודק הכל).
+// שימוש: if (!validateFields([['purchasePrice', check.money('יש להזין מחיר רכישה')], ...])) return;
+const check = {
+  required: msg => value => value === '' || value === false ? msg : null,
+  money: msg => (value, input) => numericValue(input) > 0 ? null : msg,
+  intRange: (min, max, msg, { optional = false } = {}) => value => {
+    if (value === '' && optional) return null;
+    const n = Number(value);
+    return value !== '' && Number.isInteger(n) && n >= min && n <= max ? null : msg;
+  },
+  minLength: (n, msg) => value => value.length >= n ? null : msg,
+  maxLength: (n, msg) => value => value.length <= n ? null : msg,
+  email: (msg, { optional = false } = {}) => value =>
+    (value === '' && optional) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? null : msg,
+  // טלפון ישראלי: 9-10 ספרות, מותר רווחים/מקפים ו-+972 בהתחלה
+  phone: msg => value => /^0\d{8,9}$/.test(value.replace(/[\s-]/g, '').replace(/^\+972/, '0')) ? null : msg
+};
+
+function showFieldError(input, message) {
+  const id = input.id + '-error';
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('span');
+    el.id = id;
+    el.className = 'field-error';
+    // בתוך התווית שעוטפת את השדה (כדי שבטפסים בעמודות ההודעה תישאר באותו תא, מתחת לשדה).
+    // תיבת סימון שהתווית שלה לידה ולא עוטפת אותה - ההודעה אחרי כל השורה, לא בין התיבה לטקסט
+    const label = input.closest('label');
+    if (label) label.appendChild(el);
+    else (input.type === 'checkbox' ? input.parentElement : input).insertAdjacentElement('afterend', el);
+  }
+  el.textContent = message;
+  input.setAttribute('aria-invalid', 'true');
+  input.setAttribute('aria-describedby', id);
+}
+function clearFieldError(input) {
+  document.getElementById(input.id + '-error')?.remove();
+  input.removeAttribute('aria-invalid');
+  input.removeAttribute('aria-describedby');
+}
+/** rules: [[inputId, בדיקה שמחזירה הודעה או null], ...]. מציג את כל השגיאות וממקד את השדה הראשון. true = הכל תקין. */
+function validateFields(rules) {
+  let firstInvalid = null;
+  for (const [id, rule] of rules) {
+    const input = document.getElementById(id);
+    if (!input) continue;
+    const message = rule(input.type === 'checkbox' ? input.checked : input.value.trim(), input);
+    if (message) {
+      showFieldError(input, message);
+      firstInvalid ??= input;
+    } else {
+      clearFieldError(input);
+    }
+  }
+  firstInvalid?.focus();
+  return !firstInvalid;
+}
+// טופס ההתחברות/הרשמה מופיע גם במסך ההתחברות וגם באזור האישי - אותם שדות ואותם כללים
+function validateAuthForm(isRegister) {
+  return validateFields([
+    ['authEmail', check.email('כתובת אימייל לא תקינה')],
+    ['authPassword', isRegister
+      ? value => check.minLength(6, 'הסיסמה חייבת להכיל לפחות 6 תווים')(value) || check.maxLength(72, 'הסיסמה ארוכה מדי (עד 72 תווים)')(value)
+      : check.required('יש להזין סיסמה')],
+    ...(isRegister ? [['consentCheckbox', check.required('יש לאשר את מדיניות הפרטיות כדי להירשם')]] : [])
+  ]);
+}
+
+// ההודעה נעלמת ברגע שמתחילים לתקן את השדה
+document.addEventListener('input', e => {
+  if (e.target.getAttribute && e.target.getAttribute('aria-invalid') === 'true') clearFieldError(e.target);
+});
+document.addEventListener('change', e => {
+  if (e.target.type === 'checkbox' && e.target.getAttribute('aria-invalid') === 'true') clearFieldError(e.target);
+});
+
 // ---- אזהרה כשההלוואה נחתכה בתקרת המימון (הוראה 329) - משותף לדשבורד המשכנתא ולמחשבון הבנייה העצמית ----
 function ltvCapNote(s) {
   if (!s.loanCappedByLtv) return '';

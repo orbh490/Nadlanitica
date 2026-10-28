@@ -1,4 +1,5 @@
 async function handleLogin() {
+  if (!validateAuthForm(false)) return;
   const result = await submit('/api/auth/login', false);
   if (result) {
     setAuthToken(result.data.token);
@@ -7,12 +8,7 @@ async function handleLogin() {
 }
 
 async function handleRegister() {
-  if (!document.getElementById('consentCheckbox').checked) {
-    const msgEl = document.getElementById('authMessage');
-    msgEl.style.color = 'var(--bad-text)';
-    msgEl.textContent = 'יש לאשר את מדיניות הפרטיות כדי להירשם';
-    return;
-  }
+  if (!validateAuthForm(true)) return;
   const result = await submit('/api/auth/register', true);
   if (result) {
     const msgEl = document.getElementById('authMessage');
@@ -47,6 +43,7 @@ function toggleForgotPassword() {
 }
 
 async function submitForgotPassword() {
+  if (!validateFields([['forgotEmail', check.email('כתובת אימייל לא תקינה')]])) return;
   const email = document.getElementById('forgotEmail').value.trim();
   const msgEl = document.getElementById('authMessage');
   msgEl.style.color = 'var(--ink-muted)';

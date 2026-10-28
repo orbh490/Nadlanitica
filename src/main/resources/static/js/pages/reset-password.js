@@ -5,6 +5,7 @@ if (!token) {
 }
 
 async function submitReset() {
+  if (!validateFields([['newPassword', value => check.minLength(6, 'הסיסמה חייבת להכיל לפחות 6 תווים')(value) || check.maxLength(72, 'הסיסמה ארוכה מדי (עד 72 תווים)')(value)]])) return;
   const newPassword = document.getElementById('newPassword').value;
   const msgEl = document.getElementById('resultMessage');
   msgEl.style.color = 'var(--ink-muted)';

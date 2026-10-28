@@ -3,6 +3,13 @@ function toggleTrackMix() {
 }
 
 async function submitProfile() {
+  if (!validateFields([
+    ['purchasePrice', check.money('יש להזין מחיר רכישה')],
+    // בדירה בהנחה ההון העצמי הנדרש מחושב לפי שווי השוק, אז בלעדיו התוצאה לא אמינה
+    ['marketValue', (value, input) => document.getElementById('subsidized').checked && numericValue(input) <= 0
+      ? 'בדירה בהנחה צריך להזין גם את שווי השוק של הדירה' : null],
+    ['termYears', check.intRange(1, 40, 'תקופת המשכנתא חייבת להיות בין 1 ל-40 שנה')]
+  ])) return;
   const body = {
     availableEquity: numericValue(document.getElementById('availableEquity')),
     monthlyIncome: numericValue(document.getElementById('monthlyIncome')),
@@ -210,6 +217,12 @@ async function renderAmortizationChart(loanAmount, termYears) {
 }
 
 async function calculateTrackMix() {
+  const percentRule = check.intRange(0, 100, 'אחוז בין 0 ל-100');
+  if (!validateFields([
+    ['trackMixLoanAmount', check.money('יש להזין סכום הלוואה')],
+    ['trackMixTermYears', check.intRange(1, 40, 'תקופת המשכנתא חייבת להיות בין 1 ל-40 שנה')],
+    ['fixedPercent', percentRule], ['cpiPercent', percentRule], ['primePercent', percentRule]
+  ])) return;
   const fixedPercent = Number(document.getElementById('fixedPercent').value);
   const cpiPercent = Number(document.getElementById('cpiPercent').value);
   const primePercent = Number(document.getElementById('primePercent').value);

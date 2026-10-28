@@ -171,6 +171,12 @@ function usePlotInCalculator(index) {
 }
 
 async function calculateSelfBuild() {
+  if (!validateFields([
+    ['landPrice', check.money('יש להזין את מחיר הקרקע (אפשר לבחור מגרש מהטבלה למעלה)')],
+    ['termYears', check.intRange(1, 40, 'תקופת המשכנתא חייבת להיות בין 1 ל-40 שנה')],
+    ['discountPercent', value => document.getElementById('enableDiscount').checked
+      ? check.intRange(0, 100, 'אחוז ההנחה חייב להיות בין 0 ל-100')(value) : null]
+  ])) return;
   const body = {
     landPrice: numericValue(document.getElementById('landPrice')),
     developmentCost: numericValue(document.getElementById('developmentCost')),

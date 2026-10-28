@@ -2,10 +2,13 @@ async function submitLead() {
   const fullName = document.getElementById('fullName').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const resultEl = document.getElementById('leadResult');
-  if (!fullName || !phone) {
-    resultEl.innerHTML = '<p class="form-error">נא למלא שם וטלפון</p>';
-    return;
-  }
+  if (!validateFields([
+    ['fullName', value => check.required('נא למלא שם')(value) || check.maxLength(300, 'השם ארוך מדי')(value)],
+    ['phone', check.phone('מספר טלפון לא תקין - למשל 050-1234567')],
+    ['email', check.email('כתובת אימייל לא תקינה', { optional: true })],
+    ['message', check.maxLength(300, 'ההודעה ארוכה מדי (עד 300 תווים)')]
+  ])) return;
+  resultEl.innerHTML = '';
   const body = {
     fullName,
     phone,
