@@ -37,7 +37,7 @@ public class LandTenderService {
     private static final Duration LIST_CACHE_TTL = Duration.ofMinutes(10);
     private static final Duration DETAIL_CACHE_TTL = Duration.ofMinutes(5);
     private static final Duration BOOKLET_CACHE_TTL = Duration.ofHours(1);
-    private static final int MAX_CACHED_BOOKLETS = 5;
+    private static final int MAX_CACHED_BOOKLETS = 10;
     private static final Duration CLOSED_LIST_CACHE_TTL = Duration.ofHours(1);
     private static final Duration CITY_RESULTS_CACHE_TTL = Duration.ofHours(6);
     private static final int MAX_RESULTS_SAMPLE = 60;
@@ -60,7 +60,8 @@ public class LandTenderService {
     private record CachedRawDetail(LandTenderApiClient.RmiTenderDetail raw, Instant fetchedAt) {
     }
 
-    private record CachedBooklet(byte[] pdfBytes, String text, List<String> discountSnippets, Instant fetchedAt) {
+    // רק הטקסט שחולץ (ממנו מחפשים הנחות) - לא קובץ ה-PDF עצמו, שהוא 9-14MB לחוברת ומילא את הזיכרון בשרת של 512MB
+    private record CachedBooklet(String text, List<String> discountSnippets, Instant fetchedAt) {
     }
 
     public record LandTenderSummary(long id, String tenderNumber, String city, String neighborhood, int units,
@@ -140,7 +141,7 @@ public class LandTenderService {
 
     /** מזרים את קובץ ה-PDF של חוברת המכרז המקורית, ישירות מרמ"י - לצפייה/הורדה על ידי המשתמש. */
     public byte[] bookletPdf(long id) {
-        return cachedBooklet(id).pdfBytes();
+        return fetchBookletPdf(id);
     }
 
     /** קטעי טקסט מחוברת המכרז שמזכירים הנחה/הפחתה ליד מילת מפתח של אוכלוסיית עדיפות - ראו TenderBookletExtractor. */
@@ -271,20 +272,10 @@ public class LandTenderService {
         if (cached != null && Duration.between(cached.fetchedAt(), Instant.now()).compareTo(BOOKLET_CACHE_TTL) < 0) {
             return cached;
         }
-        LandTenderApiClient.RmiTenderDetail raw = rawDetailCached(id);
-        LandTenderApiClient.RmiDocument bookletDoc = findBookletDocument(raw)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "לא נמצאה חוברת מכרז למכרז זה"));
-        byte[] bytes;
-        try {
-            bytes = apiClient.fetchDocumentContent(bookletDoc);
-        } catch (RestClientException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "לא הצלחנו לקבל את חוברת המכרז מרשות מקרקעי ישראל כרגע. נסו שוב בעוד רגע.");
-        }
-        String text = bookletExtractor.extractText(bytes);
+        String text = bookletExtractor.extractText(fetchBookletPdf(id));
         List<String> snippets = bookletExtractor.findDiscountSnippets(text);
-        CachedBooklet fresh = new CachedBooklet(bytes, text, snippets, Instant.now());
-        // כל חוברת היא PDF של כ-9MB - בלי תקרה המטמון גדל עם כל מכרז שמישהו פתח, על שרת של 512MB
+        CachedBooklet fresh = new CachedBooklet(text, snippets, Instant.now());
+        // בלי תקרה המטמון גדל עם כל מכרז שמישהו פתח
         while (bookletCache.size() >= MAX_CACHED_BOOKLETS) {
             bookletCache.entrySet().stream()
                     .min(Comparator.comparing(e -> e.getValue().fetchedAt()))
@@ -292,6 +283,19 @@ public class LandTenderService {
         }
         bookletCache.put(id, fresh);
         return fresh;
+    }
+
+    /** מוריד את חוברת המכרז (PDF) מרמ"י - לא נשמרת בזיכרון, כל צפייה מורידה אותה מחדש. */
+    private byte[] fetchBookletPdf(long id) {
+        LandTenderApiClient.RmiTenderDetail raw = rawDetailCached(id);
+        LandTenderApiClient.RmiDocument bookletDoc = findBookletDocument(raw)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "לא נמצאה חוברת מכרז למכרז זה"));
+        try {
+            return apiClient.fetchDocumentContent(bookletDoc);
+        } catch (RestClientException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                    "לא הצלחנו לקבל את חוברת המכרז מרשות מקרקעי ישראל כרגע. נסו שוב בעוד רגע.");
+        }
     }
 
     private static Optional<LandTenderApiClient.RmiDocument> findBookletDocument(LandTenderApiClient.RmiTenderDetail raw) {

@@ -1,6 +1,7 @@
 package com.nadlanitica.landtender;
 
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,8 @@ class TenderBookletExtractor {
     }
 
     String extractText(byte[] pdfBytes) {
-        try (PDDocument doc = Loader.loadPDF(pdfBytes)) {
+        // מטמון זמני בקובץ ולא בזיכרון: פענוח חוברת של 14MB לא ינפח את הערימה בשרת הקטן
+        try (PDDocument doc = Loader.loadPDF(pdfBytes, null, null, null, IOUtils.createTempFileOnlyStreamCache())) {
             return new PDFTextStripper().getText(doc);
         } catch (IOException e) {
             return "";

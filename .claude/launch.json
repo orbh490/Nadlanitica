@@ -12,6 +12,12 @@
       "runtimeExecutable": "C:/Users/Or_Ben_Hamo/Desktop/projects/Nadlanitica/mvnw.cmd",
       "runtimeArgs": ["spring-boot:run", "-Dspring-boot.run.arguments=--server.port=8090 --spring.datasource.url=jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH --spring.mail.host=localhost --spring.mail.port=1"],
       "port": 8090
+    },
+    {
+      "name": "nadlanitica-lowmem",
+      "runtimeExecutable": "java",
+      "runtimeArgs": ["-Xmx256m", "-XX:+UseSerialGC", "-Xss512k", "-XX:TieredStopAtLevel=1", "-XX:+ExitOnOutOfMemoryError", "-Duser.timezone=Asia/Jerusalem", "-jar", "C:/Users/Or_Ben_Hamo/Desktop/projects/Nadlanitica/target/nadlanitic-0.0.1-SNAPSHOT.jar", "--server.port=8095", "--server.tomcat.threads.max=30","--spring.datasource.url=jdbc:h2:mem:lowmem;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH", "--spring.mail.host=localhost", "--spring.mail.port=1"],
+      "port": 8095
     }
   ]
 }
