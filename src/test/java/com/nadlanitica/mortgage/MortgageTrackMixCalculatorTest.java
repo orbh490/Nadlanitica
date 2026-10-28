@@ -11,7 +11,7 @@ class MortgageTrackMixCalculatorTest {
 
     private final MortgageTrackMixCalculator calculator = new MortgageTrackMixCalculator(
             new MortgagePaymentCalculator(new MortgageInterestRates()), new MortgageInterestRates(),
-            new BoiRateService(new NotificationEmailService(null, "test@example.com")));
+            new BoiRateService(new NotificationEmailService(null, null, "test@example.com", "", "נדלניטיקה", "", "")));
 
     @Test
     void hundredPercentFixedMatchesSingleTrackPayment() {

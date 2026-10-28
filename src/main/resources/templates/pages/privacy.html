@@ -37,7 +37,7 @@
 
     <div class="card">
       <h2>5. הזכויות שלכם</h2>
-      <p style="font-size:14px;line-height:1.7">ניתן לבקש בכל עת לעיין בנתונים השמורים עליכם, לתקן אותם או למחוק אותם לחלוטין (כולל מחיקת חשבון) - בפנייה לכתובת <a href="mailto:orbh490@gmail.com">orbh490@gmail.com</a>. בקשת מחיקה תטופל בתוך זמן סביר. משתמשים רשומים יכולים גם למחוק את החשבון וכל המידע השמור בו בעצמם, מיידית, בעמוד <a href="/settings.html">ההגדרות</a>.</p>
+      <p style="font-size:14px;line-height:1.7">ניתן לבקש בכל עת לעיין בנתונים השמורים עליכם, לתקן אותם או למחוק אותם לחלוטין (כולל מחיקת חשבון) - בפנייה לכתובת <a th:with="contact=${@environment.getProperty('app.contact-email')}" th:href="'mailto:' + ${contact}" th:text="${contact}">כתובת הקשר</a>. בקשת מחיקה תטופל בתוך זמן סביר. משתמשים רשומים יכולים גם למחוק את החשבון וכל המידע השמור בו בעצמם, מיידית, בעמוד <a href="/settings.html">ההגדרות</a>.</p>
     </div>
 
     <div class="card">
@@ -47,7 +47,7 @@
 
     <div class="card">
       <h2>7. שינויים במדיניות</h2>
-      <p style="font-size:14px;line-height:1.7">מדיניות זו עשויה להתעדכן מעת לעת. המשך שימוש בכלי לאחר עדכון מהווה הסכמה למדיניות המעודכנת. לשאלות בנוגע לפרטיות, ניתן לפנות לכתובת <a href="mailto:orbh490@gmail.com">orbh490@gmail.com</a>.</p>
+      <p style="font-size:14px;line-height:1.7">מדיניות זו עשויה להתעדכן מעת לעת. המשך שימוש בכלי לאחר עדכון מהווה הסכמה למדיניות המעודכנת. לשאלות בנוגע לפרטיות, ניתן לפנות לכתובת <a th:with="contact=${@environment.getProperty('app.contact-email')}" th:href="'mailto:' + ${contact}" th:text="${contact}">כתובת הקשר</a>.</p>
     </div>
   </div>
 </body>

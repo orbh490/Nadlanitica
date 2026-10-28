@@ -40,7 +40,7 @@
 
     <div class="card">
       <h2>פנייה בנושא נגישות</h2>
-      <p style="font-size:14px;line-height:1.7">נתקלתם בבעיית נגישות, או שיש לכם הצעה לשיפור? כתבו לנו ל-<a href="mailto:orbh490@gmail.com">orbh490@gmail.com</a> ופרטו באיזה עמוד, מה ניסיתם לעשות, ובאיזה מכשיר ודפדפן. נשתדל לחזור אליכם ולטפל בפנייה בהקדם.</p>
+      <p style="font-size:14px;line-height:1.7">נתקלתם בבעיית נגישות, או שיש לכם הצעה לשיפור? כתבו לנו ל-<a th:with="contact=${@environment.getProperty('app.contact-email')}" th:href="'mailto:' + ${contact}" th:text="${contact}">כתובת הקשר</a> ופרטו באיזה עמוד, מה ניסיתם לעשות, ובאיזה מכשיר ודפדפן. נשתדל לחזור אליכם ולטפל בפנייה בהקדם.</p>
     </div>
 
     <div th:replace="~{fragments/nav :: policy}"></div>

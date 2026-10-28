@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title th:text="${heading}">נדלניטיקה</title>
+</head>
+<!--
+  תבנית מייל אחת לכל המיילים ללקוחות (אימות, איפוס סיסמה וכו').
+  תוכנות דואר לא מכירות CSS מודרני: הכל בטבלאות ועם style בתוך כל אלמנט, בלי קבצים חיצוניים ובלי גופנים מהרשת.
+-->
+<body style="margin:0;padding:0;background:#f4f8fa;font-family:Arial,Helvetica,sans-serif;direction:rtl">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f8fa;padding:24px 12px">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #dee9ed">
+        <tr>
+          <td style="background:#16324a;padding:20px 24px;text-align:right">
+            <img th:src="${baseUrl} + '/img/icon-192.png'" src="" width="36" height="36" alt="" style="vertical-align:middle;border-radius:8px">
+            <span style="color:#ffffff;font-size:20px;font-weight:bold;vertical-align:middle;margin-right:8px">נדלניטיקה</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px 24px 8px;text-align:right;color:#142d42">
+            <h1 style="margin:0 0 14px;font-size:22px;color:#142d42" th:text="${heading}">כותרת</h1>
+            <p th:each="paragraph : ${paragraphs}" th:text="${paragraph}" style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#142d42">פסקה</p>
+          </td>
+        </tr>
+        <tr th:if="${buttonUrl}">
+          <td style="padding:8px 24px 20px;text-align:center">
+            <a th:href="${buttonUrl}" th:text="${buttonText}" href="#"
+               style="display:inline-block;background:#1c807a;color:#ffffff;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 28px;border-radius:10px">לחצו כאן</a>
+            <p style="margin:14px 0 0;font-size:12px;line-height:1.5;color:#5a6f80">
+              הכפתור לא עובד? אפשר להעתיק את הקישור הזה לדפדפן:<br>
+              <span th:text="${buttonUrl}" style="word-break:break-all;direction:ltr;unicode-bidi:embed">https://</span>
+            </p>
+          </td>
+        </tr>
+        <tr th:if="${footnote}">
+          <td style="padding:0 24px 20px;text-align:right">
+            <p th:text="${footnote}" style="margin:0;font-size:13px;line-height:1.6;color:#5a6f80">הערה</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 24px;border-top:1px solid #dee9ed;text-align:right;font-size:12px;line-height:1.6;color:#5a6f80">
+            המייל נשלח מ<a th:href="${baseUrl}" href="#" style="color:#1c807a">נדלניטיקה</a>.
+            שאלות? אפשר פשוט להשיב למייל הזה.
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

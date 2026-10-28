@@ -12,6 +12,7 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -168,9 +169,11 @@ public class AuthService {
             String token = randomToken();
             tokenRepository.save(new AccountToken(token, user.getId(), PURPOSE_RESET, Instant.now().plus(RESET_TOKEN_TTL)));
             String link = baseUrl + "/reset-password.html?token=" + token;
-            emailService.send(user.getEmail(), "איפוס סיסמה",
-                    "קיבלנו בקשה לאיפוס הסיסמה שלכם.\n\nלאיפוס, לחצו על הקישור הבא (בתוקף לשעה אחת):\n" + link +
-                            "\n\nאם לא ביקשתם זאת, אפשר להתעלם מהמייל הזה - הסיסמה שלכם לא תשתנה.");
+            emailService.send(user.getEmail(), "איפוס סיסמה", new NotificationEmailService.EmailContent(
+                    "איפוס סיסמה",
+                    List.of("קיבלנו בקשה לאיפוס הסיסמה של החשבון שלכם בנדלניטיקה."),
+                    "בחירת סיסמה חדשה", link,
+                    "הקישור בתוקף לשעה אחת. אם לא ביקשתם זאת, אפשר להתעלם מהמייל הזה - הסיסמה שלכם לא תשתנה."));
         });
     }
 
@@ -198,9 +201,11 @@ public class AuthService {
         String token = randomToken();
         tokenRepository.save(new AccountToken(token, user.getId(), PURPOSE_VERIFY, Instant.now().plus(VERIFY_TOKEN_TTL)));
         String link = baseUrl + "/api/auth/verify?token=" + token;
-        emailService.send(user.getEmail(), "אימות כתובת אימייל",
-                "תודה שנרשמתם לנדלניטיקה!\n\nלאימות כתובת האימייל, לחצו על הקישור הבא:\n" + link +
-                        "\n\nהקישור בתוקף ל-48 שעות.");
+        emailService.send(user.getEmail(), "אימות כתובת אימייל", new NotificationEmailService.EmailContent(
+                "ברוכים הבאים לנדלניטיקה!",
+                List.of("תודה שנרשמתם. כדי להתחבר, נשאר רק לאמת את כתובת האימייל שלכם."),
+                "אימות כתובת האימייל", link,
+                "הקישור בתוקף ל-48 שעות. אם לא נרשמתם לנדלניטיקה, אפשר להתעלם מהמייל הזה."));
     }
 
     private String randomToken() {
