@@ -17,7 +17,7 @@
 
 האתר שולח מיילי אימות ואיפוס סיסמה דרך תיבת ג'ימייל. ג'ימייל לא נותן לאתרים להשתמש בסיסמה הרגילה, אלא ב"סיסמת אפליקציה" נפרדת.
 
-1. לפתוח תיבת ג'ימייל חדשה לפרויקט (למשל `nadlanitica@gmail.com`, או השם הפנוי הקרוב).
+1. תיבת הג'ימייל של הפרויקט: `ndlanitica@gmail.com` (כבר נפתחה).
 2. בחשבון החדש: **ניהול חשבון Google ← אבטחה ← אימות דו-שלבי** – להפעיל.
 3. להיכנס ל-`https://myaccount.google.com/apppasswords`, לתת שם (למשל "נדלניטיקה") וללחוץ **יצירה**.
 4. תתקבל סיסמה של 16 אותיות. **להעתיק אותה עכשיו** – היא מוצגת פעם אחת בלבד. זה הערך של `MAIL_PASSWORD`.
@@ -54,10 +54,10 @@
 | `PG_DATABASE` | `nadlanitica` |
 | `PG_USER` | `nadlanitica_owner` |
 | `PG_PASSWORD` | הסיסמה מ-Neon |
-| `MAIL_USERNAME` | כתובת הג'ימייל של הפרויקט |
+| `MAIL_USERNAME` | `ndlanitica@gmail.com` |
 | `MAIL_PASSWORD` | סיסמת האפליקציה משלב 1 (16 אותיות, בלי רווחים) |
-| `MAIL_FROM` | כתובת הג'ימייל של הפרויקט |
-| `CONTACT_EMAIL` | כתובת הג'ימייל של הפרויקט |
+| `MAIL_FROM` | `ndlanitica@gmail.com` (אפשר לדלג – זו ברירת המחדל) |
+| `CONTACT_EMAIL` | `ndlanitica@gmail.com` (אפשר לדלג – זו ברירת המחדל) |
 | `ADMIN_KEY` | המפתח משלב 2 |
 | `BASE_URL` | הכתובת ש-Render נתן לשירות, למשל `https://nadlanitica.onrender.com` (בלי `/` בסוף) |
 
