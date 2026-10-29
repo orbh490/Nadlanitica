@@ -21,4 +21,6 @@ EXPOSE 8080
 # - ExitOnOutOfMemoryError: אם הזיכרון נגמר - לצאת, ו-Render מפעיל מחדש, במקום להיתקע
 # - אזור זמן ישראל: השרתים ב-UTC, ובלי זה "היום" ותזמון משימות הלילה מחושבים לפי שעון אחר
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=50 -XX:+UseSerialGC -Xss512k -XX:TieredStopAtLevel=1 -XX:+ExitOnOutOfMemoryError -Duser.timezone=Asia/Jerusalem"
+# האימג' נועד לשרת: ברירת המחדל היא פרופיל production (PostgreSQL). בלי זה האפליקציה מנסה קובץ H2 מקומי ונופלת
+ENV SPRING_PROFILES_ACTIVE=production
 ENTRYPOINT ["java", "-jar", "app.jar"]
