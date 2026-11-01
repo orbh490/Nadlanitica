@@ -70,7 +70,7 @@
         <span class="info-tip" tabindex="0" data-tip="אם קניתם עם תיווך יש עמלה נוספת (בדרך כלל כ-2% + מע'מ). בדירת מחיר למשתכן זה כמעט תמיד לא רלוונטי.">?</span>
       </div>
       <label>תקופת משכנתא (שנים) <input type="number" id="termYears" value="20" min="1" max="40"></label>
-      <button data-click="submitProfile">חשב משכנתא</button>
+      <button data-click="submitProfile" data-result="resultsSection">חשב משכנתא</button>
       <div id="saveNote" style="margin-top:8px;font-size:12px;color:var(--ink-muted)"></div>
     </div>
 
@@ -123,7 +123,7 @@
           <span class="info-tip" tabindex="0" data-tip="ריבית שנעה יחד עם ריבית בנק ישראל בזמן אמת - יכולה לעלות או לרדת כל הזמן. מסלול גמיש אבל פחות צפוי.">?</span>
           <input type="number" id="primePercent" value="33" min="0" max="100">
         </label>
-        <button data-click="calculateTrackMix">חשב תמהיל</button>
+        <button data-click="calculateTrackMix" data-result="trackMixResult">חשב תמהיל</button>
         <div id="trackMixResult" style="margin-top:16px"></div>
       </div>
     </div>

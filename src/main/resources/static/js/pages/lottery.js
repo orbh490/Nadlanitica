@@ -178,8 +178,9 @@ async function calculateOdds() {
   const label = document.getElementById('projectSearch').value;
   const p = projectsByLabel[label];
   const resultEl = document.getElementById('oddsResult');
-  if (!p) {
-    resultEl.innerHTML = '<p class="form-error">בחרו פרויקט מהרשימה (הקלידו כדי לסנן)</p>';
+  // הודעה מתחת לשדה החיפוש (כמו בשאר הטפסים) ולא באזור התוצאה - שם צריך לתקן
+  if (!validateFields([['projectSearch', () => p ? null : 'בחרו פרויקט מהרשימה (הקלידו כדי לסנן)']])) {
+    resultEl.innerHTML = '';
     return;
   }
   const localResident = document.getElementById('localResident').checked;

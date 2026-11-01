@@ -1092,3 +1092,7 @@ button, .btn, .login-btn, .primary, .secondary { min-height: 44px; }
 .auth-small { margin: 10px 0 0; font-size: 13px; }
 .auth-switch { margin: 16px 0 0; font-size: 14px; color: var(--ink-secondary); text-align: center; }
 .auth-switch a { font-weight: 600; }
+
+/* הערה בולטת בתוך בועה (למשל "רק למשתמשים רשומים" בהגדרות) */
+.notice { margin: 0 0 12px; padding: 10px 14px; font-size: 14px; line-height: 1.6; color: var(--ink); background: var(--teal-soft); border-radius: var(--radius-sm); border-inline-start: 4px solid var(--teal); }
+.notice a { font-weight: 600; margin-inline-start: 4px; }

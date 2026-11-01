@@ -2,6 +2,8 @@ async function refreshSettingsUI() {
   const me = await fetchCurrentUser();
   document.getElementById('loggedOutView').style.display = me.loggedIn ? 'none' : 'block';
   document.getElementById('loggedInView').style.display = me.loggedIn ? 'block' : 'none';
+  // למחוברים הקישור להרשמה מיותר - ההערה עצמה נשארת, כדי שיהיה ברור למה ההתראות קשורות לחשבון
+  document.getElementById('notifyRegisterLink').style.display = me.loggedIn ? 'none' : '';
   document.getElementById('deleteAccountSection').style.display = me.loggedIn ? 'block' : 'none';
   if (!me.loggedIn) return;
   document.getElementById('settingsEmail').textContent = me.email;

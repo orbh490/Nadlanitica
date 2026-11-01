@@ -31,26 +31,39 @@ document.addEventListener('DOMContentLoaded', initMoneyInputs);
 function initPageIntro(pageKey, title, bodyHtml) {
   const seenKey = 'introSeen:' + pageKey;
 
+  // חלון נגיש: מוכרז כחלון לקורא מסך, הפוקוס עובר לכפתור, ונסגר גם ב-Escape או בלחיצה מחוץ לבועה.
+  // בכל דרך סגירה הוא מסומן כ"נראה" - כדי שלא יקפוץ שוב בכניסה הבאה
   function showIntro() {
+    if (document.querySelector('.intro-overlay')) return;
+    const returnFocus = document.activeElement;
     const overlay = document.createElement('div');
     overlay.className = 'intro-overlay';
     overlay.innerHTML = `
-      <div class="intro-bubble">
-        <h2>${title}</h2>
+      <div class="intro-bubble" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+        <h2 id="introTitle">${title}</h2>
         <p>${bodyHtml}</p>
         <button type="button">הבנתי, בוא נמשיך</button>
       </div>`;
     document.body.appendChild(overlay);
-    overlay.querySelector('button').addEventListener('click', () => {
-      localStorage.setItem(seenKey, '1');
+    function close() {
+      try { localStorage.setItem(seenKey, '1'); } catch (e) { /* בלי אחסון - פשוט יוצג שוב */ }
       overlay.remove();
-    });
+      document.removeEventListener('keydown', onKey);
+      if (returnFocus && returnFocus.focus) returnFocus.focus();
+    }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    overlay.querySelector('button').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', onKey);
+    overlay.querySelector('button').focus({ preventScroll: true });
   }
 
   const helpBtn = document.getElementById('helpBtn');
   if (helpBtn) helpBtn.addEventListener('click', e => { e.preventDefault(); showIntro(); });
 
-  if (localStorage.getItem(seenKey) !== '1') showIntro();
+  let seen = false;
+  try { seen = localStorage.getItem(seenKey) === '1'; } catch (e) { /* בלי אחסון - מציגים */ }
+  if (!seen) showIntro();
 }
 
 // ---- הופעה חלקה לכל בלוק תוצאה שמוזרק דינמית - קוראים לזה מיד אחרי שמציבים innerHTML על אלמנט תוצאה ----

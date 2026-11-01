@@ -12,7 +12,7 @@
 .page > .card:first-of-type { margin-top: 40px; }
 
 /* סרגל תחתון: לבן, עדין, עם הדגשה רכה לדף הנוכחי */
-body { padding-bottom: 96px; }
+body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 nav.m-tabs { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; height: 70px; padding: 6px 8px; align-items: center; justify-content: space-around; background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -8px 20px -14px rgba(20,45,66,.35); }
 .m-tabs a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 56px; border-radius: 16px; color: var(--ink-secondary); font-size: 12px; font-weight: 600; text-decoration: none; text-align: center; line-height: 1.2; }
 .m-tabs a .material-symbols-outlined { font-size: 24px; }
@@ -46,10 +46,10 @@ nav.m-tabs { position: fixed; bottom: 0; height: calc(70px + env(safe-area-inset
 /* טולטיפ (?) בנייד: מוצג כפס קבוע מעל הסרגלים ולא יוצא מהמסך. לפני כן הוא יצא לצד השמאלי, הרחיב את הדף והזיז את הסרגלים */
 .info-tip::after { position: fixed; left: 16px; right: 16px; top: auto; bottom: calc(190px + env(safe-area-inset-bottom, 0px)); transform: none; width: auto; max-width: none; z-index: 400; }
 
-/* קישורי מדיניות בנייד: שתי בועות עגולות, אייקון בלבד, אחת מעל השנייה, בפינה הימנית התחתונה, נעולות כמו הסרגל התחתון */
-.policy-links { position: fixed; top: auto; left: auto; right: 12px; bottom: calc(82px + env(safe-area-inset-bottom, 0px)); padding: 0; background: none; border: 0; flex-direction: column; align-items: center; gap: 10px; z-index: 70; }
-a.policy-btn { width: 44px; height: 44px; padding: 0; border-radius: 50%; justify-content: center; gap: 0; font-size: 0; color: var(--navy); background: #fff; border: 1px solid var(--border); box-shadow: 0 6px 16px rgba(18, 20, 42, .14); }
-a.policy-btn .icon { display: inline-block; font-size: 22px; line-height: 1; }
+/* קישורי מדיניות בנייד: שורה רגילה בסוף התוכן. קודם היו בועות שצפו מעל הדף וכיסו שדות וטקסט בכל הדפים */
+.policy-links { position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 32px 0 8px; padding: 0; background: none; border: 0; z-index: auto; }
+a.policy-btn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; color: var(--ink-secondary); background: var(--white); border: 1px solid var(--border); box-shadow: none; }
+a.policy-btn .icon { display: inline-block; font-size: 18px; line-height: 1; color: var(--teal); }
 a.policy-btn:hover, a.policy-btn:focus-visible { transform: none; }
 
 /* א. דוגמת החישוב בדף הבית מוסתרת בנייד */
@@ -79,5 +79,24 @@ html, body { overscroll-behavior-x: none; }
 .back-home::before { content: '→'; margin-inline-end: 8px; }
 .back-home ~ .card:first-of-type { margin-top: 40px; }
 
-/* פס טורקיז עליון - רק בבועות גילוי נאות ומדיניות */
-a.policy-btn { border-top: 4px solid var(--teal); }
+
+/* ===== נוחות מגע ונגישות בנייד ===== */
+/* שדות ב-16px לפחות: מתחת לזה אייפון מגדיל את כל הדף בכל פעם שנכנסים לשדה, וצריך להקטין חזרה ידנית */
+input[type=number], input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea { font-size: 16px; min-height: 48px; }
+textarea { min-height: 96px; }
+label { font-size: 15px; }
+/* תיבות סימון גדולות מספיק לאצבע, וכל השורה (כולל הטקסט) לחיצה */
+.checkbox-row { min-height: 44px; gap: 12px; }
+.checkbox-row input[type=checkbox], .checkbox-row input[type=radio], label > input[type=checkbox] { width: 22px; height: 22px; flex: none; margin: 0; }
+/* כפתור ה-? קטן לעין אבל עם אזור לחיצה של 44px סביבו */
+.info-tip { width: 22px; height: 22px; font-size: 13px; }
+.info-tip::before { content: ''; position: absolute; inset: -11px; }
+/* "הצג טבלה מלאה" ודומיו - שורה שקל ללחוץ עליה */
+summary { padding: 12px 0; font-size: 14px; cursor: pointer; }
+/* כפתורים ראשיים לכל הרוחב: יעד לחיצה גדול וברור בתחתית כל טופס */
+.card > button:not(.secondary):not(.tab-btn), .card > .btn:not(.secondary) { width: 100%; justify-content: center; min-height: 48px; font-size: 16px; }
+button.secondary, .btn.secondary { min-height: 44px; padding: 8px 16px; font-size: 14px; }
+/* טקסט עזר קטן מדי לקריאה בטלפון */
+.card p[style*="font-size:12px"], .card p[style*="font-size: 12px"] { font-size: 13px !important; line-height: 1.6; }
+/* גלילה אוטומטית לתוצאה (data-result ב-actions.js) עוצרת מתחת לסרגל העליון הקבוע ולא מאחוריו */
+[id] { scroll-margin-top: 76px; }

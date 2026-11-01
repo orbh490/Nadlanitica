@@ -21,7 +21,7 @@
         <datalist id="tenderOptions"></datalist>
       </label>
       <div id="tenderListStatus" style="font-size:13px;color:var(--ink-muted);margin-top:6px" aria-live="polite"></div>
-      <button data-click="loadTenderDetail">הצג פרטי מכרז</button>
+      <button data-click="loadTenderDetail" data-result="tenderDetailCard">הצג פרטי מכרז</button>
     </div>
 
     <div class="card" id="tenderDetailCard" style="display:none">
@@ -101,7 +101,7 @@
         <label>אחוז הנחה על מחיר הקרקע (%) <input type="number" id="discountPercent" value="0" min="0" max="100"></label>
       </div>
 
-      <button data-click="calculateSelfBuild">חשב</button>
+      <button data-click="calculateSelfBuild" data-result="selfBuildResult">חשב</button>
       <div id="selfBuildResult" style="margin-top:16px"></div>
     </div>
 
