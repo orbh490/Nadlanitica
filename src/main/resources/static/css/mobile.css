@@ -125,9 +125,10 @@ td { padding: 7px 9px; }
 .back-home::before { content: '→'; margin-inline-end: 6px; }
 
 /* ===== קישורי מדיניות: שורה רגילה בסוף התוכן ===== */
-.policy-links { position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 24px 0 4px; padding: 0; background: none; border: 0; z-index: auto; }
-a.policy-btn { display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 12px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 500; color: var(--ink-secondary); background: var(--white); border: 1px solid var(--border); box-shadow: none; }
-a.policy-btn .icon { display: inline-block; font-size: 16px; line-height: 1; color: var(--teal); }
+/* שלושת הקישורים תמיד זה לצד זה: כל אחד שליש רוחב, טקסט קטן ובלי שבירת שורה */
+.policy-links { position: static; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 4px; margin: 24px 0 4px; padding: 0; background: none; border: 0; z-index: auto; }
+a.policy-btn { display: inline-flex; flex: 1 1 0; min-width: 0; align-items: center; justify-content: center; gap: 3px; height: 32px; padding: 0 6px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 500; white-space: nowrap; color: var(--ink-secondary); background: var(--white); border: 1px solid var(--border); box-shadow: none; }
+a.policy-btn .icon { display: inline-block; font-size: 14px; line-height: 1; color: var(--teal); }
 a.policy-btn:hover, a.policy-btn:focus-visible { transform: none; }
 
 /* ===== סרגל תחתון ===== */
