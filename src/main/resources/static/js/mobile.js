@@ -1,3 +1,58 @@
+// פריסה בנייד, בכל הדפים: גובה הרצועה הכחולה, תת-כותרת מקוצרת, וטקסטים ארוכים שמתקפלים
+(function () {
+  if (!matchMedia('(max-width: 700px)').matches) return;
+
+  // טקסטים ארוכים שסומנו ב-data-m-collapse="כותרת השורה" נכנסים מאחורי שורה שנפתחת בלחיצה. במחשב הם נשארים גלויים
+  [].forEach.call(document.querySelectorAll('[data-m-collapse]'), function (el) {
+    var details = document.createElement('details');
+    details.className = 'm-more';
+    var summary = document.createElement('summary');
+    summary.textContent = el.getAttribute('data-m-collapse');
+    el.parentNode.insertBefore(details, el);
+    details.appendChild(summary);
+    details.appendChild(el);
+  });
+
+  // מכאן רק לעמודים עם מסגרת רגילה (.page) - לדף הבית יש פתיחה משלו
+  var page = document.querySelector('.page');
+  if (!page) return;
+
+  // תת-הכותרת ברצועה: עד שתי שורות, ו"קראו עוד" מציג את כולה
+  var sub = page.querySelector(':scope > p.subtitle');
+  if (sub) {
+    sub.classList.add('m-clamp');
+    if (sub.scrollHeight > sub.clientHeight + 2) {
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'm-sub-more';
+      more.textContent = 'קראו עוד';
+      more.setAttribute('aria-expanded', 'false');
+      sub.insertAdjacentElement('afterend', more);
+      more.addEventListener('click', function () {
+        var open = sub.classList.toggle('m-clamp') === false;
+        more.textContent = open ? 'הצג פחות' : 'קראו עוד';
+        more.setAttribute('aria-expanded', String(open));
+        setBand();
+      });
+    } else {
+      sub.classList.remove('m-clamp');
+    }
+  }
+
+  // הרצועה הכחולה (.page::before) נגמרת קצת מתחת לסוף הכותרת, כך שהבועה הראשונה עולה עליה בדיוק באותה מידה בכל דף
+  function setBand() {
+    var head = page.querySelectorAll(':scope > h1, :scope > p.subtitle, :scope > .m-sub-more, :scope > .back-home');
+    if (!head.length) return;
+    var top = page.getBoundingClientRect().top, bottom = 0;
+    [].forEach.call(head, function (el) { bottom = Math.max(bottom, el.getBoundingClientRect().bottom - top); });
+    var bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--m-bar')) || 60;
+    page.style.setProperty('--m-band', Math.round(bottom + bar + 48) + 'px');
+  }
+  setBand();
+  addEventListener('resize', setBand);
+  if (document.fonts) document.fonts.ready.then(setBand);
+})();
+
 // ניווט נייד בלבד: החלקה לצדדים בין חמשת דפי הסרגל התחתון, וסימון שזז יחד עם הדף
 (function () {
   if (!matchMedia('(max-width: 700px)').matches) return;

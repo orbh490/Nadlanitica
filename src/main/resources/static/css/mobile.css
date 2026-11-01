@@ -1,64 +1,135 @@
-/* גרסת נייד בלבד (מתחת ל-700px). נטען רק דרך media בתוך fragments/head.html - גרסת המחשב לא מושפעת */
-.topbar { height: 60px; padding: 0 16px; backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; transform: none; background: #fff; box-shadow: 0 1px 0 var(--border); }
+/* גרסת נייד בלבד (מתחת ל-700px). נטען רק דרך media בתוך fragments/head.html - גרסת המחשב לא מושפעת.
+   אותה זהות כמו במחשב (כחול כהה, טורקיז, Rubik), במידות של טלפון:
+   טקסט: כותרת עמוד 24 · כותרת בועה 17 · גוף 15 · תווית 13.5 · שדה 16 (מתחת לזה אייפון מגדיל את הדף)
+   ריווח: שוליים 12 · ריפוד בועה 16 · רווח בין בועות 12 */
+
+:root { --m-gutter: 12px; --m-pad: 16px; --m-gap: 12px; --m-bar: 60px; }
+
+/* ===== סרגל עליון קבוע ===== */
+body { padding-top: var(--m-bar); padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: var(--m-bar); padding: 0 var(--m-gutter); display: flex; align-items: center; justify-content: space-between; gap: 8px; backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; transform: none; will-change: auto; background: #fff; box-shadow: 0 1px 0 var(--border); }
 .topbar .links { display: none; }
-.topbar .brand span { font-size: 17px; }
-.topbar .brand img { width: 30px; height: 30px; }
-
-/* רצועת הכותרת: גבוהה מספיק כדי שהטקסט יישב בתוכה */
-.page::before { height: 414px; }
-.page { padding-inline: 16px; }
-.page > h1 { font-size: 30px; line-height: 1.2; }
-.page > p.subtitle { font-size: 15px; line-height: 1.7; }
-.page > .card:first-of-type { margin-top: 40px; }
-
-/* סרגל תחתון: לבן, עדין, עם הדגשה רכה לדף הנוכחי */
-body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
-nav.m-tabs { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; height: 70px; padding: 6px 8px; align-items: center; justify-content: space-around; background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -8px 20px -14px rgba(20,45,66,.35); }
-.m-tabs a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 56px; border-radius: 16px; color: var(--ink-secondary); font-size: 12px; font-weight: 600; text-decoration: none; text-align: center; line-height: 1.2; }
-.m-tabs a .material-symbols-outlined { font-size: 24px; }
-.m-tabs a.active { background: var(--teal-soft); color: #0E7C84; font-weight: 700; }
-
-/* טבלאות: גלילה אופקית במקום חיתוך */
-table { display: block; overflow-x: auto; max-width: 100%; }
-.intro-bubble { max-width: none; width: 100%; margin: 0; }
-
-/* דף הבית בנייד: עמודה אחת */
-.home-hero { padding: 130px 16px 100px; }
-.home-hero-grid { grid-template-columns: 1fr; gap: 28px; }
-.home-hero h1 { font-size: 36px; max-width: none; }
-.home-hero p { font-size: 16px; }
-.home-tiles { padding: 0 16px; margin-top: -40px; }
-.tile-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-.home-steps { padding: 0 16px; }
-.steps-grid { grid-template-columns: 1fr; gap: 14px; }
-
-/* סרגל עליון קבוע ומיושר: לוגו מימין, כפתורים משמאל, תמיד באותו מקום בכל דף */
-.topbar { position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; transform: none; will-change: auto; }
 .topbar .brand { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
-.topbar .actions { display: flex; align-items: center; gap: 4px; margin: 0; flex: 0 0 auto; }
-.topbar .login-btn { height: 40px; padding: 0 12px; font-size: 14px; white-space: nowrap; }
+.topbar .brand span { font-size: 17px; }
+.topbar .brand img { width: 28px; height: 28px; }
+.topbar .actions { display: flex; align-items: center; gap: 2px; margin: 0; flex: 0 0 auto; }
+.topbar .login-btn { height: 38px; padding: 0 12px; font-size: 14px; white-space: nowrap; }
 
-/* סרגל תחתון קבוע: נשאר במקום בגלילה, ומתאים לאזור הבטוח של המכשיר */
-nav.m-tabs { position: fixed; bottom: 0; height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); transform: translateZ(0); }
+/* ===== רצועת הכותרת: נמוכה, עוטפת בדיוק את הכותרת והשורה שמתחתיה =====
+   הגובה נמדד ב-mobile.js (--m-band) לפי סוף הכותרת; 210px הוא גיבוי אם הסקריפט לא רץ */
+.page { padding: 18px var(--m-gutter) 24px; }
+.page::before { top: calc(-1 * var(--m-bar)); height: var(--m-band, 210px); }
+.page > h1 { font-size: 24px; line-height: 1.25; margin: 0 0 6px; }
+.page > p.subtitle { font-size: 14px; line-height: 1.55; margin: 0; max-width: none; }
+/* עד שתי שורות, ו"קראו עוד" פותח (mobile.js) */
+.page > p.subtitle.m-clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.m-sub-more { display: inline-flex; align-items: center; margin: 4px 0 0; padding: 4px 0; min-height: 32px; background: none; border: 0; box-shadow: none; color: #9FE3E8; font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.m-sub-more::before { display: none; }
+.m-sub-more:hover { background: none; transform: none; }
+/* הבועה הראשונה עולה מעט על הרצועה */
+.page > :is(h1, p.subtitle, .m-sub-more) + :is(.card, .results-tabs, div) { margin-top: 28px; }
+.page > .results-tabs + .card { margin-top: 0; }
 
-/* ---- הגדרות חזרו לסרגל העליון בנייד ---- */
+/* ===== בועות ===== */
+.card { padding: var(--m-pad); border-radius: 16px; margin-bottom: var(--m-gap); box-shadow: 0 1px 2px rgba(23, 71, 111, .05), 0 8px 20px -16px rgba(23, 71, 111, .35); }
+.card h2 { font-size: 17px; margin: 0 0 10px; gap: 8px; }
+.card h2::before { height: 16px; }
+.card h3 { font-size: 15px; }
+.card p, .card li { font-size: 15px; line-height: 1.6; }
+.card p.subtitle { font-size: 14px; line-height: 1.55; }
+/* הרבה פסקאות בעמודים מגיעות עם font-size:14px בתוך style - מספיק טוב לטלפון, רק מהדקים את הריווח */
+.card p[style*="font-size:14px"], .card li[style*="font-size:14px"] { line-height: 1.6 !important; }
+.card p[style*="font-size:12px"], .card p[style*="font-size: 12px"] { font-size: 13px !important; line-height: 1.55; }
+.grid2 { gap: 0 12px; }
 
-/* טולטיפ (?) בנייד: מוצג כפס קבוע מעל הסרגלים ולא יוצא מהמסך. לפני כן הוא יצא לצד השמאלי, הרחיב את הדף והזיז את הסרגלים */
-.info-tip::after { position: fixed; left: 16px; right: 16px; top: auto; bottom: calc(190px + env(safe-area-inset-bottom, 0px)); transform: none; width: auto; max-width: none; z-index: 400; }
+/* ===== שדות וטפסים ===== */
+label { font-size: 13.5px; margin-top: 10px; }
+input[type=number], input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea { font-size: 16px; min-height: 44px; padding: 10px 12px; border-radius: 10px; margin-top: 5px; }
+textarea { min-height: 88px; }
+.checkbox-row { min-height: 40px; gap: 10px; font-size: 14px; padding: 4px 0; margin-top: 8px; }
+.checkbox-row input[type=checkbox]:not(.switch), .checkbox-row input[type=radio], label > input[type=checkbox]:not(.switch) { width: 20px; height: 20px; flex: none; margin: 0; }
+.switch-row { padding: 10px 0; }
+/* כפתור ה-? קטן לעין, עם אזור לחיצה של 44px סביבו */
+.info-tip { width: 20px; height: 20px; font-size: 12px; }
+.info-tip::before { content: ''; position: absolute; inset: -12px; }
+/* הטולטיפ מוצג כפס קבוע מעל הסרגל התחתון ולא יוצא מהמסך */
+.info-tip::after { position: fixed; left: var(--m-gutter); right: var(--m-gutter); top: auto; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: none; width: auto; max-width: none; z-index: 400; font-size: 14px; line-height: 1.55; }
 
-/* קישורי מדיניות בנייד: שורה רגילה בסוף התוכן. קודם היו בועות שצפו מעל הדף וכיסו שדות וטקסט בכל הדפים */
-.policy-links { position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 32px 0 8px; padding: 0; background: none; border: 0; z-index: auto; }
-a.policy-btn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; color: var(--ink-secondary); background: var(--white); border: 1px solid var(--border); box-shadow: none; }
-a.policy-btn .icon { display: inline-block; font-size: 18px; line-height: 1; color: var(--teal); }
+/* ===== כפתורים ===== */
+button, .btn { font-size: 15px; padding: 11px 18px; margin-top: 14px; }
+.card > button:not(.secondary):not(.tab-btn), .card > .btn:not(.secondary) { width: 100%; justify-content: center; min-height: 46px; }
+button.secondary, .btn.secondary { min-height: 40px; padding: 8px 14px; font-size: 14px; }
+summary { padding: 10px 0; font-size: 14px; cursor: pointer; }
+
+/* טקסט ארוך שמקופל בטלפון (data-m-collapse, mobile.js) */
+details.m-more { margin: 4px 0 8px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+details.m-more > summary { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0; color: var(--navy); font-weight: 600; list-style: none; }
+details.m-more > summary::-webkit-details-marker { display: none; }
+details.m-more > summary::after { content: ''; margin-inline-start: auto; width: 8px; height: 8px; border-inline-start: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .2s ease; }
+details.m-more[open] > summary::after { transform: rotate(135deg); }
+details.m-more > p { margin: 0 0 12px !important; }
+
+/* ===== תוצאות, טבלאות וגרפים ===== */
+.calc-bubbles { gap: 8px; margin: 4px 0 16px; }
+.bubble { padding: 12px 14px; border-radius: 12px; }
+.bubble b { font-size: 24px; }
+table { display: block; overflow-x: auto; max-width: 100%; font-size: 13px; border-radius: 10px; }
+th { font-size: 12px; padding: 8px 10px; }
+td { padding: 8px 10px; }
+.badge { font-size: 12.5px; padding: 4px 10px; }
+.viz-root text { font-size: 11px; }
+
+/* ===== חלון ההסבר ===== */
+.intro-overlay { padding: var(--m-gutter); align-items: flex-end; }
+.intro-bubble { max-width: none; width: 100%; margin: 0 0 calc(76px + env(safe-area-inset-bottom, 0px)); padding: 20px var(--m-pad) var(--m-pad); }
+.intro-bubble h2 { font-size: 18px; }
+.intro-bubble p { font-size: 15px; line-height: 1.6; }
+.intro-bubble button { width: 100%; justify-content: center; }
+
+/* ===== דף הבית ===== */
+.home-hero { margin-top: calc(-1 * var(--m-bar)); padding: calc(var(--m-bar) + 36px) var(--m-gutter) 76px; }
+.home-hero-grid { grid-template-columns: 1fr; gap: 20px; }
+.home-hero h1 { font-size: 30px; line-height: 1.15; margin-top: 10px; max-width: none; }
+.home-hero p { font-size: 15px; line-height: 1.6; margin-top: 12px; }
+.home-cta { margin-top: 20px; gap: 10px; }
+.home-cta a { padding: 12px 20px; font-size: 15px; border-radius: 12px; }
+.home-card { display: none; }
+.home-tiles { padding: 0 var(--m-gutter); margin-top: -48px; }
+.tile-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { padding: 14px 12px; gap: 6px; border-radius: 14px; }
+.tile .material-symbols-outlined { font-size: 24px; }
+.tile .t { font-size: 15px; line-height: 1.3; }
+.tile .d { font-size: 12.5px; line-height: 1.45; }
+.home-steps, .home-section { padding: 0 var(--m-gutter); margin-top: 32px; }
+.steps-title { font-size: 22px; }
+.steps-grid { grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
+.step { padding: 14px var(--m-pad); border-radius: 14px; display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: start; }
+.step .n { font-size: 28px; grid-row: span 2; }
+.step h3 { margin: 2px 0 4px; font-size: 16px; }
+.step p { margin: 0; font-size: 14px; line-height: 1.55; }
+.why-text { font-size: 15px; line-height: 1.7; }
+
+/* ===== דפי מידע (גילוי נאות, פרטיות, נגישות): כפתור החזרה בראש הרצועה ===== */
+.back-home { position: static; margin: 0 0 12px; height: 36px; padding: 0 14px; font-size: 13px; box-shadow: none; }
+.back-home::before { content: '→'; margin-inline-end: 6px; }
+
+
+/* ===== קישורי מדיניות: שורה רגילה בסוף התוכן ===== */
+.policy-links { position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 24px 0 4px; padding: 0; background: none; border: 0; z-index: auto; }
+a.policy-btn { display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: var(--radius-pill); font-size: 12.5px; font-weight: 500; color: var(--ink-secondary); background: var(--white); border: 1px solid var(--border); box-shadow: none; }
+a.policy-btn .icon { display: inline-block; font-size: 16px; line-height: 1; color: var(--teal); }
 a.policy-btn:hover, a.policy-btn:focus-visible { transform: none; }
 
-/* א. דוגמת החישוב בדף הבית מוסתרת בנייד */
-.home-card { display: none; }
+/* ===== סרגל תחתון ===== */
+nav.m-tabs { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; height: calc(64px + env(safe-area-inset-bottom, 0px)); padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)); align-items: center; justify-content: space-around; background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -8px 20px -14px rgba(20,45,66,.35); transform: translateZ(0); }
+/* רוחב שווה לכל לשונית, גם לפני שגופן האייקונים נטען (עד אז שם האייקון מוצג כמילה ארוכה ומרחיב את הלשונית) */
+.m-tabs a { position: relative; z-index: 1; flex: 1 1 0; min-width: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 52px; border-radius: 14px; color: var(--ink-secondary); font-size: 11.5px; font-weight: 600; text-decoration: none; text-align: center; line-height: 1.2; }
+.m-tabs a .material-symbols-outlined { font-size: 23px; width: 24px; overflow: hidden; }
+.m-tabs a.active { background: none; color: #0E7C84; font-weight: 700; }
+/* הסימון מחליק בין הלשוניות יחד עם הדף (mobile.js) */
+.m-ind { position: absolute; top: 6px; height: 52px; border-radius: 14px; background: var(--teal-soft); z-index: 0; transition: left .35s ease, width .35s ease; }
 
-/* ג. הסימון בסרגל התחתון מחליק בין הלשוניות, ודפים מחליקים לצדדים */
-.m-tabs a { position: relative; z-index: 1; }
-.m-tabs a.active { background: none; }
-.m-ind { position: absolute; top: 6px; height: 56px; border-radius: 16px; background: var(--teal-soft); z-index: 0; transition: left .35s ease, width .35s ease; }
+/* ===== מעבר בין לשוניות ===== */
 .page.m-enter-fwd { animation: mEnterFwd .35s ease; }
 .page.m-enter-back { animation: mEnterBack .35s ease; }
 /* דף הבא בסרגל נמצא משמאל (RTL): הוא נכנס משמאל, והקודם מימין */
@@ -67,36 +138,7 @@ a.policy-btn:hover, a.policy-btn:focus-visible { transform: none; }
 /* חיווי טעינה בזמן מעבר בין לשוניות, כשהדף הבא לא נטען מראש והרשת איטית */
 body.m-loading::after { content: ''; position: fixed; top: 45%; left: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 3px solid var(--teal-soft); border-top-color: var(--teal); border-radius: 50%; animation: mSpin .8s linear infinite; z-index: 50; }
 @keyframes mSpin { to { transform: rotate(360deg); } }
-/* רוחב שווה לכל לשונית, גם לפני שגופן האייקונים נטען (עד אז שם האייקון מוצג כמילה ארוכה ומרחיב את הלשונית) */
-.m-tabs a { flex: 1 1 0; min-width: 0; overflow: hidden; }
-.m-tabs a .material-symbols-outlined { width: 24px; overflow: hidden; }
 /* בלי ההחלקה של הדפדפן עצמו להיסטוריה (כרום), שמתנגשת בהחלקה בין הדפים */
 html, body { overscroll-behavior-x: none; }
-
-/* כפתור "לעמוד הבית" בדפי המידע: בנייד רצועת הכותרת גבוהה יותר, אז המיקום הקבוע של המחשב נופל על הטקסט.
-   כאן הוא חלק מהזרימה - בראש הרצועה, מעל הכותרת */
-.back-home { position: static; margin: 0 0 18px; height: 40px; padding: 0 18px; font-size: 14px; box-shadow: none; }
-.back-home::before { content: '→'; margin-inline-end: 8px; }
-.back-home ~ .card:first-of-type { margin-top: 40px; }
-
-
-/* ===== נוחות מגע ונגישות בנייד ===== */
-/* שדות ב-16px לפחות: מתחת לזה אייפון מגדיל את כל הדף בכל פעם שנכנסים לשדה, וצריך להקטין חזרה ידנית */
-input[type=number], input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea { font-size: 16px; min-height: 48px; }
-textarea { min-height: 96px; }
-label { font-size: 15px; }
-/* תיבות סימון גדולות מספיק לאצבע, וכל השורה (כולל הטקסט) לחיצה */
-.checkbox-row { min-height: 44px; gap: 12px; }
-.checkbox-row input[type=checkbox], .checkbox-row input[type=radio], label > input[type=checkbox] { width: 22px; height: 22px; flex: none; margin: 0; }
-/* כפתור ה-? קטן לעין אבל עם אזור לחיצה של 44px סביבו */
-.info-tip { width: 22px; height: 22px; font-size: 13px; }
-.info-tip::before { content: ''; position: absolute; inset: -11px; }
-/* "הצג טבלה מלאה" ודומיו - שורה שקל ללחוץ עליה */
-summary { padding: 12px 0; font-size: 14px; cursor: pointer; }
-/* כפתורים ראשיים לכל הרוחב: יעד לחיצה גדול וברור בתחתית כל טופס */
-.card > button:not(.secondary):not(.tab-btn), .card > .btn:not(.secondary) { width: 100%; justify-content: center; min-height: 48px; font-size: 16px; }
-button.secondary, .btn.secondary { min-height: 44px; padding: 8px 16px; font-size: 14px; }
-/* טקסט עזר קטן מדי לקריאה בטלפון */
-.card p[style*="font-size:12px"], .card p[style*="font-size: 12px"] { font-size: 13px !important; line-height: 1.6; }
 /* גלילה אוטומטית לתוצאה (data-result ב-actions.js) עוצרת מתחת לסרגל העליון הקבוע ולא מאחוריו */
-[id] { scroll-margin-top: 76px; }
+[id] { scroll-margin-top: calc(var(--m-bar) + 12px); }
