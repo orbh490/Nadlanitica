@@ -20,22 +20,7 @@
     <p class="subtitle">היסטוריית החישובים שלך והשוואת מסלולים - זמין רק כשמחוברים, כדי שהמידע שלך יישמר.</p>
 
     <div class="card" id="loggedOutView" style="display:none">
-      <h2>התחברות / הרשמה</h2>
-      <label>אימייל <input type="email" id="authEmail"></label>
-      <label>סיסמה (לפחות 6 תווים) <input type="password" id="authPassword"></label>
-      <div class="checkbox-row">
-        <input type="checkbox" id="consentCheckbox">
-        <label for="consentCheckbox" style="margin:0;font-weight:400">קראתי ואני מסכים/ה ל<a href="/privacy.html" target="_blank">מדיניות הפרטיות</a> (נדרש להרשמה בלבד)</label>
-      </div>
-      <button data-click="handleLogin">התחברות</button>
-      <button class="secondary" data-click="handleRegister">הרשמה</button>
-      <p style="margin-top:10px"><a href="#" data-click="toggleForgotPassword" style="font-size:12px">שכחתי סיסמה</a></p>
-      <div id="forgotPasswordBox" style="display:none">
-        <label>אימייל לאיפוס סיסמה <input type="email" id="forgotEmail"></label>
-        <button class="secondary" data-click="submitForgotPassword">שלחו קישור לאיפוס</button>
-      </div>
-      <div id="authMessage" style="margin-top:8px;font-size:13px"></div>
-      <a href="#" id="resendVerificationLink" style="display:none;font-size:12px" data-click="resendVerification">שלחו שוב מייל אימות</a>
+      <div th:replace="~{fragments/auth :: form}"></div>
     </div>
 
     <div id="loggedInView" style="display:none">
@@ -98,6 +83,7 @@
   </div>
 
 <script th:src="@{/js/app.js}"></script>
+<script th:src="@{/js/auth-form.js}"></script>
 <script th:src="@{/js/pages/account.js}"></script>
 </body>
 </html>

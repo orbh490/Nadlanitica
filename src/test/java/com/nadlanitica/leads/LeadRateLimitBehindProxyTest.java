@@ -46,7 +46,7 @@ class LeadRateLimitBehindProxyTest {
         HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/leads"))
                 .header("Content-Type", "application/json")
                 .header("X-Forwarded-For", forwardedFor)
-                .POST(HttpRequest.BodyPublishers.ofString("{\"fullName\":\"בדיקה\",\"phone\":\"0500000000\"}"))
+                .POST(HttpRequest.BodyPublishers.ofString("{\"fullName\":\"בדיקה\",\"phone\":\"0500000000\",\"email\":\"lead@example.com\"}"))
                 .build();
         return client.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
     }

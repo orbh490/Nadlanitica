@@ -4,8 +4,10 @@ async function submitLead() {
   const resultEl = document.getElementById('leadResult');
   if (!validateFields([
     ['fullName', value => check.required('נא למלא שם')(value) || check.maxLength(300, 'השם ארוך מדי')(value)],
-    ['phone', check.phone('מספר טלפון לא תקין - למשל 050-1234567')],
-    ['email', check.email('כתובת אימייל לא תקינה', { optional: true })],
+    ['phone', value => check.required('נא למלא מספר נייד')(value)
+      || check.mobile('מספר נייד לא תקין - 10 ספרות שמתחילות ב-05, למשל 050-1234567')(value)],
+    ['email', value => check.required('נא למלא כתובת אימייל')(value)
+      || check.email('כתובת אימייל לא תקינה - למשל name@gmail.com')(value)],
     ['message', check.maxLength(300, 'ההודעה ארוכה מדי (עד 300 תווים)')]
   ])) return;
   resultEl.innerHTML = '';

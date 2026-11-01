@@ -65,8 +65,11 @@ public class AuthService {
         if (!consent) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "יש לאשר את מדיניות הפרטיות כדי להירשם");
         }
-        if (userRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "כבר קיים משתמש עם האימייל הזה");
+        // לא רק אותה כתובת בדיוק: גם orbh+1@ או o.r.bh@gmail.com הם אותה תיבה (ראו MailboxKey)
+        if (userRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()
+                || !userRepository.findByMailboxKey(MailboxKey.of(normalizedEmail)).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "כבר קיים חשבון על תיבת המייל הזו - אפשר להתחבר, או לאפס סיסמה אם שכחתם אותה");
         }
         AppUser user = new AppUser(UUID.randomUUID().toString(), normalizedEmail, passwordEncoder.encode(password));
         userRepository.save(user);
@@ -74,18 +77,19 @@ public class AuthService {
     }
 
     public AuthResult login(String email, String password) {
-        String normalizedEmail = normalize(email);
-        rateLimiter.checkNotBlocked(normalizedEmail);
-        Optional<AppUser> user = userRepository.findByEmailIgnoreCase(normalizedEmail);
+        // המונה לפי התיבה ולא לפי הכתובת: אחרת orbh+1@, orbh+2@... היו נותנים עוד ניסיונות ניחוש על אותו חשבון
+        String limiterKey = MailboxKey.of(email);
+        rateLimiter.checkNotBlocked(limiterKey);
+        Optional<AppUser> user = findAccount(email);
         if (user.isEmpty() || password == null || !passwordEncoder.matches(password, user.get().getPasswordHash())) {
-            rateLimiter.recordFailure(normalizedEmail);
+            rateLimiter.recordFailure(limiterKey);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "אימייל או סיסמה שגויים");
         }
         if (!user.get().isEmailVerified()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "יש לאמת את כתובת האימייל לפני ההתחברות - בדקו את תיבת הדואר שלכם (כולל תיקיית ספאם)");
         }
-        rateLimiter.recordSuccess(normalizedEmail);
+        rateLimiter.recordSuccess(limiterKey);
         return new AuthResult(createSession(user.get().getId()), user.get().getEmail());
     }
 
@@ -119,9 +123,9 @@ public class AuthService {
      */
     public void deleteAccount(String token, String password) {
         AppUser user = requireUser(token);
-        rateLimiter.checkNotBlocked(user.getEmail());
+        rateLimiter.checkNotBlocked(user.getMailboxKey());
         if (password == null || !passwordEncoder.matches(password, user.getPasswordHash())) {
-            rateLimiter.recordFailure(user.getEmail());
+            rateLimiter.recordFailure(user.getMailboxKey());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "הסיסמה שגויה - החשבון לא נמחק");
         }
         userRepository.delete(user);
@@ -129,7 +133,7 @@ public class AuthService {
 
     /** לא חושף אם הכתובת קיימת/מאומתת כבר - תמיד "מצליח" מנקודת מבטו של הקורא. */
     public void resendVerification(String email) {
-        userRepository.findByEmailIgnoreCase(normalize(email))
+        findAccount(email)
                 .filter(u -> !u.isEmailVerified())
                 .ifPresent(this::sendVerificationEmail);
     }
@@ -165,7 +169,7 @@ public class AuthService {
 
     /** לא חושף אם הכתובת קיימת במערכת - תמיד "מצליח" מנקודת מבטו של הקורא. */
     public void requestPasswordReset(String email) {
-        userRepository.findByEmailIgnoreCase(normalize(email)).ifPresent(user -> {
+        findAccount(email).ifPresent(user -> {
             String token = randomToken();
             tokenRepository.save(new AccountToken(token, user.getId(), PURPOSE_RESET, Instant.now().plus(RESET_TOKEN_TTL)));
             String link = baseUrl + "/reset-password.html?token=" + token;
@@ -218,6 +222,19 @@ public class AuthService {
         String token = randomToken();
         sessionRepository.save(new UserSession(token, userId, Instant.now().plus(SESSION_TTL)));
         return token;
+    }
+
+    /**
+     * החשבון של הכתובת: קודם התאמה מדויקת, ואם אין - החשבון שעל אותה תיבה (מי שנרשם כ-or.bh@gmail.com ומתחבר
+     * כ-orbh@gmail.com). אם יש כמה חשבונות ישנים על אותה תיבה, לא מנחשים איזה מהם - רק התאמה מדויקת תעבוד.
+     */
+    private Optional<AppUser> findAccount(String email) {
+        Optional<AppUser> exact = userRepository.findByEmailIgnoreCase(normalize(email));
+        if (exact.isPresent()) {
+            return exact;
+        }
+        List<AppUser> sameMailbox = userRepository.findByMailboxKey(MailboxKey.of(email));
+        return sameMailbox.size() == 1 ? Optional.of(sameMailbox.get(0)) : Optional.empty();
     }
 
     private static String normalize(String email) {

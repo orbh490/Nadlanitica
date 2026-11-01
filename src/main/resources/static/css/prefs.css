@@ -54,3 +54,6 @@
 /* מסגרת הפוקוס (#0E7C84) כמעט לא נראית על הרקע הכהה */
 [data-theme="dark"] a:focus-visible, [data-theme="dark"] button:focus-visible, [data-theme="dark"] summary:focus-visible,
 [data-theme="dark"] .icon-btn:focus-visible, [data-theme="dark"] .login-btn:focus-visible { outline-color: var(--teal); }
+[data-theme="dark"] .auth-tabs { background: var(--page-bg); }
+[data-theme="dark"] .auth-tabs button.tab-btn { background: transparent; color: var(--ink-secondary); }
+[data-theme="dark"] .auth-tabs button.tab-btn.active { background: var(--teal); color: #0B2238; }

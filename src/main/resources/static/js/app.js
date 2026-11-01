@@ -128,10 +128,13 @@ const check = {
   },
   minLength: (n, msg) => value => value.length >= n ? null : msg,
   maxLength: (n, msg) => value => value.length <= n ? null : msg,
+  // שם@דומיין.סיומת, בלי רווחים ובלי נקודות כפולות או נקודה בסוף; הסיומת לפחות 2 אותיות (co.il, com...)
   email: (msg, { optional = false } = {}) => value =>
-    (value === '' && optional) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? null : msg,
+    (value === '' && optional) || /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[A-Za-z]{2,}$/.test(value) ? null : msg,
   // טלפון ישראלי: 9-10 ספרות, מותר רווחים/מקפים ו-+972 בהתחלה
-  phone: msg => value => /^0\d{8,9}$/.test(value.replace(/[\s-]/g, '').replace(/^\+972/, '0')) ? null : msg
+  phone: msg => value => /^0\d{8,9}$/.test(value.replace(/[\s-]/g, '').replace(/^\+972/, '0')) ? null : msg,
+  // נייד ישראלי: 05 ועוד 8 ספרות. מותר 050-1234567, רווחים, ו-+972 / 972 בהתחלה (כמו normalizeMobile בשרת)
+  mobile: msg => value => /^05\d{8}$/.test(value.replace(/[\s\-().]/g, '').replace(/^\+?972/, '0')) ? null : msg
 };
 
 function showFieldError(input, message) {

@@ -1079,3 +1079,16 @@ button, .btn, .login-btn, .primary, .secondary { min-height: 44px; }
   text-decoration: none;
 }
 .skip-link:focus { top: 12px; }
+
+/* ===== טופס התחברות/הרשמה (fragments/auth.html): מתג בין שני מצבים, כותרת וכפתור לפי המצב ===== */
+.auth-tabs { display: flex; gap: 4px; padding: 4px; margin-bottom: 20px; background: var(--page-bg); border: 1px solid var(--border); border-radius: var(--radius-pill); }
+.auth-tabs button.tab-btn { flex: 1; justify-content: center; margin: 0; min-height: 44px; padding: 0 12px; background: transparent; color: var(--ink-secondary); border: 0; border-radius: var(--radius-pill); box-shadow: none; font-size: 15px; font-weight: 600; }
+.auth-tabs button.tab-btn::before { display: none; }
+.auth-tabs button.tab-btn:hover { transform: none; filter: none; box-shadow: none; color: var(--navy); }
+.auth-tabs button.tab-btn.active { background: var(--teal); color: #0B2238; box-shadow: 0 8px 18px -10px rgba(27,178,187,.9); }
+.auth-form h2 { margin-top: 0; }
+.auth-intro { font-size: 14px; line-height: 1.7; color: var(--ink-secondary); margin: 0 0 14px; }
+.auth-form button.auth-submit { width: 100%; justify-content: center; }
+.auth-small { margin: 10px 0 0; font-size: 13px; }
+.auth-switch { margin: 16px 0 0; font-size: 14px; color: var(--ink-secondary); text-align: center; }
+.auth-switch a { font-weight: 600; }

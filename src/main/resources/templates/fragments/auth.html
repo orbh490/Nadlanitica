@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="he" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- טופס התחברות/הרשמה משותף לעמוד הכניסה (index) ולאזור האישי (account).
+     שני מצבים נפרדים שמחליפים כותרת, הסבר, שדות וכפתור - הלוגיקה ב-static/js/auth-form.js -->
+<div class="auth-form" th:fragment="form">
+  <div class="auth-tabs" role="tablist" aria-label="התחברות או הרשמה">
+    <button type="button" class="tab-btn active" role="tab" id="authTabLogin" aria-selected="true" aria-controls="authPanel" data-click="setAuthMode" data-arg="login">התחברות</button>
+    <button type="button" class="tab-btn" role="tab" id="authTabRegister" aria-selected="false" aria-controls="authPanel" data-click="setAuthMode" data-arg="register">הרשמה</button>
+  </div>
+
+  <div id="authPanel" role="tabpanel">
+    <h2 id="authTitle">התחברות לחשבון</h2>
+    <p id="authIntro" class="auth-intro">ברוכים השבים! התחברו כדי לראות את החישובים השמורים שלכם.</p>
+
+    <label>אימייל <input type="email" id="authEmail" autocomplete="email"></label>
+    <label><span id="authPasswordLabel">סיסמה</span> <input type="password" id="authPassword" autocomplete="current-password"></label>
+
+    <div class="checkbox-row" id="consentRow" style="display:none">
+      <input type="checkbox" id="consentCheckbox">
+      <label for="consentCheckbox" style="margin:0;font-weight:400">קראתי ואני מסכים/ה ל<a href="/privacy.html" target="_blank">מדיניות הפרטיות</a></label>
+    </div>
+
+    <button id="authSubmit" class="auth-submit" data-click="submitAuth">התחברות</button>
+
+    <p id="forgotRow" class="auth-small"><a href="#" data-click="toggleForgotPassword">שכחתי סיסמה</a></p>
+    <div id="forgotPasswordBox" style="display:none">
+      <label>אימייל לאיפוס סיסמה <input type="email" id="forgotEmail" autocomplete="email"></label>
+      <button class="secondary" data-click="submitForgotPassword">שלחו קישור לאיפוס</button>
+    </div>
+
+    <div id="authMessage" role="status" style="margin-top:8px;font-size:13px"></div>
+    <a href="#" id="resendVerificationLink" style="display:none;font-size:12px" data-click="resendVerification">שלחו שוב מייל אימות</a>
+
+    <p class="auth-switch" id="switchToRegister">עוד אין לכם חשבון? <a href="#" data-click="setAuthMode" data-arg="register">להרשמה</a></p>
+    <p class="auth-switch" id="switchToLogin" style="display:none">כבר יש לכם חשבון? <a href="#" data-click="setAuthMode" data-arg="login">להתחברות</a></p>
+  </div>
+</div>
+</body>
+</html>

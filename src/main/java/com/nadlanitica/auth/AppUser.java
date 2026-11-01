@@ -13,6 +13,9 @@ public class AppUser {
     private String id;
     @Column(unique = true, nullable = false)
     private String email;
+    /** התיבה האמיתית מאחורי הכתובת - ראו MailboxKey. מתעדכנת יחד עם email ולא נקבעת בנפרד. */
+    @Column(nullable = false)
+    private String mailboxKey;
     private String passwordHash;
     private Instant createdAt;
     private boolean emailVerified;
@@ -24,6 +27,7 @@ public class AppUser {
     public AppUser(String id, String email, String passwordHash) {
         this.id = id;
         this.email = email;
+        this.mailboxKey = MailboxKey.of(email);
         this.passwordHash = passwordHash;
         this.createdAt = Instant.now();
         this.emailVerified = false;
@@ -31,6 +35,7 @@ public class AppUser {
 
     public String getId() { return id; }
     public String getEmail() { return email; }
+    public String getMailboxKey() { return mailboxKey; }
     public String getPasswordHash() { return passwordHash; }
     public Instant getCreatedAt() { return createdAt; }
     public boolean isEmailVerified() { return emailVerified; }
