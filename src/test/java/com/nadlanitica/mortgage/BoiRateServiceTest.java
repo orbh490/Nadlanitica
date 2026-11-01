@@ -2,6 +2,7 @@ package com.nadlanitica.mortgage;
 
 import com.nadlanitica.common.AppState;
 import com.nadlanitica.common.AppStateRepository;
+import com.nadlanitica.notifications.DailyAlertGate;
 import com.nadlanitica.notifications.NotificationEmailService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -20,7 +21,7 @@ class BoiRateServiceTest {
 
     private final NotificationEmailService email = mock(NotificationEmailService.class);
     private final AppStateRepository appState = mock(AppStateRepository.class);
-    private final BoiRateService service = new BoiRateService(email, appState);
+    private final BoiRateService service = new BoiRateService(email, appState, mock(DailyAlertGate.class));
 
     @Test
     void sendsAlertWhenRateChangesFromTheStoredValue() {

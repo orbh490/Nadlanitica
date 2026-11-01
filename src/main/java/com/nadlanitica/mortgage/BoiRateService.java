@@ -2,6 +2,7 @@ package com.nadlanitica.mortgage;
 
 import com.nadlanitica.common.AppState;
 import com.nadlanitica.common.AppStateRepository;
+import com.nadlanitica.notifications.DailyAlertGate;
 import com.nadlanitica.notifications.NotificationEmailService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -32,13 +33,15 @@ public class BoiRateService {
     private final RestClient restClient = RestClient.create("https://boi.org.il");
     private final NotificationEmailService emailService;
     private final AppStateRepository appState;
+    private final DailyAlertGate dailyGate;
 
     private volatile double currentBaseRatePercent = FALLBACK_BASE_RATE_PERCENT;
     private volatile Instant lastSuccessfulFetch;
 
-    public BoiRateService(NotificationEmailService emailService, AppStateRepository appState) {
+    public BoiRateService(NotificationEmailService emailService, AppStateRepository appState, DailyAlertGate dailyGate) {
         this.emailService = emailService;
         this.appState = appState;
+        this.dailyGate = dailyGate;
     }
 
     record BoiInterestResponse(Double currentInterest) {
@@ -72,6 +75,10 @@ public class BoiRateService {
         } catch (RestClientException e) {
             log.warn("שליפת ריבית בנק ישראל נכשלה - ממשיכים עם הערך הקודם ({}%): {}",
                     currentBaseRatePercent, e.getMessage());
+            // השליפה רצה בכל עלייה של השרת: בלי השער, תקלה ארוכה אצל בנק ישראל הייתה שולחת מייל בכל התעוררות
+            if (!dailyGate.firstToday("boi-fetch-failed")) {
+                return;
+            }
             emailService.sendAlert("שליפת ריבית בנק ישראל נכשלה",
                     "ה-API של בנק ישראל (boi.org.il/PublicApi/GetInterest) לא הגיב כצפוי.\n" +
                     "האפליקציה ממשיכה לעבוד עם הערך הידוע האחרון (%.2f%%), אך כדאי לבדוק את התקלה.\n\nשגיאה: %s"

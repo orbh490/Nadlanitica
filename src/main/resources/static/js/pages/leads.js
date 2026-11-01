@@ -12,7 +12,7 @@ async function loadLeads() {
   statusEl.textContent = '';
   const res = await fetch('/api/admin/leads', { headers: { 'X-Admin-Key': currentKey() } });
   if (!res.ok) {
-    statusEl.textContent = res.status === 403 ? 'מפתח שגוי' : 'שגיאה בטעינה';
+    statusEl.textContent = res.status === 403 ? 'מפתח שגוי' : res.status === 429 ? 'יותר מדי ניסיונות שגויים - נסו שוב בעוד כ-15 דקות' : 'שגיאה בטעינה';
     document.getElementById('leadsTable').style.display = 'none';
     return;
   }
@@ -36,7 +36,7 @@ async function exportCsv() {
   statusEl.textContent = '';
   const res = await fetch('/api/admin/leads/export.csv', { headers: { 'X-Admin-Key': currentKey() } });
   if (!res.ok) {
-    statusEl.textContent = res.status === 403 ? 'מפתח שגוי' : 'שגיאה בייצוא';
+    statusEl.textContent = res.status === 403 ? 'מפתח שגוי' : res.status === 429 ? 'יותר מדי ניסיונות שגויים - נסו שוב בעוד כ-15 דקות' : 'שגיאה בייצוא';
     return;
   }
   const blob = await res.blob();

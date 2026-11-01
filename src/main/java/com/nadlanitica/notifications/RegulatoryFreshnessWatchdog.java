@@ -2,6 +2,8 @@ package com.nadlanitica.notifications;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +24,11 @@ public class RegulatoryFreshnessWatchdog {
     private static final int WARNING_WINDOW_DAYS = 30;
 
     private final NotificationEmailService emailService;
+    private final DailyAlertGate dailyGate;
 
-    public RegulatoryFreshnessWatchdog(NotificationEmailService emailService) {
+    public RegulatoryFreshnessWatchdog(NotificationEmailService emailService, DailyAlertGate dailyGate) {
         this.emailService = emailService;
+        this.dailyGate = dailyGate;
     }
 
     private record ExpiringConstant(String name, LocalDate expiryDate, String note) {
@@ -53,11 +57,26 @@ public class RegulatoryFreshnessWatchdog {
 
     /** להרצה ידנית מ-NotificationTestController, כדי לוודא שהגדרות המייל תקינות בלי לחכות ל-06:00. */
     public void runNow() {
-        checkFreshness();
+        String body = findDueItems();
+        if (!body.isEmpty()) {
+            emailService.sendAlert("קבועים רגולטוריים דורשים בדיקה", body);
+        }
     }
 
+    /**
+     * רץ ב-06:00, וגם בכל עלייה של השרת: בשרת החינמי הוא ישן רוב הלילה, וב-06:00 לרוב אין מי שיריץ את הבדיקה.
+     * DailyAlertGate דואג שגם עם כמה התעוררויות ביום יישלח מייל אחד לכל היותר.
+     */
+    @EventListener(ApplicationReadyEvent.class)
     @Scheduled(cron = "0 0 6 * * *")
     void checkFreshness() {
+        String body = findDueItems();
+        if (!body.isEmpty() && dailyGate.firstToday("regulatory-freshness")) {
+            emailService.sendAlert("קבועים רגולטוריים דורשים בדיקה", body);
+        }
+    }
+
+    String findDueItems() {
         LocalDate today = LocalDate.now();
         StringBuilder emailBody = new StringBuilder();
 
@@ -86,8 +105,6 @@ public class RegulatoryFreshnessWatchdog {
             }
         }
 
-        if (!emailBody.isEmpty()) {
-            emailService.sendAlert("קבועים רגולטוריים דורשים בדיקה", emailBody.toString());
-        }
+        return emailBody.toString();
     }
 }
