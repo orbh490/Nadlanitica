@@ -1,198 +1,194 @@
-/* גרסת נייד בלבד (מתחת ל-700px). נטען רק דרך media בתוך fragments/head.html - גרסת המחשב לא מושפעת.
-   אותה זהות כמו במחשב (כחול כהה, טורקיז, Rubik), במידות של טלפון:
-   טקסט (אחרי ההקטנה בסוף הקובץ): כותרת עמוד 21 · כותרת בועה 15.5 · גוף 14 · תווית 12.5 · שדה 16 (מתחת לזה אייפון מגדיל את הדף)
-   ריווח: שוליים 12 · ריפוד בועה 16 · רווח בין בועות 12 */
+/* ==========================================================================
+   גרסת הטלפון (מתחת ל-700px) - נטען רק דרך media בתוך fragments/head.html, כך שגרסת המחשב לא מושפעת.
 
-:root { --m-gutter: 12px; --m-pad: 16px; --m-gap: 12px; --m-bar: 60px; }
+   הרעיון: אפליקציה שקטה עם "ספר חשבונות" במרכז. כל שדה מספרי הוא שורה אחת - הכותרת מימין והערך משמאל,
+   מודגש ובספרות ברוחב אחיד, עם קו דק בין השורות (כמו באפליקציות בנק). כל השאר שקט: לוחות לבנים עם מסגרת דקה,
+   בלי אנימציות כניסה, בלי סימני מים, בלי איורים.
 
-/* ===== סרגל עליון קבוע ===== */
-body { padding-top: var(--m-bar); padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
-.topbar { position: fixed; top: 0; left: 0; right: 0; height: var(--m-bar); padding: 0 var(--m-gutter); display: flex; align-items: center; justify-content: space-between; gap: 8px; backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; transform: none; will-change: auto; background: #fff; box-shadow: 0 1px 0 var(--border); }
+   צבעים: כחול #17476F · כחול כהה #0F3150 · טורקיז #1BB2BB · רקע #EEF3F6 · לוח #FFFFFF · קו #E3EAEF · שדה #F3F7F9
+   טקסט (Rubik): כותרת עמוד 20 · כותרת לוח 15 · גוף 14 · תווית 13 · ערך 16 (המינימום באייפון כדי שהדף לא יתקרב)
+   ריווח: שוליים 10 · ריפוד לוח 14 · רווח בין לוחות 10 · שורת שדה 52
+   ========================================================================== */
+
+:root {
+  --m-bar: 56px;
+  --m-gutter: 10px;
+  --m-pad: 14px;
+  --m-gap: 10px;
+  --m-canvas: #EEF3F6;
+  --m-line: #E3EAEF;
+  --m-field: #F3F7F9;
+  --m-tabs: 62px;
+}
+
+/* ---------- בסיס ---------- */
+html, body { overscroll-behavior-x: none; }
+body { background: var(--m-canvas); font-size: 14px; line-height: 1.5; padding: var(--m-bar) 0 calc(var(--m-tabs) + 18px + env(safe-area-inset-bottom, 0px)); }
+/* בלי הרעש של המחשב: סימני המים, האיורים ואנימציות הכניסה של כל רכיב */
+body::before, body::after, .hero-art { display: none !important; }
+.page > h1, .page > p.subtitle, .card, .tile, .step, .home-hero h1, .home-hero p, .home-cta, .home-eyebrow, .page::before { animation: none !important; }
+[id] { scroll-margin-top: calc(var(--m-bar) + 10px); }
+
+/* ---------- סרגל עליון ---------- */
+.topbar { position: fixed; inset: 0 0 auto 0; height: var(--m-bar); padding: 0 var(--m-gutter); display: flex; align-items: center; justify-content: space-between; gap: 6px; background: #fff; box-shadow: 0 1px 0 var(--m-line); backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; transform: none; will-change: auto; }
 .topbar .links { display: none; }
-.topbar .brand { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
-.topbar .brand span { font-size: 17px; }
-.topbar .brand img { width: 28px; height: 28px; }
-.topbar .actions { display: flex; align-items: center; gap: 2px; margin: 0; flex: 0 0 auto; }
-.topbar .login-btn { height: 38px; padding: 0 12px; font-size: 14px; white-space: nowrap; }
+.topbar .brand { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; gap: 8px; }
+.topbar .brand img { width: 26px; height: 26px; }
+.topbar .brand span { font-size: 16px; }
+.topbar .actions { display: flex; align-items: center; gap: 0; margin: 0; flex: none; }
+.topbar .icon-btn { width: 40px; height: 40px; }
+.topbar .login-btn { height: 34px; padding: 0 10px; font-size: 13px; white-space: nowrap; }
 
-/* ===== רצועת הכותרת: נמוכה, עוטפת בדיוק את הכותרת והשורה שמתחתיה =====
-   הגובה נמדד ב-mobile.js (--m-band) לפי סוף הכותרת; 210px הוא גיבוי אם הסקריפט לא רץ */
-.page { padding: 18px var(--m-gutter) 24px; }
-.page::before { top: calc(-1 * var(--m-bar)); height: var(--m-band, 210px); }
-.page > h1 { font-size: 24px; line-height: 1.25; margin: 0 0 6px; }
-.page > p.subtitle { font-size: 14px; line-height: 1.55; margin: 0; max-width: none; }
-/* עד שתי שורות, ו"קראו עוד" פותח (mobile.js) */
+/* ---------- כותרת העמוד: רצועה כחולה נמוכה (הגובה מ-mobile.js, --m-band) ---------- */
+.page { max-width: none; padding: 14px var(--m-gutter) 8px; }
+.page::before { top: calc(-1 * var(--m-bar)); height: var(--m-band, 190px); background: linear-gradient(160deg, #17476F 0%, #0F3150 100%); }
+.page > h1 { font-size: 20px; line-height: 1.25; margin: 0 0 4px; letter-spacing: -.01em; }
+.page > p.subtitle { font-size: 13px; line-height: 1.5; margin: 0; max-width: none; color: #C9DEEA; }
+.page > p.subtitle a { color: #fff; }
 .page > p.subtitle.m-clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-.m-sub-more { display: inline-flex; align-items: center; margin: 4px 0 0; padding: 4px 0; min-height: 32px; background: none; border: 0; box-shadow: none; color: #9FE3E8; font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.m-sub-more { display: inline-flex; align-items: center; min-height: 28px; margin: 2px 0 0; padding: 0; background: none; border: 0; box-shadow: none; color: #8FDDE3; font-size: 12px; font-weight: 600; }
 .m-sub-more::before { display: none; }
-.m-sub-more:hover { background: none; transform: none; }
-/* הבועה הראשונה עולה מעט על הרצועה */
-.page > :is(h1, p.subtitle, .m-sub-more) + :is(.card, .results-tabs, div) { margin-top: 28px; }
+.m-sub-more:hover, .m-sub-more:active { background: none; transform: none; }
+/* הלוח הראשון עולה מעט על הרצועה */
+.page > :is(h1, p.subtitle, .m-sub-more) + :is(.card, .results-tabs, div) { margin-top: 20px; }
 .page > .results-tabs + .card { margin-top: 0; }
 
-/* ===== בועות ===== */
-.card { padding: var(--m-pad); border-radius: 16px; margin-bottom: var(--m-gap); box-shadow: 0 1px 2px rgba(23, 71, 111, .05), 0 8px 20px -16px rgba(23, 71, 111, .35); }
-.card h2 { font-size: 17px; margin: 0 0 10px; gap: 8px; }
-.card h2::before { height: 16px; }
-.card h3 { font-size: 15px; }
-.card p, .card li { font-size: 15px; line-height: 1.6; }
-.card p.subtitle { font-size: 14px; line-height: 1.55; }
-/* הרבה פסקאות בעמודים מגיעות עם font-size:14px בתוך style - מספיק טוב לטלפון, רק מהדקים את הריווח */
-.card p[style*="font-size:14px"], .card li[style*="font-size:14px"] { line-height: 1.6 !important; }
-.card p[style*="font-size:12px"], .card p[style*="font-size: 12px"] { font-size: 13px !important; line-height: 1.55; }
-.grid2 { gap: 0 12px; }
+/* ---------- לוחות ---------- */
+.card { margin: 0 0 var(--m-gap); padding: var(--m-pad); border: 1px solid var(--m-line); border-radius: 14px; box-shadow: 0 1px 2px rgba(15, 49, 80, .04); }
+.card h2 { font-size: 15px; line-height: 1.35; margin: 0 0 6px; gap: 8px; }
+.card h2::before { width: 3px; height: 14px; }
+.card h3 { font-size: 14px; margin: 14px 0 6px; }
+.card p, .card li { font-size: 14px; line-height: 1.55; }
+.card p.subtitle { font-size: 13px; line-height: 1.5; margin-bottom: 8px; color: var(--ink-secondary); }
+/* פסקאות עם גודל בתוך style - מיישרים לסולם של הטלפון */
+.card [style*="font-size:14px"] { font-size: 13.5px !important; line-height: 1.55 !important; }
+.card [style*="font-size:13px"] { font-size: 12.5px !important; }
+.card [style*="font-size:12px"], .card [style*="font-size: 12px"] { font-size: 12px !important; line-height: 1.5 !important; }
+.grid2 { display: block; }
 
-/* ===== שדות וטפסים ===== */
-label { font-size: 13.5px; margin-top: 10px; }
-input[type=number], input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea { font-size: 16px; min-height: 44px; padding: 10px 12px; border-radius: 10px; margin-top: 5px; }
-textarea { min-height: 88px; }
-.checkbox-row { min-height: 40px; gap: 10px; font-size: 14px; padding: 4px 0; margin-top: 8px; }
-.checkbox-row input[type=checkbox]:not(.switch), .checkbox-row input[type=radio], label > input[type=checkbox]:not(.switch) { width: 20px; height: 20px; flex: none; margin: 0; }
-.switch-row { padding: 10px 0; }
-/* כפתור ה-? קטן לעין, עם אזור לחיצה של 44px סביבו */
-.info-tip { width: 20px; height: 20px; font-size: 12px; }
-.info-tip::before { content: ''; position: absolute; inset: -12px; }
-/* הטולטיפ מוצג כפס קבוע מעל הסרגל התחתון ולא יוצא מהמסך */
-.info-tip::after { position: fixed; left: var(--m-gutter); right: var(--m-gutter); top: auto; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: none; width: auto; max-width: none; z-index: 400; font-size: 14px; line-height: 1.55; }
+/* ---------- טפסים ---------- */
+label { display: block; margin: 10px 0 0; font-size: 13px; font-weight: 500; color: var(--ink-secondary); }
+input[type=number], input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea {
+  width: 100%; min-height: 44px; margin-top: 5px; padding: 9px 12px;
+  font-size: 16px; color: var(--ink); background: var(--m-field); border: 1px solid transparent; border-radius: 10px; box-shadow: none;
+}
+input:focus, select:focus, textarea:focus { background: #fff; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+textarea { min-height: 84px; }
 
-/* ===== כפתורים ===== */
-button, .btn { font-size: 15px; padding: 11px 18px; margin-top: 14px; }
-.card > button:not(.secondary):not(.tab-btn), .card > .btn:not(.secondary) { width: 100%; justify-content: center; min-height: 46px; }
-button.secondary, .btn.secondary { min-height: 40px; padding: 8px 14px; font-size: 14px; }
-summary { padding: 10px 0; font-size: 14px; cursor: pointer; }
+/* ספר החשבונות: שדה מספרי = שורה אחת. כותרת מימין, ערך משמאל, קו דק בין השורות */
+.card label:has(> input.money-input), .card label:has(> input[type=number]) {
+  display: flex; align-items: center; gap: 6px; min-height: 54px; margin: 0; padding: 5px 0;
+  font-size: 14px; font-weight: 500; color: var(--ink); border-bottom: 1px solid var(--m-line);
+}
+.card label > input.money-input, .card label > input[type=number] {
+  flex: none; width: 44%; max-width: 170px; margin: 0 auto 0 0; min-height: 42px; padding: 8px 10px;
+  direction: ltr; text-align: left; font-weight: 600; color: var(--navy); font-variant-numeric: tabular-nums;
+}
+.card h2 + .grid2 > label:first-child, .card h2 + label { border-top: 0; }
 
-/* טקסט ארוך שמקופל בטלפון (data-m-collapse, mobile.js) */
-details.m-more { margin: 4px 0 8px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-details.m-more > summary { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0; color: var(--navy); font-weight: 600; list-style: none; }
+/* תיבות סימון: שורה עם קו, כמו שורות ספר החשבונות */
+.checkbox-row { display: flex; align-items: center; gap: 10px; min-height: 50px; margin: 0; padding: 4px 0; font-size: 14px; color: var(--ink); border-bottom: 1px solid var(--m-line); }
+.checkbox-row label { margin: 0; font-size: 14px; color: var(--ink); }
+.checkbox-row input[type=checkbox]:not(.switch), .checkbox-row input[type=radio], label > input[type=checkbox]:not(.switch) { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--navy); }
+.switch-row { padding: 12px 0; border-bottom: 1px solid var(--m-line); }
+.switch-row:last-child { border-bottom: 0; }
+.switch-row b { font-size: 14px; }
+.switch-row small { font-size: 12px; }
+
+/* ? - קטן לעין, אזור לחיצה של 44px; ההסבר מופיע כפס מעל הסרגל התחתון */
+.info-tip { flex: none; width: 18px; height: 18px; margin: 0 2px; font-size: 11px; }
+.info-tip::before { content: ''; position: absolute; inset: -13px; }
+.info-tip::after { position: fixed; left: var(--m-gutter); right: var(--m-gutter); top: auto; bottom: calc(var(--m-tabs) + 14px + env(safe-area-inset-bottom, 0px)); transform: none; width: auto; max-width: none; z-index: 400; font-size: 13px; line-height: 1.55; }
+
+/* ---------- כפתורים ---------- */
+button, .btn { margin-top: 14px; padding: 10px 16px; font-size: 14px; border-radius: 11px; }
+.card > button:not(.secondary):not(.tab-btn), .card > .btn:not(.secondary) { display: flex; width: 100%; justify-content: center; min-height: 46px; font-size: 15px; }
+button.secondary, .btn.secondary { min-height: 38px; margin: 6px 0 0 6px; padding: 7px 12px; font-size: 13px; border-radius: 10px; }
+summary { padding: 10px 0; font-size: 13px; cursor: pointer; }
+
+/* לשוניות בראש לוח התוצאות */
+.results-tabs { display: flex; gap: 6px; margin-bottom: var(--m-gap); padding: 4px; background: #fff; border: 1px solid var(--m-line); border-radius: 12px; }
+.results-tabs button.tab-btn { flex: 1; justify-content: center; margin: 0; min-height: 38px; padding: 0 8px; font-size: 13.5px; border: 0; border-radius: 9px; box-shadow: none; }
+
+/* טקסט ארוך שמתקפל (data-m-collapse, mobile.js) */
+details.m-more { margin: 4px 0 6px; border-bottom: 1px solid var(--m-line); }
+details.m-more > summary { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0; color: var(--navy); font-size: 13.5px; font-weight: 600; list-style: none; }
 details.m-more > summary::-webkit-details-marker { display: none; }
-details.m-more > summary::after { content: ''; margin-inline-start: auto; width: 8px; height: 8px; border-inline-start: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .2s ease; }
+details.m-more > summary::after { content: ''; margin-inline-start: auto; width: 7px; height: 7px; border-inline-start: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .2s ease; }
 details.m-more[open] > summary::after { transform: rotate(135deg); }
 details.m-more > p { margin: 0 0 12px !important; }
 
-/* ===== תוצאות, טבלאות וגרפים ===== */
-.calc-bubbles { gap: 8px; margin: 4px 0 16px; }
-.bubble { padding: 12px 14px; border-radius: 12px; }
-.bubble b { font-size: 24px; }
-table { display: block; overflow-x: auto; max-width: 100%; font-size: 13px; border-radius: 10px; }
-th { font-size: 12px; padding: 8px 10px; }
-td { padding: 8px 10px; }
-.badge { font-size: 12.5px; padding: 4px 10px; }
-.viz-root text { font-size: 11px; }
-
-/* ===== חלון ההסבר ===== */
-.intro-overlay { padding: var(--m-gutter); align-items: flex-end; }
-.intro-bubble { max-width: none; width: 100%; margin: 0 0 calc(76px + env(safe-area-inset-bottom, 0px)); padding: 20px var(--m-pad) var(--m-pad); }
-.intro-bubble h2 { font-size: 18px; }
-.intro-bubble p { font-size: 15px; line-height: 1.6; }
-.intro-bubble button { width: 100%; justify-content: center; }
-
-/* ===== דף הבית ===== */
-.home-hero { margin-top: calc(-1 * var(--m-bar)); padding: calc(var(--m-bar) + 36px) var(--m-gutter) 76px; }
-.home-hero-grid { grid-template-columns: 1fr; gap: 20px; }
-.home-hero h1 { font-size: 30px; line-height: 1.15; margin-top: 10px; max-width: none; }
-.home-hero p { font-size: 15px; line-height: 1.6; margin-top: 12px; }
-.home-cta { margin-top: 20px; gap: 10px; }
-.home-cta a { padding: 12px 20px; font-size: 15px; border-radius: 12px; }
-.home-card { display: none; }
-.home-tiles { padding: 0 var(--m-gutter); margin-top: -48px; }
-.tile-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-.tile { padding: 14px 12px; gap: 6px; border-radius: 14px; }
-.tile .material-symbols-outlined { font-size: 24px; }
-.tile .t { font-size: 15px; line-height: 1.3; }
-.tile .d { font-size: 12.5px; line-height: 1.45; }
-.home-steps, .home-section { padding: 0 var(--m-gutter); margin-top: 32px; }
-.steps-title { font-size: 22px; }
-.steps-grid { grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
-.step { padding: 14px var(--m-pad); border-radius: 14px; display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: start; }
-.step .n { font-size: 28px; grid-row: span 2; }
-.step h3 { margin: 2px 0 4px; font-size: 16px; }
-.step p { margin: 0; font-size: 14px; line-height: 1.55; }
-.why-text { font-size: 15px; line-height: 1.7; }
-
-/* ===== דפי מידע (גילוי נאות, פרטיות, נגישות): כפתור החזרה בראש הרצועה ===== */
-.back-home { position: static; margin: 0 0 12px; height: 36px; padding: 0 14px; font-size: 13px; box-shadow: none; }
-.back-home::before { content: '→'; margin-inline-end: 6px; }
-
-
-/* ===== קישורי מדיניות: שורה רגילה בסוף התוכן ===== */
-.policy-links { position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 24px 0 4px; padding: 0; background: none; border: 0; z-index: auto; }
-a.policy-btn { display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: var(--radius-pill); font-size: 12.5px; font-weight: 500; color: var(--ink-secondary); background: var(--white); border: 1px solid var(--border); box-shadow: none; }
-a.policy-btn .icon { display: inline-block; font-size: 16px; line-height: 1; color: var(--teal); }
-a.policy-btn:hover, a.policy-btn:focus-visible { transform: none; }
-
-/* ===== סרגל תחתון ===== */
-nav.m-tabs { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; height: calc(64px + env(safe-area-inset-bottom, 0px)); padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)); align-items: center; justify-content: space-around; background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -8px 20px -14px rgba(20,45,66,.35); transform: translateZ(0); }
-/* רוחב שווה לכל לשונית, גם לפני שגופן האייקונים נטען (עד אז שם האייקון מוצג כמילה ארוכה ומרחיב את הלשונית) */
-.m-tabs a { position: relative; z-index: 1; flex: 1 1 0; min-width: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 52px; border-radius: 14px; color: var(--ink-secondary); font-size: 11.5px; font-weight: 600; text-decoration: none; text-align: center; line-height: 1.2; }
-.m-tabs a .material-symbols-outlined { font-size: 23px; width: 24px; overflow: hidden; }
-.m-tabs a.active { background: none; color: #0E7C84; font-weight: 700; }
-/* הסימון מחליק בין הלשוניות יחד עם הדף (mobile.js) */
-.m-ind { position: absolute; top: 6px; height: 52px; border-radius: 14px; background: var(--teal-soft); z-index: 0; transition: left .35s ease, width .35s ease; }
-
-/* ===== מעבר בין לשוניות ===== */
-.page.m-enter-fwd { animation: mEnterFwd .35s ease; }
-.page.m-enter-back { animation: mEnterBack .35s ease; }
-/* דף הבא בסרגל נמצא משמאל (RTL): הוא נכנס משמאל, והקודם מימין */
-@keyframes mEnterFwd { from { transform: translateX(-40px); opacity: .3; } to { transform: none; opacity: 1; } }
-@keyframes mEnterBack { from { transform: translateX(40px); opacity: .3; } to { transform: none; opacity: 1; } }
-/* חיווי טעינה בזמן מעבר בין לשוניות, כשהדף הבא לא נטען מראש והרשת איטית */
-body.m-loading::after { content: ''; position: fixed; top: 45%; left: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 3px solid var(--teal-soft); border-top-color: var(--teal); border-radius: 50%; animation: mSpin .8s linear infinite; z-index: 50; }
-@keyframes mSpin { to { transform: rotate(360deg); } }
-/* בלי ההחלקה של הדפדפן עצמו להיסטוריה (כרום), שמתנגשת בהחלקה בין הדפים */
-html, body { overscroll-behavior-x: none; }
-/* גלילה אוטומטית לתוצאה (data-result ב-actions.js) עוצרת מתחת לסרגל העליון הקבוע ולא מאחוריו */
-[id] { scroll-margin-top: calc(var(--m-bar) + 12px); }
-
-/* ===== סולם טקסט קטן יותר (1/11): הגדלים הקודמים עדיין נראו גדולים בטלפון =====
-   הכל עובר כאן במקום אחד; רק שדות ההקלדה נשארים 16 (מתחת לזה אייפון מגדיל את כל הדף בכל לחיצה על שדה) */
-body { font-size: 14px; }
-.topbar .brand span { font-size: 16px; }
-.topbar .login-btn { height: 34px; padding: 0 10px; font-size: 13px; }
-.page > h1 { font-size: 21px; margin-bottom: 4px; }
-.page > p.subtitle { font-size: 13px; line-height: 1.5; }
-.m-sub-more { font-size: 12px; min-height: 28px; }
-.card h2 { font-size: 15.5px; margin-bottom: 8px; }
-.card h2::before { height: 14px; width: 3px; }
-.card h3 { font-size: 14px; }
-.card p, .card li { font-size: 14px; line-height: 1.55; }
-.card p.subtitle { font-size: 13px; line-height: 1.5; }
-.card p[style*="font-size:14px"], .card li[style*="font-size:14px"], .card ul[style*="font-size:14px"] { font-size: 13.5px !important; line-height: 1.55 !important; }
-.card p[style*="font-size:13px"], .card div[style*="font-size:13px"] { font-size: 12.5px !important; }
-.card p[style*="font-size:12px"], .card p[style*="font-size: 12px"] { font-size: 12px !important; line-height: 1.5; }
-label { font-size: 12.5px; margin-top: 8px; }
-input[type=number], input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea { min-height: 42px; padding: 8px 11px; margin-top: 4px; }
-.checkbox-row { font-size: 13px; min-height: 36px; }
-.checkbox-row input[type=checkbox]:not(.switch), label > input[type=checkbox]:not(.switch) { width: 18px; height: 18px; }
-.switch-row b { font-size: 14px; }
-.switch-row small { font-size: 12px; }
-.info-tip { width: 18px; height: 18px; font-size: 11px; }
-.info-tip::after { font-size: 13px; }
-button, .btn { font-size: 14px; padding: 10px 16px; margin-top: 12px; }
-.card > button:not(.secondary):not(.tab-btn), .card > .btn:not(.secondary) { min-height: 44px; }
-button.secondary, .btn.secondary { min-height: 38px; padding: 7px 12px; font-size: 13px; }
-summary, details.m-more > summary { font-size: 13px; }
-details.m-more > summary { min-height: 40px; }
-.notice { font-size: 13px; padding: 8px 12px; }
-.badge { font-size: 12px; }
-.bubble b { font-size: 21px; }
+/* ---------- תוצאות ---------- */
+.calc-bubbles { gap: 8px; margin: 4px 0 12px; }
+.bubble { padding: 12px; border-radius: 12px; }
+.bubble b { font-size: 22px; font-variant-numeric: tabular-nums; }
 .bubble-label, .bubble-note { font-size: 12px; }
-table { font-size: 12.5px; }
-th { font-size: 11.5px; padding: 7px 9px; }
-td { padding: 7px 9px; }
-.results-tabs button.tab-btn, .auth-tabs button.tab-btn { font-size: 14px; }
-.auth-intro, .auth-switch { font-size: 13px; }
+table { display: block; overflow-x: auto; max-width: 100%; font-size: 12.5px; border-radius: 10px; }
+th { padding: 7px 9px; font-size: 11.5px; }
+td { padding: 7px 9px; font-variant-numeric: tabular-nums; }
+.badge { padding: 4px 10px; font-size: 12px; }
+.viz-root text { font-size: 11px; }
+.notice { padding: 9px 12px; font-size: 13px; }
+
+/* ---------- חלון ההסבר: גיליון תחתון ---------- */
+.intro-overlay { align-items: flex-end; padding: var(--m-gutter); }
+.intro-bubble { width: 100%; max-width: none; margin: 0 0 calc(var(--m-tabs) + 8px + env(safe-area-inset-bottom, 0px)); padding: 18px var(--m-pad) var(--m-pad); }
 .intro-bubble h2 { font-size: 16px; }
 .intro-bubble p { font-size: 14px; line-height: 1.55; }
-.home-hero h1 { font-size: 26px; }
-.home-hero p { font-size: 14px; line-height: 1.55; }
-.home-cta a { padding: 10px 18px; font-size: 14px; }
-.tile .t { font-size: 14px; }
-.tile .d { font-size: 12px; }
+.intro-bubble button { display: flex; width: 100%; justify-content: center; }
+
+/* ---------- דף הבית ---------- */
+.home-hero { margin-top: calc(-1 * var(--m-bar)); padding: calc(var(--m-bar) + 26px) var(--m-gutter) 64px; }
+.home-hero-grid { grid-template-columns: 1fr; gap: 16px; }
+.home-eyebrow { font-size: 12px; letter-spacing: 0; }
+.home-hero h1 { max-width: none; margin-top: 8px; font-size: 25px; line-height: 1.2; }
+.home-hero p { margin-top: 10px; font-size: 14px; line-height: 1.55; }
+.home-cta { margin-top: 16px; gap: 8px; }
+.home-cta a { padding: 10px 18px; font-size: 14px; border-radius: 11px; }
+.home-card { display: none; }
+.home-tiles { margin-top: -40px; padding: 0 var(--m-gutter); }
+.tile-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+.tile { gap: 4px; padding: 12px; border-radius: 14px; box-shadow: 0 1px 2px rgba(15, 49, 80, .05); }
 .tile .material-symbols-outlined { font-size: 22px; }
-.steps-title { font-size: 19px; }
-.step .n { font-size: 24px; }
-.step h3 { font-size: 14.5px; }
-.step p { font-size: 13px; }
+.tile .t { font-size: 14px; line-height: 1.3; }
+.tile .d { font-size: 12px; line-height: 1.45; }
+.home-steps, .home-section { margin-top: 26px; padding: 0 var(--m-gutter); }
+.steps-title { font-size: 18px; }
+.steps-grid { grid-template-columns: 1fr; gap: 8px; margin-top: 12px; }
+.step { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: start; padding: 12px var(--m-pad); border-radius: 14px; box-shadow: none; }
+.step .n { grid-row: span 2; font-size: 22px; }
+.step h3 { margin: 1px 0 3px; font-size: 14.5px; }
+.step p { margin: 0; font-size: 13px; line-height: 1.5; }
 .why-text { font-size: 14px; line-height: 1.6; }
-a.policy-btn { font-size: 12px; height: 34px; }
-.m-tabs a { font-size: 11px; }
+
+/* ---------- דפי מידע (גילוי נאות, פרטיות, נגישות) ---------- */
+.back-home { position: static; display: inline-flex; height: 32px; margin: 0 0 10px; padding: 0 12px; font-size: 12.5px; box-shadow: none; }
+.back-home::before { content: '→'; margin-inline-end: 6px; }
+
+/* ---------- קישורי מדיניות: שורה בסוף התוכן ---------- */
+.policy-links { position: static; display: flex; flex-flow: row wrap; justify-content: center; gap: 6px; margin: 18px 0 4px; padding: 0; background: none; border: 0; z-index: auto; }
+a.policy-btn { display: inline-flex; align-items: center; gap: 5px; height: 32px; padding: 0 11px; font-size: 12px; font-weight: 500; color: var(--ink-secondary); background: #fff; border: 1px solid var(--m-line); border-radius: var(--radius-pill); box-shadow: none; }
+a.policy-btn .icon { display: inline-block; font-size: 15px; line-height: 1; color: var(--teal); }
+a.policy-btn:hover, a.policy-btn:focus-visible { transform: none; }
+
+/* ---------- סרגל תחתון ---------- */
+nav.m-tabs { position: fixed; inset: auto 0 0 0; z-index: 60; display: flex; align-items: center; justify-content: space-around; height: calc(var(--m-tabs) + env(safe-area-inset-bottom, 0px)); padding: 5px 4px calc(5px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid var(--m-line); transform: translateZ(0); }
+/* רוחב שווה לכל לשונית, גם לפני שגופן האייקונים נטען */
+.m-tabs a { position: relative; z-index: 1; flex: 1 1 0; min-width: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; height: 52px; border-radius: 12px; color: var(--ink-muted); font-size: 11px; font-weight: 600; line-height: 1.2; text-align: center; text-decoration: none; }
+.m-tabs a .material-symbols-outlined { width: 24px; overflow: hidden; font-size: 22px; }
+.m-tabs a.active { background: none; color: var(--navy); font-weight: 700; }
+.m-ind { position: absolute; top: 5px; height: 52px; border-radius: 12px; background: var(--teal-soft); z-index: 0; transition: left .35s ease, width .35s ease; }
+
+/* ---------- מעבר בין לשוניות (mobile.js) ---------- */
+.page.m-enter-fwd { animation: mEnterFwd .3s ease !important; }
+.page.m-enter-back { animation: mEnterBack .3s ease !important; }
+/* הדף הבא בסרגל נמצא משמאל (RTL): נכנס משמאל, והקודם מימין */
+@keyframes mEnterFwd { from { transform: translateX(-36px); opacity: .3; } to { transform: none; opacity: 1; } }
+@keyframes mEnterBack { from { transform: translateX(36px); opacity: .3; } to { transform: none; opacity: 1; } }
+body.m-loading::after { content: ''; display: block !important; position: fixed; top: 45%; left: 50%; width: 32px; height: 32px; margin: -16px 0 0 -16px; border: 3px solid var(--teal-soft); border-top-color: var(--teal); border-radius: 50%; animation: mSpin .8s linear infinite; z-index: 50; background: none; opacity: 1; filter: none; }
+@keyframes mSpin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .page.m-enter-fwd, .page.m-enter-back { animation: none !important; }
+  .m-ind, details.m-more > summary::after { transition: none; }
+}
