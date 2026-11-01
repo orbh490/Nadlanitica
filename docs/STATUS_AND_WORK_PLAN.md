@@ -210,7 +210,7 @@ raw-data/ (מחוץ ל-git)   הקבצים הגולמיים (לשעבר deta/)
 - [x] כל שרשרת הענפים מוזגה ל-`main` (1/11, מיזוג ישיר בלי התנגשויות – אחרי שכל 86 הבדיקות עברו מקומית). מעכשיו: ענף לכל משימה ו-Pull Request ל-`main`, וה-CI חייב לעבור
 - [x] גרסה `1.0.0` ב-`pom.xml` ו-tag `v1.0.0` (1/11). ה-`Dockerfile` מעתיק את ה-jar בלי תלות במספר הגרסה
 - [ ] דף Release בגיטהאב מה-tag (שלך – בגיטהאב: Releases ← Draft a new release ← v1.0.0)
-- [ ] Render: להחליף את ה-Branch מ-`feat/free-deploy` ל-`main` (שלך – Settings ← Build & Deploy ← Branch)
+- [x] Render: שירות חדש בפרנקפורט (ליד מסד הנתונים ב-Neon) שעובד מ-`main`, באותה כתובת – `https://nadlanitica.onrender.com` (1/11)
 - [ ] להגן על `main` ב-GitHub (בלי push ישיר)
 - [x] `README.md`: מה האפליקציה, מבנה, הרצה ובדיקות, משתני סביבה, מיגרציות, העלאה (1/11)
 - [x] `.env.example` עם כל המשתנים, בלי ערכים אמיתיים; `.env` מוחרג מגיט (1/11)
