@@ -10,7 +10,7 @@ RUN ./mvnw -B -q clean package -DskipTests
 
 FROM eclipse-temurin:25-jre
 WORKDIR /app
-COPY --from=build /app/target/nadlanitic-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/nadlanitic-*.jar app.jar
 # לא להריץ כ-root בתוך הקונטיינר
 RUN useradd --system --no-create-home app
 USER app
