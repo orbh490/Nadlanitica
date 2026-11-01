@@ -28,20 +28,37 @@
   if (document.fonts) document.fonts.ready.then(settle);
   addEventListener('load', settle);
 
-  var cameFrom = null;
-  try { cameFrom = JSON.parse(sessionStorage.getItem('mtab') || 'null'); sessionStorage.removeItem('mtab'); } catch (e) {}
-  if (cameFrom && page && cameFrom.from !== cur) page.classList.add(cameFrom.from < cur ? 'm-enter-fwd' : 'm-enter-back');
+  // אנימציית הכניסה לפי הכיוון שממנו הגענו. דף שנטען מראש ברקע (prerender) מגיע לכאן עוד לפני ההחלקה,
+  // אז מחכים לרגע שבו הוא באמת מוצג
+  function enter() {
+    var cameFrom = null;
+    try { cameFrom = JSON.parse(sessionStorage.getItem('mtab') || 'null'); sessionStorage.removeItem('mtab'); } catch (e) {}
+    if (cameFrom && page && cameFrom.from !== cur) page.classList.add(cameFrom.from < cur ? 'm-enter-fwd' : 'm-enter-back');
+    animated(false);
+    place(cur);
+  }
+  if (document.prerendering) document.addEventListener('prerenderingchange', enter, { once: true });
+  else enter();
 
-  // הדפים השכנים נטענים מראש, כדי שהמעבר יהיה מהיר
-  [cur - 1, cur + 1].forEach(function (i) {
-    if (!tabs[i]) return;
-    var l = document.createElement('link');
-    l.rel = 'prefetch'; l.href = tabs[i].href;
-    document.head.appendChild(l);
-  });
+  // הדפים השכנים נטענים מראש ברקע כולל הנתונים שלהם (בכרום), כך שהמעבר אליהם מיידי.
+  // בדפדפן שלא תומך - לפחות ה-HTML נטען מראש
+  var near = [cur - 1, cur + 1].filter(function (i) { return tabs[i]; }).map(function (i) { return tabs[i].href; });
+  if (window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
+    var rules = document.createElement('script');
+    rules.type = 'speculationrules';
+    rules.textContent = JSON.stringify({ prerender: [{ source: 'list', urls: near }] });
+    document.head.appendChild(rules);
+  } else {
+    near.forEach(function (href) {
+      var l = document.createElement('link');
+      l.rel = 'prefetch'; l.href = href;
+      document.head.appendChild(l);
+    });
+  }
 
-  var leaving = false;
-  // מעבר לדף i: הסימון מחליק ללשונית החדשה והדף יוצא לכיוון ההחלקה, ורק אז עוברים
+  var leaving = false, waitTimer = null;
+  // מעבר לדף i: הסימון מחליק ללשונית החדשה והדף יוצא עד הסוף לכיוון ההחלקה, ורק אז עוברים.
+  // אם הדף הבא לא נטען מראש והרשת איטית - מוצג חיווי טעינה, ולא דף שנתקע באמצע הדרך
   function go(i) {
     if (leaving) return;
     leaving = true;
@@ -49,12 +66,13 @@
     animated(true);
     place(i);
     if (page) {
-      page.style.transition = 'transform .25s ease, opacity .25s ease';
+      page.style.transition = 'transform .2s ease-in, opacity .2s ease-in';
       // הדף הבא נמצא משמאל (RTL), אז הדף הנוכחי יוצא ימינה - ולהפך
-      page.style.transform = 'translateX(' + (i > cur ? 1 : -1) * innerWidth * 0.5 + 'px)';
-      page.style.opacity = '.35';
+      page.style.transform = 'translateX(' + (i > cur ? 1 : -1) * innerWidth + 'px)';
+      page.style.opacity = '0';
     }
-    setTimeout(function () { location.href = tabs[i].href; }, 250);
+    setTimeout(function () { location.href = tabs[i].href; }, 200);
+    waitTimer = setTimeout(function () { document.body.classList.add('m-loading'); }, 450);
   }
   tabs.forEach(function (a, i) {
     a.addEventListener('click', function (e) { if (i === cur) return; e.preventDefault(); go(i); });
@@ -64,6 +82,8 @@
   addEventListener('pageshow', function (e) {
     if (!e.persisted) return;
     leaving = false;
+    clearTimeout(waitTimer);
+    document.body.classList.remove('m-loading');
     if (page) { page.style.transition = 'none'; page.style.transform = ''; page.style.opacity = ''; }
     animated(false);
     place(cur);

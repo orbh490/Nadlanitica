@@ -102,7 +102,7 @@ async function renderHistory() {
   const row = h => `
     <div class="history-item">
       <span>${h.category} · ${Math.round(h.purchasePrice).toLocaleString()} ש"ח <small style="color:var(--ink-muted)">(${new Date(h.createdAt).toLocaleString('he-IL')})</small></span>
-      <span><button class="secondary" onclick="loadFromHistory('${escapeHtml(h.id)}')">צפייה</button></span>
+      <span><button class="secondary" data-click="loadFromHistory" data-arg="${escapeHtml(h.id)}">צפייה</button></span>
     </div>`;
   el.innerHTML = history.slice(0, 3).map(row).join('')
     + (history.length > 3

@@ -19,18 +19,18 @@
         <input type="checkbox" id="consentCheckbox">
         <label for="consentCheckbox" style="margin:0;font-weight:400">קראתי ואני מסכים/ה ל<a href="/privacy.html" target="_blank">מדיניות הפרטיות</a> (נדרש להרשמה בלבד)</label>
       </div>
-      <button onclick="handleLogin()">התחברות</button>
-      <button class="secondary" onclick="handleRegister()">הרשמה</button>
-      <p style="margin-top:10px"><a href="#" onclick="toggleForgotPassword();return false" style="font-size:12px">שכחתי סיסמה</a></p>
+      <button data-click="handleLogin">התחברות</button>
+      <button class="secondary" data-click="handleRegister">הרשמה</button>
+      <p style="margin-top:10px"><a href="#" data-click="toggleForgotPassword" style="font-size:12px">שכחתי סיסמה</a></p>
       <div id="forgotPasswordBox" style="display:none">
         <label>אימייל לאיפוס סיסמה <input type="email" id="forgotEmail"></label>
-        <button class="secondary" onclick="submitForgotPassword()">שלחו קישור לאיפוס</button>
+        <button class="secondary" data-click="submitForgotPassword">שלחו קישור לאיפוס</button>
       </div>
       <div id="authMessage" style="margin-top:8px;font-size:13px"></div>
-      <a href="#" id="resendVerificationLink" style="display:none;font-size:12px" onclick="resendVerification();return false">שלחו שוב מייל אימות</a>
+      <a href="#" id="resendVerificationLink" style="display:none;font-size:12px" data-click="resendVerification">שלחו שוב מייל אימות</a>
 
       <hr style="margin:22px 0 16px;border:none;border-top:1px solid var(--border)">
-      <button class="secondary" onclick="continueAsGuest()" style="width:100%;text-align:center">המשך כאורח/ת</button>
+      <button class="secondary" data-click="continueAsGuest" style="width:100%;text-align:center">המשך כאורח/ת</button>
       <p style="font-size:12px;color:var(--ink-muted);margin-top:8px">בלי חשבון אפשר להשתמש בכל המחשבונים, אבל שום דבר לא נשמר אחרי שסוגרים את הדפדפן.</p>
     </div>
 

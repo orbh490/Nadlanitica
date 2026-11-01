@@ -15,7 +15,7 @@
         <span class="info-tip" tabindex="0" data-tip="ב'מחיר למשתכן' לא כולם מתחרים על אותן דירות בדיוק - כל נרשם מקבל ניקוד, ולפי הניקוד משבצים אותו לקבוצה. זה קובע איזה חלק מהדירות פתוח בשבילו. אם זה נשמע מסובך - אפשר לדלג ולראות רק ממוצע כללי.">?</span>
       </h2>
       <label class="advanced-toggle">
-        <input type="checkbox" id="enableScoreCalc" onchange="toggleScoreCalc()">
+        <input type="checkbox" id="enableScoreCalc" data-change="toggleScoreCalc">
         רוצה לחשב את הניקוד האישי שלך? (מומלץ, אבל אפשר לדלג)
       </label>
       <div id="scoreDetails" style="display:none">
@@ -49,7 +49,7 @@
           <label for="lowIncomeHousehold" style="margin:0">הכנסה עד עשירון 5</label>
           <span class="info-tip" tabindex="0" data-tip="עשירון 5 = תקרת העשירון החמישי (מתוך 10) בהתפלגות ההכנסות בישראל - בערך החציון. אם ההכנסה המשותפת שלכם לא עוברת את זה, זה מוסיף נקודות.">?</span>
         </div>
-        <button onclick="calculateScore()">חשב ניקוד</button>
+        <button data-click="calculateScore">חשב ניקוד</button>
         <div id="scoreResult" style="margin-top:16px"></div>
       </div>
     </div>
@@ -63,7 +63,7 @@
         <datalist id="projectOptions"></datalist>
       </label>
       <label>הצג
-        <select id="liveFilter" onchange="renderProjectOptions()">
+        <select id="liveFilter" data-change="renderProjectOptions">
           <option value="all">כל הפרויקטים</option>
           <option value="open">רק פרויקטים עם הרשמה פתוחה כרגע</option>
           <option value="open_or_upcoming">פרויקטים פתוחים או שעומדים להיפתח בקרוב</option>
@@ -75,7 +75,7 @@
         <label for="localResident" style="margin:0">בן מקום</label>
         <span class="info-tip" tabindex="0" data-tip="תושב רשום של העיר בה נמצא הפרויקט. יש מכסת דירות שמורה במיוחד לבני מקום, עם סיכוי זכייה אחר לגמרי.">?</span>
       </div>
-      <button onclick="calculateOdds()">בדוק סיכוי זכייה</button>
+      <button data-click="calculateOdds">בדוק סיכוי זכייה</button>
       <div id="oddsResult" style="margin-top:16px"></div>
     </div>
 

@@ -11,17 +11,18 @@ import java.io.IOException;
 
 /**
  * כותרות אבטחה לכל תשובה. החשובה שבהן היא CSP: טוקן ההתחברות נשמר ב-localStorage, אז קוד זר שיצליח לרוץ בדף
- * יכול לקרוא אותו. ה-CSP מתיר להריץ סקריפטים רק מהאתר עצמו ולשלוח בקשות רק אליו - כך שגם אם קוד כזה רץ,
- * אין לו לאן להעביר את הטוקן ואין ממנו לטעון סקריפטים נוספים.
- * 'unsafe-inline' ב-script-src נשאר בינתיים: יש בעמודים onclick="..." וסקריפט מצב-כהה קטן ב-head.
- * כשהם יעברו ל-addEventListener בקובצי ה-JS, אפשר להוריד אותו ולקבל הגנה מלאה.
+ * יכול לקרוא אותו. ה-CSP מתיר להריץ סקריפטים רק מקבצים של האתר עצמו - לא קוד שכתוב בתוך הדף (onclick="...",
+ * <script> בלי src) - ולשלוח בקשות רק אליו. כך גם טקסט זדוני שיגיע לדף לא ירוץ, ואין לו לאן להעביר את הטוקן.
+ * לכן בעמודים אין קוד בתוך ה-HTML: כפתורים מחוברים דרך data-click / data-change (ראו static/js/actions.js).
+ * style-src עדיין מתיר inline (style="..." בעמודים) - סגנונות לא מריצים קוד, אז הסיכון שם נמוך.
  */
 @Component
 class SecurityHeadersFilter extends OncePerRequestFilter {
 
     static final String CSP = String.join("; ",
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline'",
+            // inline-speculation-rules: רק הוראות JSON לדפדפן לטעון מראש את הדפים השכנים בנייד (mobile.js) - לא קוד
+            "script-src 'self' 'inline-speculation-rules'",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com",
             "img-src 'self' data:",

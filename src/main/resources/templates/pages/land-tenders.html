@@ -17,13 +17,11 @@
     <div class="card">
       <h2>שלב 1: בחרו מכרז</h2>
       <label>חפשו עיר או מספר מכרז
-        <input type="text" id="tenderSearch" list="tenderOptions" placeholder="למשל: גבע בנימין, או 143/2023..."
-          onfocus="this.dataset.prev = this.value; this.value = '';"
-          onblur="if (!this.value) this.value = this.dataset.prev || '';">
+        <input type="text" id="tenderSearch" list="tenderOptions" placeholder="למשל: גבע בנימין, או 143/2023...">
         <datalist id="tenderOptions"></datalist>
       </label>
       <div id="tenderListStatus" style="font-size:13px;color:var(--ink-muted);margin-top:6px" aria-live="polite"></div>
-      <button onclick="loadTenderDetail()">הצג פרטי מכרז</button>
+      <button data-click="loadTenderDetail">הצג פרטי מכרז</button>
     </div>
 
     <div class="card" id="tenderDetailCard" style="display:none">
@@ -86,14 +84,14 @@
       </div>
 
       <label class="advanced-toggle">
-        <input type="checkbox" id="enableDiscount" onchange="toggleDiscount()">
+        <input type="checkbox" id="enableDiscount" data-change="toggleDiscount">
         מגיעה לכם הנחה מיוחדת על המכרז הזה? (מילואים / חסרי דיור / נכות וכו')
       </label>
       <div id="discountDetails" style="display:none">
         <div id="discountCategoryWrap" style="display:none; margin-bottom:10px">
           <label>איזו קטגוריה חלה עליכם, לפי הרשימה הרשמית של המכרז?
             <span class="info-tip" tabindex="0" data-tip="חיפשנו עבורכם בחוברת המכרז ליד הקטגוריה שתבחרו, ונמלא הצעה לאחוז הנחה. זו הצעה אוטומטית שמבוססת על חיפוש טקסט - לא ערך רשמי - ולכן מוצג גם הציטוט המקורי שממנו היא הגיעה, כדי שתוכלו לבדוק בעצמכם.">?</span>
-            <select id="discountCategory" onchange="loadDiscountSuggestion()">
+            <select id="discountCategory" data-change="loadDiscountSuggestion">
               <option value="">בחרו קטגוריה...</option>
             </select>
           </label>
@@ -103,7 +101,7 @@
         <label>אחוז הנחה על מחיר הקרקע (%) <input type="number" id="discountPercent" value="0" min="0" max="100"></label>
       </div>
 
-      <button onclick="calculateSelfBuild()">חשב</button>
+      <button data-click="calculateSelfBuild">חשב</button>
       <div id="selfBuildResult" style="margin-top:16px"></div>
     </div>
 

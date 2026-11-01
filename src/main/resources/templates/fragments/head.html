@@ -33,7 +33,7 @@
 <script th:src="@{/js/mobile.js}" defer></script>
 <link rel="stylesheet" th:href="@{/css/prefs.css}">
 <script th:src="@{/js/prefs.js}"></script>
-<script>try { if (JSON.parse(localStorage.getItem('displayPrefs') || '{}').dark) document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {}</script>
+<script th:src="@{/js/actions.js}" defer></script>
 </th:block>
 </head>
 <body></body>

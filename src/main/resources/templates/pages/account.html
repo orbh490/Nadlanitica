@@ -27,21 +27,21 @@
         <input type="checkbox" id="consentCheckbox">
         <label for="consentCheckbox" style="margin:0;font-weight:400">קראתי ואני מסכים/ה ל<a href="/privacy.html" target="_blank">מדיניות הפרטיות</a> (נדרש להרשמה בלבד)</label>
       </div>
-      <button onclick="handleLogin()">התחברות</button>
-      <button class="secondary" onclick="handleRegister()">הרשמה</button>
-      <p style="margin-top:10px"><a href="#" onclick="toggleForgotPassword();return false" style="font-size:12px">שכחתי סיסמה</a></p>
+      <button data-click="handleLogin">התחברות</button>
+      <button class="secondary" data-click="handleRegister">הרשמה</button>
+      <p style="margin-top:10px"><a href="#" data-click="toggleForgotPassword" style="font-size:12px">שכחתי סיסמה</a></p>
       <div id="forgotPasswordBox" style="display:none">
         <label>אימייל לאיפוס סיסמה <input type="email" id="forgotEmail"></label>
-        <button class="secondary" onclick="submitForgotPassword()">שלחו קישור לאיפוס</button>
+        <button class="secondary" data-click="submitForgotPassword">שלחו קישור לאיפוס</button>
       </div>
       <div id="authMessage" style="margin-top:8px;font-size:13px"></div>
-      <a href="#" id="resendVerificationLink" style="display:none;font-size:12px" onclick="resendVerification();return false">שלחו שוב מייל אימות</a>
+      <a href="#" id="resendVerificationLink" style="display:none;font-size:12px" data-click="resendVerification">שלחו שוב מייל אימות</a>
     </div>
 
     <div id="loggedInView" style="display:none">
       <div class="card">
         <span class="badge ok">מחובר/ת כ-<span id="authEmailDisplay"></span></span>
-        <button class="secondary" onclick="handleLogout()">התנתקות</button>
+        <button class="secondary" data-click="handleLogout">התנתקות</button>
       </div>
 
       <div class="card">
@@ -70,7 +70,7 @@
             <input type="text" inputmode="numeric" class="money-input" id="cmpSelfBuildBudget" value="2000000">
           </label>
         </div>
-        <button onclick="comparePaths()">השווה מסלולים</button>
+        <button data-click="comparePaths">השווה מסלולים</button>
         <div id="pathComparisonResult" style="margin-top:14px"></div>
       </div>
 
@@ -79,7 +79,7 @@
         <p class="subtitle" style="margin-bottom:12px">בחרו מקומות בארץ שמעניינים אתכם, לקבלת התראות (ניתן לבטל התראות בהגדרות).</p>
         <div class="interest-add">
           <input type="text" id="interestInput" maxlength="60" placeholder="למשל: גבע בנימין, באר שבע" aria-label="שם האזור">
-          <button onclick="addInterestArea()">הוספה</button>
+          <button data-click="addInterestArea">הוספה</button>
         </div>
         <div id="interestMsg" style="font-size:13px;margin-top:6px"></div>
         <div id="interestList" class="interest-list"></div>
@@ -88,7 +88,7 @@
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <h2 style="margin:0">ההיסטוריה שלי</h2>
-          <button class="secondary" id="clearHistoryBtn" onclick="clearHistory()" style="display:none">נקה היסטוריה</button>
+          <button class="secondary" id="clearHistoryBtn" data-click="clearHistory" style="display:none">נקה היסטוריה</button>
         </div>
         <div id="historyList"></div>
       </div>

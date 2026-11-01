@@ -5,6 +5,11 @@ function toggleDiscount() {
 let tendersByLabel = {};
 let selectedTenderId = null;
 
+// בפוקוס השדה מתרוקן כדי שכל רשימת המכרזים תיפתח; אם עוזבים בלי לבחור - חוזר הערך הקודם
+const tenderSearchInput = document.getElementById('tenderSearch');
+tenderSearchInput.addEventListener('focus', () => { tenderSearchInput.dataset.prev = tenderSearchInput.value; tenderSearchInput.value = ''; });
+tenderSearchInput.addEventListener('blur', () => { if (!tenderSearchInput.value) tenderSearchInput.value = tenderSearchInput.dataset.prev || ''; });
+
 function labelFor(t) { return `${t.tenderNumber} - ${t.city}${t.neighborhood ? ' (' + t.neighborhood + ')' : ''}`; }
 
 async function loadTenders() {
@@ -114,7 +119,7 @@ async function loadTenderDetail() {
           <td>${fmtMoney(p.appraisedPrice)}</td>
           <td>${fmtMoney(p.developmentCost)}</td>
           <td>${fmtMoney(p.guaranteeDeposit)}</td>
-          <td><button class="secondary" onclick="usePlotInCalculator(${i})">השתמש במחשבון</button></td>
+          <td><button class="secondary" data-click="usePlotInCalculator" data-arg="${i}">השתמש במחשבון</button></td>
         </tr>`;
     const PLOTS_SHOWN_INITIALLY = 3;
     const firstRows = detail.plots.slice(0, PLOTS_SHOWN_INITIALLY).map(rowHtml).join('');

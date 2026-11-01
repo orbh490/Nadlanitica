@@ -1,5 +1,7 @@
 // העדפות תצוגה: מצב כהה והגדלת טקסט. נשמרות ב-localStorage ומוחלות בכל הדפים.
 // נטען בלי defer כדי ש-window.displayPrefs יהיה זמין גם לסקריפטים שבסוף הדף (למשל הגדרות).
+// מצב כהה מוחל מיד, עוד לפני שהדף מצויר - כדי שלא יהבהב לבן לרגע
+try { if (JSON.parse(localStorage.getItem('displayPrefs') || '{}').dark) document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {}
 (function () {
   var KEY = 'displayPrefs', SCALE = 1.2, timer = null;
 
