@@ -61,8 +61,14 @@ a.policy-btn:hover, a.policy-btn:focus-visible { transform: none; }
 .m-ind { position: absolute; top: 6px; height: 56px; border-radius: 16px; background: var(--teal-soft); z-index: 0; transition: left .35s ease, width .35s ease; }
 .page.m-enter-fwd { animation: mEnterFwd .35s ease; }
 .page.m-enter-back { animation: mEnterBack .35s ease; }
-@keyframes mEnterFwd { from { transform: translateX(40px); opacity: .3; } to { transform: none; opacity: 1; } }
-@keyframes mEnterBack { from { transform: translateX(-40px); opacity: .3; } to { transform: none; opacity: 1; } }
+/* דף הבא בסרגל נמצא משמאל (RTL): הוא נכנס משמאל, והקודם מימין */
+@keyframes mEnterFwd { from { transform: translateX(-40px); opacity: .3; } to { transform: none; opacity: 1; } }
+@keyframes mEnterBack { from { transform: translateX(40px); opacity: .3; } to { transform: none; opacity: 1; } }
+/* רוחב שווה לכל לשונית, גם לפני שגופן האייקונים נטען (עד אז שם האייקון מוצג כמילה ארוכה ומרחיב את הלשונית) */
+.m-tabs a { flex: 1 1 0; min-width: 0; overflow: hidden; }
+.m-tabs a .material-symbols-outlined { width: 24px; overflow: hidden; }
+/* בלי ההחלקה של הדפדפן עצמו להיסטוריה (כרום), שמתנגשת בהחלקה בין הדפים */
+html, body { overscroll-behavior-x: none; }
 
 /* כפתור "לעמוד הבית" בדפי המידע: בנייד רצועת הכותרת גבוהה יותר, אז המיקום הקבוע של המחשב נופל על הטקסט.
    כאן הוא חלק מהזרימה - בראש הרצועה, מעל הכותרת */
