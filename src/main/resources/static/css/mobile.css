@@ -64,5 +64,11 @@ a.policy-btn:hover, a.policy-btn:focus-visible { transform: none; }
 @keyframes mEnterFwd { from { transform: translateX(40px); opacity: .3; } to { transform: none; opacity: 1; } }
 @keyframes mEnterBack { from { transform: translateX(-40px); opacity: .3; } to { transform: none; opacity: 1; } }
 
+/* כפתור "לעמוד הבית" בדפי המידע: בנייד רצועת הכותרת גבוהה יותר, אז המיקום הקבוע של המחשב נופל על הטקסט.
+   כאן הוא חלק מהזרימה - בראש הרצועה, מעל הכותרת */
+.back-home { position: static; margin: 0 0 18px; height: 40px; padding: 0 18px; font-size: 14px; box-shadow: none; }
+.back-home::before { content: '→'; margin-inline-end: 8px; }
+.back-home ~ .card:first-of-type { margin-top: 40px; }
+
 /* פס טורקיז עליון - רק בבועות גילוי נאות ומדיניות */
 a.policy-btn { border-top: 4px solid var(--teal); }
