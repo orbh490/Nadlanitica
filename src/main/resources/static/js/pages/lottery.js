@@ -6,10 +6,19 @@ let projectsByLabel = {};
 let lastScoreInfo = null;
 let allProjects = [];
 
-// לאותו פרויקט יש לפעמים כמה סבבי הגרלה (אפילו באותו יום) - מספר ההגרלה הוא מה שמבדיל ביניהם ברשימה
+// לאותו פרויקט יש לפעמים כמה סבבי הגרלה (אפילו באותו יום) - מספר ההגרלה הוא מה שמבדיל ביניהם ברשימה.
+// הגרלות עם הרשמה פתוחה/קרובה מסומנות כבר בשם, כדי שיבלטו בחיפוש
+const STATUS_PREFIX = { OPEN: '🟢 הרשמה פתוחה · ', NOT_YET_OPEN: '🕓 נפתחת בקרוב · ' };
 function labelFor(p) {
   const when = p.lotteryDate ? ` (${p.lotteryDate.slice(5, 7)}/${p.lotteryDate.slice(0, 4)})` : '';
-  return `${p.city} - ${p.projectName} · הגרלה ${p.lotteryId}${when}`;
+  return `${STATUS_PREFIX[p.liveStatus] || ''}${p.city} - ${p.projectName} · הגרלה ${p.lotteryId}${when}`;
+}
+// פתוחות קודם, אחריהן אלה שנפתחות בקרוב, ואז כל השאר לפי שם
+const STATUS_ORDER = { OPEN: 0, NOT_YET_OPEN: 1 };
+function compareProjects(a, b) {
+  return (STATUS_ORDER[a.liveStatus] ?? 2) - (STATUS_ORDER[b.liveStatus] ?? 2)
+    || `${a.city} ${a.projectName}`.localeCompare(`${b.city} ${b.projectName}`, 'he')
+    || a.lotteryId.localeCompare(b.lotteryId);
 }
 
 async function loadProjects() {
@@ -25,7 +34,7 @@ async function loadProjects() {
   } finally {
     searchEl.disabled = false;
   }
-  allProjects.sort((a, b) => labelFor(a).localeCompare(labelFor(b), 'he'));
+  allProjects.sort(compareProjects);
   renderProjectOptions();
 }
 
@@ -52,8 +61,16 @@ function renderProjectOptions() {
   document.getElementById('openCountStatus').textContent = liveUnavailable
     ? `המידע על הרשמה פתוחה ממשרד הבינוי והשיכון לא זמין כרגע - נסו לרענן בעוד כמה דקות. אפשר כבר לבדוק סיכויים על ${allProjects.length} הגרלות קודמות.`
     : openCount + upcomingCount === 0
-    ? `כרגע אין הגרלה עם הרשמה פתוחה או קרובה במשרד הבינוי והשיכון. אפשר לבדוק סיכויים על ${allProjects.length} הגרלות קודמות.`
-    : `${openCount} פרויקטים עם הרשמה פתוחה כרגע, ${upcomingCount} עומדים להיפתח בקרוב (מתוך ${allProjects.length} ברשימה)`;
+    ? `כרגע אין הגרלה עם הרשמה פתוחה או קרובה במשרד הבינוי והשיכון. אפשר לבדוק סיכויים על ${allProjects.length} הגרלות, כולל האחרונות שנערכו.`
+    : `${openCount} הגרלות עם הרשמה פתוחה כרגע, ${upcomingCount} נפתחות בקרוב - הן בראש הרשימה (מתוך ${allProjects.length})`;
+}
+
+// הגרלה מהלוח החי (עוד אין לה תוצאות בקובץ הרשמי): מה הסיכוי אומר ומה עוד יכול להשתנות
+function liveOddsNote(p) {
+  if (p.liveStatus === 'OPEN') {
+    return '<p style="font-size:13px;color:var(--warn-text);margin-top:10px;text-align:center">ההרשמה עדיין פתוחה: הסיכוי מחושב לפי מספר הנרשמים עד עכשיו, ויירד ככל שיצטרפו עוד נרשמים.</p>';
+  }
+  return '<p style="font-size:13px;color:var(--ink-muted);margin-top:10px;text-align:center">תוצאות ההגרלה הזו עוד לא פורסמו בנתונים הרשמיים - הסיכוי מחושב לפי מספר הנרשמים הסופי.</p>';
 }
 
 async function calculateScore() {
@@ -196,7 +213,18 @@ async function calculateOdds() {
     resultEl.innerHTML = errorHtml(err);
     return;
   }
-  const historicalLine = data.actualHistoricalWinRatePercent == null
+  // הרשמה שעוד לא נפתחה: אין נרשמים, אז "סיכוי" היה יוצא 100% - מציגים רק את פרטי ההרשמה
+  if (data.fromLiveBoard && data.poolApplicants === 0) {
+    resultEl.innerHTML = `
+      <div class="badge ok">${escapeHtml(data.city)} - ${escapeHtml(data.projectName)} · הגרלה ${escapeHtml(p.lotteryId)}</div>
+      <p style="font-size:14px;margin-top:12px">עוד אין נרשמים להגרלה הזו, ולכן אי אפשר לחשב סיכוי. ${data.poolUnits} דירות במכסה ${data.localResident ? 'של בני המקום' : 'הכללית'} - חזרו לבדוק אחרי שההרשמה נפתחת.</p>
+      ${liveStatusHtml(live)}`;
+    revealResult(resultEl);
+    return;
+  }
+  const historicalLine = data.fromLiveBoard
+    ? liveOddsNote(p)
+    : data.actualHistoricalWinRatePercent == null
     ? '<p style="font-size:13px;margin-top:10px;text-align:center"><small style="color:var(--ink-muted)">אין נתון זכייה בפועל זמין להגרלה זו</small></p>'
     : '';
   // המספר למעלה הוא הממוצע האמיתי של כלל הנרשמים בקבוצה (בן מקום/כלל הארץ) - לא לפי קבוצת הניקוד.

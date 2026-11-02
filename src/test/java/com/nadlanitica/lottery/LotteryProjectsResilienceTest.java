@@ -19,8 +19,9 @@ class LotteryProjectsResilienceTest {
             }
         };
         LotteryOddsEngine engine = new LotteryOddsEngine();
-        LotteryController controller = new LotteryController(engine, new PeripheryGrantCities(),
-                new LotteryLiveService(failingClient));
+        LotteryLiveService live = new LotteryLiveService(failingClient);
+        LotteryController controller = new LotteryController(engine, new PeripheryGrantCities(), live,
+                new LotteryCatalog(engine, live));
 
         List<ProjectSummary> projects = controller.projects();
 

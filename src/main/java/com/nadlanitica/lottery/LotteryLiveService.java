@@ -39,7 +39,7 @@ public class LotteryLiveService {
             String neighborhood, String projectName, String processName, String contractorName,
             Integer housingUnits, Integer targetHousingUnits, Double pricePerSqm, String entitlement,
             Integer totalSubscribers, Integer totalLocalSubscribers, LocalDate applicationStartDate,
-            LocalDate applicationEndDate, RegistrationStatus status) {
+            LocalDate applicationEndDate, RegistrationStatus status, Integer localHousingUnits, LocalDate lotteryDate) {
     }
 
     public LotteryLiveService(MochLotteryApiClient apiClient) {
@@ -91,6 +91,11 @@ public class LotteryLiveService {
                         (a, b) -> a == RegistrationStatus.OPEN ? a : b)));
     }
 
+    /** כל הלוח החי כפי שהרענון ברקע הביא אותו (כולל פרויקטים שנסגרו), או ריק אם עוד לא נטען - בלי לפנות לרשת. */
+    public List<LiveLotteryProject> loadedProjects() {
+        return cached;
+    }
+
     private static String normalize(String s) {
         return s == null ? "" : s.trim();
     }
@@ -132,7 +137,8 @@ public class LotteryLiveService {
         return new LiveLotteryProject(raw.projectNumber(), raw.lotteryNumber(), raw.tenderName(), raw.cityDescription(),
                 raw.neighborhoodName(), raw.projectName(), raw.processName(), raw.contractorDescription(),
                 raw.housingUnits(), raw.targetHousingUnits(), raw.pricePerSqm(), raw.entitlementDescription(),
-                raw.totalSubscribers(), raw.totalLocalSubscribers(), start, end, status);
+                raw.totalSubscribers(), raw.totalLocalSubscribers(), start, end, status,
+                raw.localHousing(), parseDate(raw.lotteryDate()));
     }
 
     private static LocalDate parseDate(String isoDateTime) {

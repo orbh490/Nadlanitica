@@ -14,12 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
 
+/** fromLiveBoard = הגרלה מהלוח החי של משרד השיכון שעוד אין לה תוצאות בקובץ ההיסטורי (פתוחה, עתידית או טרייה). */
 record ProjectSummary(String lotteryId, String city, String projectName, String projectId, LocalDate lotteryDate,
-        String liveStatus) {
+        String liveStatus, boolean fromLiveBoard) {
 }
 
 record LotteryOddsResponse(String city, String projectName, boolean localResident, double winProbabilityPercent,
-        Double actualHistoricalWinRatePercent, boolean peripheryGrantEligibleCity, int poolUnits, int poolApplicants) {
+        Double actualHistoricalWinRatePercent, boolean peripheryGrantEligibleCity, int poolUnits, int poolApplicants,
+        boolean fromLiveBoard) {
 }
 
 record LiveStatusResponse(boolean hasLiveData, LotteryLiveService.LiveLotteryProject liveProject) {
@@ -32,11 +34,14 @@ class LotteryController {
     private final LotteryOddsEngine engine;
     private final PeripheryGrantCities peripheryGrantCities;
     private final LotteryLiveService liveService;
+    private final LotteryCatalog catalog;
 
-    LotteryController(LotteryOddsEngine engine, PeripheryGrantCities peripheryGrantCities, LotteryLiveService liveService) {
+    LotteryController(LotteryOddsEngine engine, PeripheryGrantCities peripheryGrantCities, LotteryLiveService liveService,
+            LotteryCatalog catalog) {
         this.engine = engine;
         this.peripheryGrantCities = peripheryGrantCities;
         this.liveService = liveService;
+        this.catalog = catalog;
     }
 
     /** האם יש כרגע הרשמה פתוחה/עתידית לפרויקט ההיסטורי הזה, חי ממשרד הבינוי והשיכון - מותאם לפי מזהה פרויקט. */
@@ -50,9 +55,15 @@ class LotteryController {
     @GetMapping("/projects")
     List<ProjectSummary> projects() {
         var liveStatuses = liveService.openStatusesByProjectId();
-        return engine.allProjects().stream()
-                .map(p -> new ProjectSummary(p.getLotteryId(), p.getCity(), p.getProjectName(), p.getProjectId(),
-                        p.getLotteryDate(), liveStatuses.map(m -> liveStatusFor(m, p.getProjectId())).orElse("UNKNOWN")))
+        return catalog.all().stream()
+                .map(e -> {
+                    LotteryProject p = e.project();
+                    String status = e.fromLiveBoard()
+                            ? (e.registration() == LotteryLiveService.RegistrationStatus.CLOSED ? "NONE" : e.registration().name())
+                            : liveStatuses.map(m -> liveStatusFor(m, p.getProjectId())).orElse("UNKNOWN");
+                    return new ProjectSummary(p.getLotteryId(), p.getCity(), p.getProjectName(), p.getProjectId(),
+                            p.getLotteryDate(), status, e.fromLiveBoard());
+                })
                 .toList();
     }
 
@@ -67,14 +78,15 @@ class LotteryController {
 
     @GetMapping("/odds")
     LotteryOddsResponse odds(@RequestParam String lotteryId, @RequestParam boolean localResident) {
-        LotteryProject p = engine.findByLotteryId(lotteryId)
+        LotteryCatalog.Entry entry = catalog.find(lotteryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ההגרלה לא נמצאה"));
+        LotteryProject p = entry.project();
         OptionalDouble historical = engine.actualHistoricalOddsPercent(p, localResident);
         LotteryOddsEngine.OddsPool pool = engine.poolFor(p, localResident);
         return new LotteryOddsResponse(p.getCity(), p.getProjectName(), localResident,
                 engine.calculateOddsPercent(p, localResident),
                 historical.isPresent() ? historical.getAsDouble() : null,
-                peripheryGrantCities.isEligible(p.getCity()), pool.units(), pool.applicants());
+                peripheryGrantCities.isEligible(p.getCity()), pool.units(), pool.applicants(), entry.fromLiveBoard());
     }
 
     @GetMapping("/city-comparison")

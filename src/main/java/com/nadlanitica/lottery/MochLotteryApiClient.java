@@ -58,7 +58,11 @@ class MochLotteryApiClient {
             @JsonProperty("TenderName") String tenderName,
             @JsonProperty("EntitlementDescription") String entitlementDescription,
             @JsonProperty("TotalSubscribers") Integer totalSubscribers,
-            @JsonProperty("TotalLocalSubscribers") Integer totalLocalSubscribers) {
+            @JsonProperty("TotalLocalSubscribers") Integer totalLocalSubscribers,
+            // נבדק מול הקובץ ההיסטורי (אותו LotteryNumber = LotteryId): TargetHousingUnits = יח"ד בהגרלה,
+            // LocalHousing = מכסת בני המקום, TotalSubscribers / TotalLocalSubscribers = נרשמים - זהים לעמודות שם
+            @JsonProperty("LocalHousing") Integer localHousing,
+            @JsonProperty("LotteryDate") String lotteryDate) {
     }
 
     private record MochProjectsResponse(@JsonProperty("ProjectItems") List<MochProjectItem> projectItems) {
