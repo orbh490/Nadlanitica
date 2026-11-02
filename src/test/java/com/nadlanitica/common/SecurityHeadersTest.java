@@ -40,6 +40,14 @@ class SecurityHeadersTest {
     }
 
     @Test
+    void healthCheckReportsUpWhenTheDatabaseAnswers() throws Exception {
+        var res = client.send(HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/health")).build(),
+                HttpResponse.BodyHandlers.ofString());
+        assertThat(res.statusCode()).isEqualTo(200);
+        assertThat(res.body()).contains("\"status\":\"UP\"");
+    }
+
+    @Test
     void apiResponsesSkipCsp() throws Exception {
         var headers = get("/api/lottery/projects").headers();
         assertThat(headers.firstValue("Content-Security-Policy")).isEmpty();

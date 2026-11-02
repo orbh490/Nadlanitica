@@ -1,5 +1,7 @@
 package com.nadlanitica.common;
 
+import com.nadlanitica.notifications.ServerErrorAlerts;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,12 @@ class ApiExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
     private static final String INVALID_REQUEST = "הבקשה אינה תקינה - בדקו את הערכים שהוזנו ונסו שוב";
+
+    private final ServerErrorAlerts errorAlerts;
+
+    ApiExceptionHandler(ServerErrorAlerts errorAlerts) {
+        this.errorAlerts = errorAlerts;
+    }
 
     @ExceptionHandler(ResponseStatusException.class)
     ResponseEntity<Map<String, String>> handle(ResponseStatusException ex) {
@@ -68,11 +76,12 @@ class ApiExceptionHandler {
 
     /** כל השאר: שגיאות Spring עם סטטוס משלהן (405, 415...) נשארות עם הסטטוס, וכל חריגה אחרת = 500 עם לוג מלא. */
     @ExceptionHandler(Exception.class)
-    ResponseEntity<Map<String, String>> unexpected(Exception ex) {
+    ResponseEntity<Map<String, String>> unexpected(Exception ex, HttpServletRequest request) {
         if (ex instanceof ErrorResponse errorResponse) {
             return error(errorResponse.getStatusCode(), messageFor(errorResponse.getStatusCode()));
         }
         log.error("שגיאה לא צפויה ב-API", ex);
+        errorAlerts.report(request.getMethod() + " " + request.getRequestURI(), ex);
         return error(HttpStatus.INTERNAL_SERVER_ERROR, messageFor(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
